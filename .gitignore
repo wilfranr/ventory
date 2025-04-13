@@ -1,0 +1,15 @@
+# Node modules
+# ventory-frontend/node_modules
+# ventory-backend/node_modules
+#
+# # Builds y dist
+# ventory-frontend/dist
+# ventory-frontend/build
+#
+# #Archivos de entorno
+# ventory-frontend/.env
+# ventory-backend/.env
+#
+# #IDE Y SO
+# .log
+# .DS_Store
