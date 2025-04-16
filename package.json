@@ -1,0 +1,24 @@
+{
+  "name": "ventory",
+  "version": "1.0.0",
+  "description": "Proyecto full-stack con Angular + Nestjs.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "concurrently \"cd ventory-frontend && npm run start\" \"cd ventory-backend && npm run start:dev\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wilfranr/ventory.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/wilfranr/ventory/issues"
+  },
+  "homepage": "https://github.com/wilfranr/ventory#readme",
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
