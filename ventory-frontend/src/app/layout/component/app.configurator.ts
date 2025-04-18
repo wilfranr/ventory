@@ -438,4 +438,12 @@ export class AppConfigurator {
     onMenuModeChange(event: string) {
         this.layoutService.layoutConfig.update((prev) => ({ ...prev, menuMode: event }));
     }
+
+    changeTheme(color: string) {
+        this.layoutService.setPrimaryColor(color);
+    }
+
+    changeSurface(color: string) {
+        this.layoutService.setSurfaceColor(color);
+    }
 }

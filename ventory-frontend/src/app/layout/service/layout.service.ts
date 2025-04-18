@@ -79,6 +79,34 @@ export class LayoutService {
     private initialized = false;
 
     constructor() {
+        // 🟢 Leer tema desde localStorage al iniciar
+        const savedTheme = localStorage.getItem('theme-mode');
+        const config = this.layoutConfig();
+        const savedPreset = localStorage.getItem('theme-preset');
+        const savedPrimary = localStorage.getItem('theme-primary');
+        const savedSurface = localStorage.getItem('theme-surface');
+
+        if (savedPrimary) {
+            this.layoutConfig().primary = savedPrimary;
+        }
+
+        if (savedSurface) {
+            this.layoutConfig().surface = savedSurface;
+        }
+
+        if (savedPreset) {
+            this.layoutConfig().preset = savedPreset;
+        }
+
+        if (savedTheme === 'dark') {
+            config.darkTheme = true;
+            document.documentElement.classList.add('app-dark');
+        } else {
+            config.darkTheme = false;
+            document.documentElement.classList.remove('app-dark');
+        }
+
+        // 🎯 Efectos reactivos
         effect(() => {
             const config = this.layoutConfig();
             if (config) {
@@ -98,15 +126,15 @@ export class LayoutService {
         });
     }
 
-    private handleDarkModeTransition(config: layoutConfig): void {
-        if ((document as any).startViewTransition) {
-            this.startViewTransition(config);
+    handleDarkModeTransition(config: layoutConfig) {
+        if (config.darkTheme) {
+            document.documentElement.classList.add('app-dark');
+            localStorage.setItem('theme-mode', 'dark');
         } else {
-            this.toggleDarkMode(config);
-            this.onTransitionEnd();
+            document.documentElement.classList.remove('app-dark');
+            localStorage.setItem('theme-mode', 'light');
         }
     }
-
     private startViewTransition(config: layoutConfig): void {
         const transition = (document as any).startViewTransition(() => {
             this.toggleDarkMode(config);
@@ -121,13 +149,15 @@ export class LayoutService {
 
     toggleDarkMode(config?: layoutConfig): void {
         const _config = config || this.layoutConfig();
+
         if (_config.darkTheme) {
             document.documentElement.classList.add('app-dark');
+            localStorage.setItem('theme-mode', 'dark');
         } else {
             document.documentElement.classList.remove('app-dark');
+            localStorage.setItem('theme-mode', 'light');
         }
     }
-
     private onTransitionEnd() {
         this.transitionComplete.set(true);
         setTimeout(() => {
@@ -174,5 +204,20 @@ export class LayoutService {
 
     reset() {
         this.resetSource.next(true);
+    }
+
+    setPreset(preset: string): void {
+        this.layoutConfig().preset = preset;
+        localStorage.setItem('theme-preset', preset);
+    }
+
+    setPrimaryColor(color: string): void {
+        this.layoutConfig().primary = color;
+        localStorage.setItem('theme-primary', color);
+    }
+
+    setSurfaceColor(color: string): void {
+        this.layoutConfig().surface = color;
+        localStorage.setItem('theme-surface', color);
     }
 }
