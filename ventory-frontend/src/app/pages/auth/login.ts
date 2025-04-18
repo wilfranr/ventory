@@ -1,3 +1,4 @@
+import { AuthService } from '../../services/auth.service';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -54,7 +55,8 @@ import { AppFloatingConfigurator } from '../../layout/component/app.floatingconf
                                 </div>
                                 <span class="font-medium no-underline ml-2 text-right cursor-pointer text-primary">Forgot password?</span>
                             </div>
-                            <p-button label="Sign In" styleClass="w-full" routerLink="/"></p-button>
+
+                            <p-button label="Iniciar sesión" styleClass="w-full mt-3" (onClick)="onSubmit()" [loading]="loading"> </p-button>
                         </div>
                     </div>
                 </div>
@@ -68,4 +70,20 @@ export class Login {
     password: string = '';
 
     checked: boolean = false;
+
+    loading: boolean = false;
+
+    constructor(private auth: AuthService) {}
+
+    onSubmit() {
+        this.loading = true;
+        this.auth.login({ email: this.email, password: this.password }).subscribe({
+            next: () => {
+                this.loading = false;
+            },
+            error: () => {
+                this.loading = false;
+            }
+        });
+    }
 }
