@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { StyleClassModule } from 'primeng/styleclass';
 import { AppConfigurator } from './app.configurator';
 import { LayoutService } from '../service/layout.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
     selector: 'app-topbar',
@@ -33,7 +34,7 @@ import { LayoutService } from '../service/layout.service';
                         />
                     </g>
                 </svg>
-                <span>SAKAI</span>
+                <span>VENTORY</span>
             </a>
         </div>
 
@@ -72,10 +73,19 @@ import { LayoutService } from '../service/layout.service';
                         <i class="pi pi-inbox"></i>
                         <span>Messages</span>
                     </button>
-                    <button type="button" class="layout-topbar-action">
-                        <i class="pi pi-user"></i>
-                        <span>Profile</span>
-                    </button>
+
+                    <!-- Botón de perfil tipo paleta -->
+                    <div class="relative">
+                        <button class="layout-topbar-action" pStyleClass="@next" enterFromClass="hidden" enterActiveClass="animate-scalein" leaveToClass="hidden" leaveActiveClass="animate-fadeout" [hideOnOutsideClick]="true">
+                            <i class="pi pi-user"></i>
+                            <span class="ml-2">Perfil</span>
+                        </button>
+
+                        <!-- Dropdown personalizado -->
+                        <div class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded shadow z-50 hidden">
+                            <button class="w-full px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-700" (click)="logout()"><i class="pi pi-sign-out mr-2"></i> Cerrar sesión</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -84,9 +94,16 @@ import { LayoutService } from '../service/layout.service';
 export class AppTopbar {
     items!: MenuItem[];
 
-    constructor(public layoutService: LayoutService) {}
+    constructor(
+        public layoutService: LayoutService,
+        private auth: AuthService
+    ) {}
 
     toggleDarkMode() {
         this.layoutService.layoutConfig.update((state) => ({ ...state, darkTheme: !state.darkTheme }));
+    }
+
+    logout() {
+        this.auth.logout();
     }
 }
