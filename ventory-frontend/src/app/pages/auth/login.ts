@@ -1,20 +1,17 @@
 import { Component } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
 import { RouterModule } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { RippleModule } from 'primeng/ripple';
-import { MessageModule } from 'primeng/message';
 import { AppFloatingConfigurator } from '../../layout/component/app.floatingconfigurator';
 
 @Component({
     selector: 'app-login',
     standalone: true,
-    imports: [ButtonModule, CheckboxModule, InputTextModule, PasswordModule, FormsModule, RouterModule, RippleModule, AppFloatingConfigurator, MessageModule],
+    imports: [ButtonModule, CheckboxModule, InputTextModule, PasswordModule, FormsModule, RouterModule, RippleModule, AppFloatingConfigurator],
     template: `
         <app-floating-configurator />
         <div class="bg-surface-50 dark:bg-surface-950 flex items-center justify-center min-h-screen min-w-[100vw] overflow-hidden">
@@ -44,11 +41,11 @@ import { AppFloatingConfigurator } from '../../layout/component/app.floatingconf
                         </div>
 
                         <div>
-                            <label for="email" class="block text-surface-900 dark:text-surface-0 text-xl font-medium mb-2">Email</label>
-                            <input pInputText id="email" type="text" placeholder="Correo" class="w-full md:w-[30rem] mb-8" [(ngModel)]="email" />
+                            <label for="email1" class="block text-surface-900 dark:text-surface-0 text-xl font-medium mb-2">Email</label>
+                            <input pInputText id="email1" type="text" placeholder="Email address" class="w-full md:w-[30rem] mb-8" [(ngModel)]="email" />
 
-                            <label for="password" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Password</label>
-                            <p-password id="password" [(ngModel)]="password" placeholder="Contraseña" [toggleMask]="true" styleClass="mb-4" [fluid]="true" [feedback]="false"></p-password>
+                            <label for="password1" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Password</label>
+                            <p-password id="password1" [(ngModel)]="password" placeholder="Password" [toggleMask]="true" styleClass="mb-4" [fluid]="true" [feedback]="false"></p-password>
 
                             <div class="flex items-center justify-between mt-2 mb-8 gap-8">
                                 <div class="flex items-center">
@@ -57,8 +54,7 @@ import { AppFloatingConfigurator } from '../../layout/component/app.floatingconf
                                 </div>
                                 <span class="font-medium no-underline ml-2 text-right cursor-pointer text-primary">Forgot password?</span>
                             </div>
-                            <p-button label="Iniciar Sesión" styleClass="w-full" (click)="login()"></p-button>
-                            <p-message *ngIf="error" severity="error" text={{ error }}></p-message>
+                            <p-button label="Sign In" styleClass="w-full" routerLink="/"></p-button>
                         </div>
                     </div>
                 </div>
@@ -68,24 +64,8 @@ import { AppFloatingConfigurator } from '../../layout/component/app.floatingconf
 })
 export class Login {
     email: string = '';
+
     password: string = '';
-    error: string = '';
+
     checked: boolean = false;
-    
-    constructor(private http: HttpClient, private router: Router) {}
-    
-    login() {
-        this.http.post<{ access_token: string }>('http://localhost:3001/auth/login', {
-            email: this.email,
-            password: this.password
-        }).subscribe({
-            next: (res) => {
-                localStorage.setItem('access_token', res.access_token);
-                this.router.navigate(['/dashboard'])
-            },
-            error: () => {
-                this.error = 'Credenciales Inválidas'
-            }
-        })
-    }
 }

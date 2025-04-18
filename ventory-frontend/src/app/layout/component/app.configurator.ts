@@ -114,7 +114,6 @@ export class AppConfigurator {
         if (isPlatformBrowser(this.platformId)) {
             this.onPresetChange(this.layoutService.layoutConfig().preset);
         }
-        
     }
 
     surfaces: SurfacesType[] = [
