@@ -1,0 +1,80 @@
+<div class="surface-card p-4 shadow-2 border-round w-full lg:w-6 mx-auto mt-5">
+    <div class="text-center mb-5">
+        <h2>Crear cuenta</h2>
+        <p>Elige cómo deseas registrarte</p>
+    </div>
+
+    <div class="flex justify-content-center mb-4 gap-3">
+        <p-button label="Crear empresa" [outlined]="registerMode !== 'newCompany'" (click)="switchMode('newCompany')" [severity]="registerMode === 'newCompany' ? 'primary' : 'secondary'"></p-button>
+
+        <p-button label="Ya tengo token" [outlined]="registerMode !== 'joinCompany'" (click)="switchMode('joinCompany')" [severity]="registerMode === 'joinCompany' ? 'primary' : 'secondary'"></p-button>
+    </div>
+
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" enctype="multipart/form-data" class="p-fluid">
+        <!-- Datos del usuario -->
+        <div class="field">
+            <label for="name">Nombre completo</label>
+            <input id="name" type="text" pInputText formControlName="name" />
+        </div>
+
+        <div class="field">
+            <label for="email">Correo electrónico</label>
+            <input id="email" type="email" pInputText formControlName="email" />
+        </div>
+
+        <div class="field">
+            <label for="password">Contraseña</label>
+            <input id="password" type="password" pPassword formControlName="password" [feedback]="false" />
+        </div>
+
+        <!-- Registro con empresa nueva -->
+        <ng-container *ngIf="registerMode === 'newCompany'">
+            <h4 class="mt-4">Datos de la empresa</h4>
+
+            <div class="field">
+                <label for="companyName">Razón social</label>
+                <input id="companyName" type="text" pInputText formControlName="companyName" />
+            </div>
+
+            <div class="field">
+                <label for="nit">NIT</label>
+                <input id="nit" type="text" pInputText formControlName="nit" />
+            </div>
+
+            <div class="field">
+                <label for="address">Dirección</label>
+                <input id="address" type="text" pInputText formControlName="address" />
+            </div>
+
+            <div class="field">
+                <label for="phones">Teléfonos</label>
+                <input id="phones" type="text" pInputText formControlName="phones" />
+            </div>
+
+            <div class="field">
+                <label for="companyEmail">Correo de la empresa</label>
+                <input id="companyEmail" type="email" pInputText formControlName="companyEmail" />
+            </div>
+
+            <div class="field">
+                <label for="website">Sitio web</label>
+                <input id="website" type="text" pInputText formControlName="website" />
+            </div>
+
+            <div class="field">
+                <label for="logo">Logo</label>
+                <input id="logo" type="file" (change)="onFileChange($event)" />
+            </div>
+        </ng-container>
+
+        <!-- Registro con token -->
+        <ng-container *ngIf="registerMode === 'joinCompany'">
+            <div class="field">
+                <label for="token">Token de empresa</label>
+                <input id="token" type="text" pInputText formControlName="token" maxlength="6" />
+            </div>
+        </ng-container>
+
+        <p-button label="Registrarse" type="submit" class="mt-4" [disabled]="registerForm.invalid"></p-button>
+    </form>
+</div>

@@ -31,4 +31,8 @@ export class AuthService {
     isAuthenticated(): boolean {
         return !!localStorage.getItem('access_token');
     }
+
+    register(formData: FormData) {
+        return this.http.post(`${this.apiUrl}/register`, formData);
+    }
 }
