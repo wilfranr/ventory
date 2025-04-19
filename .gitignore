@@ -1,42 +1,57 @@
-# Node modules
-# ventory-frontend/node_modules
-# ventory-backend/node_modules
-#
-# # Builds y dist
-# ventory-frontend/dist
-# ventory-frontend/build
-#
-# #Archivos de entorno
-# ventory-frontend/.env
-# ventory-backend/.env
-#
-# #IDE Y SO
-# .log
-# .DS_Store
 
-# node
-node_modules/
-dist/
-tmp/
+# 👉 General
+.DS_Store
 .env
+.env.local
 .env.*.local
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-pnpm-debug.log*
 
-# Angular cache & build
-.angular/
-*.ngsummary.json
+# 👉 Respaldo temporal
+ventory-backend-backup/
 
-# IDEs y sistema
+# 👉 Node modules (ignora los de backend y frontend)
+**/node_modules/
+
+# 👉 Dist/output folders
+**/dist/
+**/build/
+
+# 👉 Angular (frontend)
+**/.angular/
+**/.angular/cache/
+**/.angular/config.json
+**/.browserlistrc
+**/coverage/
+**/.vscode/
+
+# 👉 NestJS (backend)
+**/.nestjs/
+**/.turbo/
+**/.output/
+
+# 👉 Prisma
+**/prisma/dev.db
+**/prisma/dev.db-journal
+**/prisma/migrations/
+
+# 👉 IDEs & sistema
 .vscode/
 .idea/
-.DS_Store
-Thumbs.db
+*.swp
+*.swo
+*.bak
+*.tmp
 
-# Git
-.git/
+# 👉 MacOS
+*.DS_Store
 
-# Compilados temporales
-*.tsbuildinfo
+# 👉 Linux
+*~
+
+# 👉 Test files (si no los quieres versionar)
+**/*.spec.ts
+**/*.test.ts
+
