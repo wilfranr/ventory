@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
@@ -9,12 +9,15 @@ import { FluidModule } from 'primeng/fluid';
 import { AppFloatingConfigurator } from '../../../layout/component/app.floatingconfigurator';
 import { CommonModule } from '@angular/common';
 import { MessageModule } from 'primeng/message';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
 
 @Component({
     selector: 'app-register',
     templateUrl: './register.component.html',
-    imports: [ReactiveFormsModule, FormsModule, InputTextModule, PasswordModule, ButtonModule, FluidModule, AppFloatingConfigurator, CommonModule, MessageModule],
-    standalone: true
+    imports: [ReactiveFormsModule, FormsModule, InputTextModule, PasswordModule, ButtonModule, FluidModule, AppFloatingConfigurator, CommonModule, MessageModule, ToastModule, RouterModule],
+    standalone: true,
+    providers: [AppFloatingConfigurator, MessageService]
 })
 export class RegisterComponent {
     registerMode: 'newCompany' | 'joinCompany' = 'newCompany';
@@ -23,7 +26,8 @@ export class RegisterComponent {
     constructor(
         private fb: FormBuilder,
         private authService: AuthService,
-        private router: Router
+        private router: Router,
+        private messageService: MessageService
     ) {
         this.registerForm = this.fb.group({
             // Comunes
@@ -86,8 +90,21 @@ export class RegisterComponent {
         });
 
         this.authService.register(formData).subscribe({
-            next: () => this.router.navigate(['/auth/login']),
-            error: (err) => console.error('❌ Error en registro:', err)
+            next: () => {
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Registro exitoso',
+                    detail: 'Bienvenido a Ventory 🎉'
+                });
+                setTimeout(() => this.router.navigate(['/auth/login']), 2000);
+            },
+            error: (err) => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Error al registrar',
+                    detail: err?.error?.message || 'Ocurrió un error inesperado'
+                });
+            }
         });
     }
 }

@@ -15,9 +15,11 @@ export class AuthService {
     ) {}
 
     login(credentials: { email: string; password: string }) {
-        return this.http.post<{ access_token: string }>(`${this.baseUrl}/login`, credentials).pipe(
+        return this.http.post<{ access_token: string; user: { name: string } }>(`${this.baseUrl}/login`, credentials).pipe(
             tap((res) => {
                 localStorage.setItem('access_token', res.access_token);
+                localStorage.setItem('userName', res.user?.name); // si la respuesta lo trae
+                localStorage.setItem('Bienvenido', 'true'); // activar toast
                 this.router.navigate(['/']);
             })
         );

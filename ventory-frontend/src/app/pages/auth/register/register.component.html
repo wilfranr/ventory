@@ -1,6 +1,7 @@
 <app-floating-configurator />
 
 <p-fluid>
+    <p-toast></p-toast>
     <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
         <div class="flex flex-col md:flex-row gap-8 p-4 justify-center mt-14">
             <div class="md:w-1/2">
@@ -95,8 +96,17 @@
                         <input type="file" id="logo" (change)="onFileChange($event)" accept="image/*" />
                     </div>
                     <p-button type="submit" label="Registrar Empresa"></p-button>
+
                 </div>
+                <p-button label="Cancelar" type="button" routerLink="/auth/login" outlined></p-button>
+
+                <p-message
+                severity="error"
+                *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched"
+                text="Ingresa un correo válido"
+                ></p-message>
             </div>
         </div>
     </form>
+
 </p-fluid>

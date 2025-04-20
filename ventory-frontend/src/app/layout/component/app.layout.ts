@@ -6,12 +6,15 @@ import { AppTopbar } from './app.topbar';
 import { AppSidebar } from './app.sidebar';
 import { AppFooter } from './app.footer';
 import { LayoutService } from '../service/layout.service';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
 
 @Component({
     selector: 'app-layout',
     standalone: true,
-    imports: [CommonModule, AppTopbar, AppSidebar, RouterModule, AppFooter],
+    imports: [CommonModule, AppTopbar, AppSidebar, RouterModule, AppFooter, ToastModule],
     template: `<div class="layout-wrapper" [ngClass]="containerClass">
+        <p-toast></p-toast>
         <app-topbar></app-topbar>
         <app-sidebar></app-sidebar>
         <div class="layout-main-container">
@@ -35,7 +38,8 @@ export class AppLayout {
     constructor(
         public layoutService: LayoutService,
         public renderer: Renderer2,
-        public router: Router
+        public router: Router,
+        private messageService: MessageService
     ) {
         this.overlayMenuOpenSubscription = this.layoutService.overlayOpen$.subscribe(() => {
             if (!this.menuOutsideClickListener) {
@@ -106,6 +110,21 @@ export class AppLayout {
 
         if (this.menuOutsideClickListener) {
             this.menuOutsideClickListener();
+        }
+    }
+
+    ngOnInit() {
+        if (localStorage.getItem('showWelcome')) {
+            const name = localStorage.getItem('userName') ?? 'usuario';
+            this.messageService.add({
+                severity: 'success',
+                summary: 'Bienvenido',
+                detail: `Hola, ${name}`,
+                life: 3000
+            });
+
+            // Evita que se muestre cada vez que entra al layout
+            localStorage.removeItem('showWelcome');
         }
     }
 }
