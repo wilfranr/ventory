@@ -7,7 +7,7 @@ import { tap } from 'rxjs/operators';
     providedIn: 'root'
 })
 export class AuthService {
-    private apiUrl = 'http://localhost:3001/auth/login';
+    private baseUrl = 'http://localhost:3001/auth';
 
     constructor(
         private http: HttpClient,
@@ -15,7 +15,7 @@ export class AuthService {
     ) {}
 
     login(credentials: { email: string; password: string }) {
-        return this.http.post<{ access_token: string }>(this.apiUrl, credentials).pipe(
+        return this.http.post<{ access_token: string }>(`${this.baseUrl}/login`, credentials).pipe(
             tap((res) => {
                 localStorage.setItem('access_token', res.access_token);
                 this.router.navigate(['/']);
@@ -33,6 +33,6 @@ export class AuthService {
     }
 
     register(formData: FormData) {
-        return this.http.post(`${this.apiUrl}/register`, formData);
+        return this.http.post(`${this.baseUrl}/register`, formData);
     }
 }

@@ -5,11 +5,15 @@ import { AuthService } from '../../../services/auth.service';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { ButtonModule } from 'primeng/button';
+import { FluidModule } from 'primeng/fluid';
+import { AppFloatingConfigurator } from '../../../layout/component/app.floatingconfigurator';
+import { CommonModule } from '@angular/common';
+import { MessageModule } from 'primeng/message';
 
 @Component({
     selector: 'app-register',
     templateUrl: './register.component.html',
-    imports: [ReactiveFormsModule, FormsModule, InputTextModule, PasswordModule, ButtonModule],
+    imports: [ReactiveFormsModule, FormsModule, InputTextModule, PasswordModule, ButtonModule, FluidModule, AppFloatingConfigurator, CommonModule, MessageModule],
     standalone: true
 })
 export class RegisterComponent {
@@ -22,11 +26,12 @@ export class RegisterComponent {
         private router: Router
     ) {
         this.registerForm = this.fb.group({
+            // Comunes
             name: ['', Validators.required],
             email: ['', [Validators.required, Validators.email]],
             password: ['', [Validators.required, Validators.minLength(6)]],
 
-            // Campos para crear empresa
+            // Para creación de empresa
             companyName: [''],
             nit: [''],
             address: [''],
@@ -35,29 +40,34 @@ export class RegisterComponent {
             website: [''],
             logo: [null],
 
-            // Campo para token si se une a una empresa
+            // Para unión por token
             token: ['']
         });
     }
 
     switchMode(mode: 'newCompany' | 'joinCompany') {
         this.registerMode = mode;
+
         if (mode === 'newCompany') {
             this.registerForm.get('token')?.reset();
         } else {
-            this.registerForm.get('companyName')?.reset();
-            this.registerForm.get('nit')?.reset();
-            this.registerForm.get('address')?.reset();
-            this.registerForm.get('phones')?.reset();
-            this.registerForm.get('companyEmail')?.reset();
-            this.registerForm.get('website')?.reset();
-            this.registerForm.get('logo')?.reset();
+            this.registerForm.patchValue({
+                companyName: '',
+                nit: '',
+                address: '',
+                phones: '',
+                companyEmail: '',
+                website: '',
+                logo: null
+            });
         }
     }
 
     onFileChange(event: any) {
         const file = event.target.files[0];
-        this.registerForm.patchValue({ logo: file });
+        if (file) {
+            this.registerForm.patchValue({ logo: file });
+        }
     }
 
     onSubmit() {
@@ -67,7 +77,6 @@ export class RegisterComponent {
 
         Object.entries(this.registerForm.value).forEach(([key, value]) => {
             if (value !== null && value !== undefined) {
-                // Si es un archivo (logo)
                 if (key === 'logo' && value instanceof File) {
                     formData.append(key, value);
                 } else {
@@ -76,8 +85,9 @@ export class RegisterComponent {
             }
         });
 
-        this.authService.register(formData).subscribe(() => {
-            this.router.navigate(['/login']);
+        this.authService.register(formData).subscribe({
+            next: () => this.router.navigate(['/auth/login']),
+            error: (err) => console.error('❌ Error en registro:', err)
         });
     }
 }

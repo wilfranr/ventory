@@ -1,80 +1,102 @@
-<div class="surface-card p-4 shadow-2 border-round w-full lg:w-6 mx-auto mt-5">
-    <div class="text-center mb-5">
-        <h2>Crear cuenta</h2>
-        <p>Elige cómo deseas registrarte</p>
-    </div>
+<app-floating-configurator />
 
-    <div class="flex justify-content-center mb-4 gap-3">
-        <p-button label="Crear empresa" [outlined]="registerMode !== 'newCompany'" (click)="switchMode('newCompany')" [severity]="registerMode === 'newCompany' ? 'primary' : 'secondary'"></p-button>
+<p-fluid>
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+        <div class="flex flex-col md:flex-row gap-8 p-4 justify-center mt-14">
+            <div class="md:w-1/2">
+                <!-- 🔁 Botones para cambiar modo -->
+                <div class="flex justify-center mb-4 gap-2">
+                    <p-button label="Registro con Token" (onClick)="switchMode('joinCompany')" [outlined]="registerMode !== 'joinCompany'"></p-button>
+                    <p-button label="Registrar Empresa" (onClick)="switchMode('newCompany')" [outlined]="registerMode !== 'newCompany'"></p-button>
+                </div>
 
-        <p-button label="Ya tengo token" [outlined]="registerMode !== 'joinCompany'" (click)="switchMode('joinCompany')" [severity]="registerMode === 'joinCompany' ? 'primary' : 'secondary'"></p-button>
-    </div>
+                <!-- 🟢 Registro con Token -->
+                <div *ngIf="registerMode === 'joinCompany'" class="card flex flex-col gap-4">
+                    <div class="font-semibold text-xl text-center mb-2">Registro con Token</div>
+                    <div class="flex flex-col gap-4">
+                        <div class="field">
+                            <label for="name">Nombres y Apellidos</label>
+                            <input pInputText id="name" type="name" formControlName="name" placeholder="Ingrese nombre y apellidos" />
+                        </div>
 
-    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" enctype="multipart/form-data" class="p-fluid">
-        <!-- Datos del usuario -->
-        <div class="field">
-            <label for="name">Nombre completo</label>
-            <input id="name" type="text" pInputText formControlName="name" />
+                        <div class="field">
+                            <label for="email">Email</label>
+                            <input pInputText id="email" type="email" formControlName="email" placeholder="Email" />
+                        </div>
+                        <div class="field">
+                            <label for="password">Contraseña</label>
+                            <p-password id="password" formControlName="password" placeholder="Contraseña" />
+                        </div>
+                        <div class="field">
+                            <label for="token">Token</label>
+                            <input pInputText id="token" type="text" formControlName="token" placeholder="Token" />
+                            <p-message severity="info">El token puedes solicitarlo al administrador de la empresa</p-message>
+                        </div>
+                        <p-button type="submit" label="Registrar con Token"></p-button>
+                    </div>
+                </div>
+
+                <!-- 🏢 Registro de Empresa -->
+                <div *ngIf="registerMode === 'newCompany'" class="card flex flex-col gap-4 mt-6">
+                    <div class="font-semibold text-xl text-center mb-2">Registro de Empresa</div>
+                    <div class="flex flex-wrap gap-6">
+                        <div class="flex flex-col grow basis-0 gap-2">
+                            <label for="companyName">Razón Social</label>
+                            <input pInputText id="companyName" formControlName="companyName" type="text" />
+                        </div>
+                        <div class="flex flex-col grow basis-0 gap-2">
+                            <label for="nit">NIT</label>
+                            <input pInputText id="nit" formControlName="nit" type="text" />
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap gap-6">
+                        <div class="flex flex-col grow basis-0 gap-2">
+                            <label for="address">Dirección</label>
+                            <input pInputText id="address" formControlName="address" type="text" />
+                        </div>
+                        <div class="flex flex-col grow basis-0 gap-2">
+                            <label for="phones">Teléfono</label>
+                            <input pInputText id="phones" formControlName="phones" type="text" />
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap gap-6">
+                        <div class="flex flex-col grow basis-0 gap-2">
+                            <label for="companyEmail">Email de la Empresa</label>
+                            <input pInputText id="companyEmail" formControlName="companyEmail" type="email" />
+                        </div>
+                        <div class="flex flex-col grow basis-0 gap-2">
+                            <label for="website">Website</label>
+                            <input pInputText id="website" formControlName="website" type="text"/>
+                        </div>
+                    </div>
+
+                    <div class="font-semibold text-xl text-center mb-2 mt-6">Registro Usuario</div>
+                    <div class="flex flex-wrap gap-6">
+                        <div class="flex flex-col grow basis-0 gap-2">
+                            <label for="name">Nombre y Apellidos</label>
+                            <input pInputText id="name" formControlName="name" type="text" />
+                        </div>
+                        <div class="flex flex-col grow basis-0 gap-2">
+                            <label for="email">Email</label>
+                            <input pInputText id="email" formControlName="email" type="email" />
+                        </div>
+
+                        <div class="flex flex-col grow basis-0 gap-2">
+                            <label for="password">Contraseña</label>
+                            <p-password id="password" formControlName="password" />
+                        </div>
+                    </div>
+                    <div class="flex flex-col grow basis-0 gap-2">
+                        <p-message severity="info">Al crear empresa, se asignará por defecto rol SuperUsuario</p-message>
+                        </div>
+
+                    <div class="flex flex-col grow basis-0 gap-2">
+                        <label for="logo">Logo</label>
+                        <input type="file" id="logo" (change)="onFileChange($event)" accept="image/*" />
+                    </div>
+                    <p-button type="submit" label="Registrar Empresa"></p-button>
+                </div>
+            </div>
         </div>
-
-        <div class="field">
-            <label for="email">Correo electrónico</label>
-            <input id="email" type="email" pInputText formControlName="email" />
-        </div>
-
-        <div class="field">
-            <label for="password">Contraseña</label>
-            <input id="password" type="password" pPassword formControlName="password" [feedback]="false" />
-        </div>
-
-        <!-- Registro con empresa nueva -->
-        <ng-container *ngIf="registerMode === 'newCompany'">
-            <h4 class="mt-4">Datos de la empresa</h4>
-
-            <div class="field">
-                <label for="companyName">Razón social</label>
-                <input id="companyName" type="text" pInputText formControlName="companyName" />
-            </div>
-
-            <div class="field">
-                <label for="nit">NIT</label>
-                <input id="nit" type="text" pInputText formControlName="nit" />
-            </div>
-
-            <div class="field">
-                <label for="address">Dirección</label>
-                <input id="address" type="text" pInputText formControlName="address" />
-            </div>
-
-            <div class="field">
-                <label for="phones">Teléfonos</label>
-                <input id="phones" type="text" pInputText formControlName="phones" />
-            </div>
-
-            <div class="field">
-                <label for="companyEmail">Correo de la empresa</label>
-                <input id="companyEmail" type="email" pInputText formControlName="companyEmail" />
-            </div>
-
-            <div class="field">
-                <label for="website">Sitio web</label>
-                <input id="website" type="text" pInputText formControlName="website" />
-            </div>
-
-            <div class="field">
-                <label for="logo">Logo</label>
-                <input id="logo" type="file" (change)="onFileChange($event)" />
-            </div>
-        </ng-container>
-
-        <!-- Registro con token -->
-        <ng-container *ngIf="registerMode === 'joinCompany'">
-            <div class="field">
-                <label for="token">Token de empresa</label>
-                <input id="token" type="text" pInputText formControlName="token" maxlength="6" />
-            </div>
-        </ng-container>
-
-        <p-button label="Registrarse" type="submit" class="mt-4" [disabled]="registerForm.invalid"></p-button>
     </form>
-</div>
+</p-fluid>

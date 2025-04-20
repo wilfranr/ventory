@@ -57,6 +57,7 @@ import { AppFloatingConfigurator } from '../../layout/component/app.floatingconf
                             </div>
 
                             <p-button label="Iniciar sesión" styleClass="w-full mt-3" (onClick)="onSubmit()" [loading]="loading"> </p-button>
+                            <p-button label="¿No te encuentras registrado?" styleClass="w-full mt-3" routerLink="/auth/register" outlined></p-button>
                         </div>
                     </div>
                 </div>
