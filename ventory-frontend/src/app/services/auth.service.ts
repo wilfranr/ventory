@@ -16,15 +16,25 @@ export class AuthService {
 
     login(credentials: { email: string; password: string }) {
         return this.http.post<{ access_token: string; user: { name: string } }>(`${this.baseUrl}/login`, credentials).pipe(
-            tap((res) => {
-                localStorage.setItem('access_token', res.access_token);
-                localStorage.setItem('userName', res.user?.name); // si la respuesta lo trae
-                localStorage.setItem('Bienvenido', 'true'); // activar toast
+            tap((res: any) => {
+                console.log('Respuesta del login:', res);
+                console.log('Access token:', res.access_token);
+
+                const token = res?.access_token ?? '';
+                if (typeof token === 'object') {
+                    console.warn('Access token es un objeto. Corrigiendo...');
+                    localStorage.setItem('access_token', token.access_token);
+                } else {
+                    localStorage.setItem('access_token', token);
+                }
+
+                localStorage.setItem('userName', res?.user?.name ?? '');
+                localStorage.setItem('Bienvenido', 'true');
+
                 this.router.navigate(['/']);
             })
         );
     }
-
     logout() {
         localStorage.removeItem('access_token');
         this.router.navigate(['/auth/login']);
@@ -36,5 +46,9 @@ export class AuthService {
 
     register(formData: FormData) {
         return this.http.post(`${this.baseUrl}/register`, formData);
+    }
+
+    getToken(): string | null {
+        return localStorage.getItem('access_token');
     }
 }
