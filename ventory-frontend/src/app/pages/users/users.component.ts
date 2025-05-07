@@ -14,19 +14,20 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TagModule } from 'primeng/tag';
 import { IconFieldModule } from 'primeng/iconfield';
 import { UserService } from '../../services/user.service';
+import { InputSwitchModule } from 'primeng/inputswitch';
 
 interface User {
     id?: string;
     name?: string;
     email?: string;
-    role?: string;
+    role?: string | { name: string };
     status?: string;
 }
 
 @Component({
     selector: 'app-users',
     standalone: true,
-    imports: [ToolbarModule, ButtonModule, TableModule, InputTextModule, InputIconModule, DropdownModule, DialogModule, ConfirmDialogModule, TagModule, IconFieldModule, FormsModule, CommonModule, ReactiveFormsModule],
+    imports: [ToolbarModule, ButtonModule, TableModule, InputTextModule, InputIconModule, DropdownModule, DialogModule, ConfirmDialogModule, TagModule, IconFieldModule, FormsModule, CommonModule, ReactiveFormsModule, InputSwitchModule],
     templateUrl: './users.component.html',
     providers: [MessageService, ConfirmationService]
 })
@@ -50,12 +51,15 @@ export class UsersComponent implements OnInit {
     submitted: boolean = false;
 
     // 🔹 Roles y estados
+
     roles = [
+        { label: 'Superadmin', value: 'superadmin' },
+        { label: 'Admin', value: 'admin' },
         { label: 'Vendedor', value: 'vendedor' },
         { label: 'Analista de Partes', value: 'analistaPartes' },
         { label: 'Logística', value: 'logistica' }
-        // Puedes agregar más
     ];
+
     statuses = [
         { label: 'Activo', value: 'activo' },
         { label: 'Inactivo', value: 'inactivo' }
@@ -74,7 +78,6 @@ export class UsersComponent implements OnInit {
             role: ['', Validators.required]
         });
 
-        // Cargar usuarios (luego conecto a API, por ahora datos de ejemplo)
         this.loadUsers();
     }
     loadUsers() {
@@ -133,20 +136,54 @@ export class UsersComponent implements OnInit {
         this.submitted = false;
     }
 
+    userPayload = {
+        id: this.user.id ?? this.createId(),
+        name: this.user.name,
+        email: this.user.email,
+        role: this.user.role, // string: 'admin', 'vendedor', etc.
+        status: this.user.status ?? 'activo'
+    };
+
     saveUser() {
         this.submitted = true;
 
         if (this.user.name && this.user.email && this.user.role && this.user.status) {
-            if (this.user.id) {
-                // Editar existente
-                this.users = this.users.map((u) => (u.id === this.user.id ? this.user : u));
-                this.messageService.add({ severity: 'success', summary: 'Éxito', detail: 'Usuario actualizado', life: 3000 });
-            } else {
-                // Crear nuevo
-                this.user.id = this.createId();
-                this.users.push({ ...this.user });
-                this.messageService.add({ severity: 'success', summary: 'Éxito', detail: 'Usuario creado', life: 3000 });
+            if (!this.user.id) {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: 'No se puede crear un nuevo usuario desde este formulario.'
+                });
+                return;
             }
+
+            const role = typeof this.user.role === 'object' ? this.user.role.name : this.user.role;
+
+            const userPayload = {
+                name: this.user.name,
+                email: this.user.email,
+                role,
+                status: this.user.status ?? 'activo'
+            };
+
+            this.userService.updateUser(this.user.id, userPayload).subscribe({
+                next: () => {
+                    this.messageService.add({
+                        severity: 'success',
+                        summary: 'Éxito',
+                        detail: 'Usuario actualizado',
+                        life: 3000
+                    });
+                    this.loadUsers();
+                },
+                error: () => {
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'Error',
+                        detail: 'No se pudo actualizar el usuario.'
+                    });
+                }
+            });
 
             this.userDialog = false;
             this.user = {};
@@ -154,10 +191,13 @@ export class UsersComponent implements OnInit {
     }
 
     editUser(user: User) {
-        this.user = { ...user };
+        this.user = {
+            ...user,
+            role: typeof user.role === 'object' ? user.role?.name : user.role,
+            status: user.status ?? 'activo' // valor por defecto si está vacío
+        };
         this.userDialog = true;
     }
-
     deleteUser(user: User) {
         this.confirmationService.confirm({
             message: `¿Seguro que quieres eliminar a ${user.name}?`,

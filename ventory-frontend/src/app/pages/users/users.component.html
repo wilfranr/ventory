@@ -52,7 +52,7 @@
       </td>
       <td>{{ user.name }}</td>
       <td>{{ user.email }}</td>
-      <td>{{ user.role }}</td>
+      <td><p-tag [value]= "user.role?.name"/></td>
       <td>
         <p-tag [value]="user.status" [severity]="getStatusSeverity(user.status)" />
       </td>
@@ -65,55 +65,89 @@
 </p-table>
 
 
-<p-dialog [(visible)]="userDialog" [style]="{ width: '450px' }" header="Detalles del Usuario" [modal]="true">
-  <ng-template #content>
-    <div class="flex flex-col gap-6">
-      <div>
-        <label for="name" class="block font-bold mb-3">Nombre</label>
-        <input type="text" pInputText id="name" [(ngModel)]="user.name" required autofocus fluid />
-        <small class="text-red-500" *ngIf="submitted && !user.name">El nombre es obligatorio.</small>
-      </div>
-
-      <div>
-        <label for="email" class="block font-bold mb-3">Correo</label>
-        <input type="email" pInputText id="email" [(ngModel)]="user.email" required fluid />
-        <small class="text-red-500" *ngIf="submitted && !user.email">El correo es obligatorio.</small>
-      </div>
-
-      <div>
-        <label for="role" class="block font-bold mb-3">Rol</label>
-        <p-dropdown
-          id="role"
-          [options]="roles"
-          [(ngModel)]="user.role"
-          optionLabel="label"
-          optionValue="value"
-          placeholder="Selecciona un rol"
-          fluid
-        />
-      </div>
-
-      <div>
-        <label for="status" class="block font-bold mb-3">Estado</label>
-        <p-dropdown
-          id="status"
-          [options]="statuses"
-          [(ngModel)]="user.status"
-          optionLabel="label"
-          optionValue="value"
-          placeholder="Selecciona un estado"
-          fluid
-        />
-      </div>
+<p-dialog
+  [(visible)]="userDialog"
+  [style]="{ width: '450px' }"
+  header="Detalles del Usuario"
+  [modal]="true"
+  [closable]="true"
+  (onHide)="hideDialog()"
+>
+  <div class="p-4 space-y-6">
+    <!-- Nombre -->
+    <div>
+      <label for="name" class="block text-sm font-semibold text-white mb-1">Nombre</label>
+      <input
+        type="text"
+        pInputText
+        id="name"
+        [(ngModel)]="user.name"
+        name="name"
+        class="w-full"
+        autofocus
+        required
+      />
+      <small *ngIf="submitted && !user.name" class="text-red-400">El nombre es obligatorio.</small>
     </div>
-  </ng-template>
+
+    <!-- Correo -->
+    <div>
+      <label for="email" class="block text-sm font-semibold text-white mb-1">Correo</label>
+      <input
+        type="email"
+        pInputText
+        id="email"
+        [(ngModel)]="user.email"
+        name="email"
+        class="w-full"
+        required
+      />
+      <small *ngIf="submitted && !user.email" class="text-red-400">El correo es obligatorio.</small>
+    </div>
+
+    <!-- Rol -->
+    <div>
+      <label for="role" class="block text-sm font-semibold text-white mb-1">Rol</label>
+      <p-dropdown
+        inputId="role"
+        [options]="roles"
+        [(ngModel)]="user.role"
+        name="role"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Selecciona un rol"
+        appendTo="body"
+        class="w-full"
+      />
+      <small *ngIf="submitted && !user.role" class="text-red-400">El rol es obligatorio.</small>
+    </div>
+
+    <!-- Estado -->
+
+<div>
+  <label for="status" class="block text-sm font-semibold text-white mb-1">Estado</label>
+  <div class="flex items-center gap-3">
+    <p-inputSwitch
+      id="status"
+
+      [(ngModel)]="user.status"
+      name="status"
+      [trueValue]="'activo'"
+      [falseValue]="'inactivo'"
+    ></p-inputSwitch>
+    <span class="text-white text-sm">{{ user.status === 'activo' ? 'Activo' : 'Inactivo' }}</span>
+  </div>
+</div>
+  </div>
 
   <ng-template #footer>
-    <p-button label="Cancelar" icon="pi pi-times" text (click)="hideDialog()" />
-    <p-button label="Guardar" icon="pi pi-check" (click)="saveUser()" />
+    <div class="flex justify-end gap-2 p-4">
+      <p-button label="Cancelar" icon="pi pi-times" text (click)="hideDialog()" />
+      <p-button label="Guardar" icon="pi pi-check" (click)="saveUser()" [disabled]="!user.id" />
+
+    </div>
   </ng-template>
 </p-dialog>
-
 <p-dialog
     [(visible)]="displayTokenDialog"
     [style]="{ width: '400px' }"
@@ -122,28 +156,35 @@
     [closable]="true"
     (onHide)="closeTokenDialog()"
 >
-    <form [formGroup]="tokenForm">
-        <div class="flex flex-col gap-4 p-4">
-            <div>
-                <label for="role" class="block font-bold mb-2">Rol</label>
-                <p-dropdown
-                    id="role"
-                    [options]="roles"
-                    formControlName="role"
-                    optionLabel="label"
-                    optionValue="value"
-                    placeholder="Selecciona un rol"
-                    fluid
-                ></p-dropdown>
-            </div>
 
-            <div *ngIf="generatedToken" class="flex flex-col gap-2">
-                <label class="block font-bold">Token Generado:</label>
-                <input pInputText [value]="generatedToken" readonly />
-                <p-button label="Copiar Token" icon="pi pi-copy" (click)="copyToken()" text />
-            </div>
-        </div>
-    </form>
+<form [formGroup]="tokenForm" class="p-4 space-y-6">
+<!-- Selector de Rol -->
+<div>
+<label for="role" class="block text-sm font-semibold text-white mb-1">Rol</label>
+
+<p-dropdown
+  inputId="role"
+  [options]="roles"
+  formControlName="role"
+  optionLabel="label"
+  optionValue="value"
+  placeholder="Selecciona un rol"
+  appendTo="body"
+  class="w-full"
+/>
+
+<small *ngIf="tokenForm.get('role')?.invalid && tokenForm.get('role')?.touched" class="text-red-400">
+El rol es requerido
+</small>
+</div>
+
+<!-- Token Generado -->
+<div *ngIf="generatedToken" class="space-y-2">
+<label class="block text-sm font-semibold text-white">Token generado</label>
+<input pInputText [value]="generatedToken" readonly class="w-full" />
+<p-button label="Copiar Token" icon="pi pi-copy" (click)="copyToken()" text />
+</div>
+</form>
 
     <ng-template #footer>
         <div class="flex justify-end gap-2 p-4">

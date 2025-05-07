@@ -17,9 +17,6 @@ export class AuthService {
     login(credentials: { email: string; password: string }) {
         return this.http.post<{ access_token: string; user: { name: string } }>(`${this.baseUrl}/login`, credentials).pipe(
             tap((res: any) => {
-                console.log('Respuesta del login:', res);
-                console.log('Access token:', res.access_token);
-
                 const token = res?.access_token ?? '';
                 if (typeof token === 'object') {
                     console.warn('Access token es un objeto. Corrigiendo...');
