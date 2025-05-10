@@ -1,0 +1,198 @@
+<p-toolbar styleClass="mb-6">
+  <ng-template #start>
+    <p-button label="Nuevo" icon="pi pi-plus" severity="secondary" class="mr-2" (click)="showTokenDialog()" />
+    <p-button severity="secondary" label="Eliminar" icon="pi pi-trash" outlined (onClick)="deleteSelectedUsers()" [disabled]="!selectedUsers || !selectedUsers.length" />
+  </ng-template>
+
+</p-toolbar>
+
+
+<p-table
+  #dt
+  [value]="users"
+  [rows]="10"
+  [columns]="cols"
+  [paginator]="true"
+  [globalFilterFields]="['name', 'email', 'role', 'status']"
+  [tableStyle]="{ 'min-width': '75rem' }"
+  [(selection)]="selectedUsers"
+  [rowHover]="true"
+  dataKey="id"
+  currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} usuarios"
+  [showCurrentPageReport]="true"
+  [rowsPerPageOptions]="[10, 20, 30]"
+>
+  <ng-template #caption>
+    <div class="flex items-center justify-between">
+      <h5 class="m-0">Administrar Usuarios</h5>
+      <p-iconfield>
+        <p-inputicon styleClass="pi pi-search" />
+        <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Buscar..." />
+      </p-iconfield>
+    </div>
+  </ng-template>
+
+  <ng-template #header>
+    <tr>
+      <th style="width: 3rem">
+        <p-tableHeaderCheckbox />
+      </th>
+      <th style="min-width: 16rem">Nombre</th>
+      <th style="min-width: 16rem">Correo</th>
+      <th style="min-width: 12rem">Rol</th>
+      <th style="min-width: 12rem">Estado</th>
+      <th style="min-width: 12rem"></th>
+    </tr>
+  </ng-template>
+
+  <ng-template #body let-user>
+    <tr>
+      <td style="width: 3rem">
+        <p-tableCheckbox [value]="user" />
+      </td>
+      <td>{{ user.name }}</td>
+      <td>{{ user.email }}</td>
+      <td><p-tag [value]= "user.role?.name"/></td>
+      <td>
+        <p-tag [value]="user.status" [severity]="getStatusSeverity(user.status)" />
+      </td>
+      <td>
+        <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" (click)="editUser(user)" />
+        <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true" (click)="deleteUser(user)" />
+      </td>
+    </tr>
+  </ng-template>
+</p-table>
+
+
+<p-dialog
+  [(visible)]="userDialog"
+  [style]="{ width: '450px' }"
+  header="Detalles del Usuario"
+  [modal]="true"
+  [closable]="true"
+  (onHide)="hideDialog()"
+>
+  <div class="p-4 space-y-6">
+    <!-- Nombre -->
+    <div>
+      <label for="name" class="block text-sm font-semibold text-white mb-1">Nombre</label>
+      <input
+        type="text"
+        pInputText
+        id="name"
+        [(ngModel)]="user.name"
+        name="name"
+        class="w-full"
+        autofocus
+        required
+      />
+      <small *ngIf="submitted && !user.name" class="text-red-400">El nombre es obligatorio.</small>
+    </div>
+
+    <!-- Correo -->
+    <div>
+      <label for="email" class="block text-sm font-semibold text-white mb-1">Correo</label>
+      <input
+        type="email"
+        pInputText
+        id="email"
+        [(ngModel)]="user.email"
+        name="email"
+        class="w-full"
+        required
+      />
+      <small *ngIf="submitted && !user.email" class="text-red-400">El correo es obligatorio.</small>
+    </div>
+
+    <!-- Rol -->
+    <div>
+      <label for="role" class="block text-sm font-semibold text-white mb-1">Rol</label>
+      <p-dropdown
+        inputId="role"
+        [options]="roles"
+        [(ngModel)]="user.role"
+        name="role"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Selecciona un rol"
+        appendTo="body"
+        class="w-full"
+      />
+      <small *ngIf="submitted && !user.role" class="text-red-400">El rol es obligatorio.</small>
+    </div>
+
+    <!-- Estado -->
+
+<div>
+  <label for="status" class="block text-sm font-semibold text-white mb-1">Estado</label>
+  <div class="flex items-center gap-3">
+    <p-inputSwitch
+      id="status"
+
+      [(ngModel)]="user.status"
+      name="status"
+      [trueValue]="'activo'"
+      [falseValue]="'inactivo'"
+    ></p-inputSwitch>
+    <span class="text-white text-sm">{{ user.status === 'activo' ? 'Activo' : 'Inactivo' }}</span>
+  </div>
+</div>
+  </div>
+
+  <ng-template #footer>
+    <div class="flex justify-end gap-2 p-4">
+      <p-button label="Cancelar" icon="pi pi-times" text (click)="hideDialog()" />
+      <p-button label="Guardar" icon="pi pi-check" (click)="saveUser()" [disabled]="!user.id" />
+
+    </div>
+  </ng-template>
+</p-dialog>
+<p-dialog
+    [(visible)]="displayTokenDialog"
+    [style]="{ width: '400px' }"
+    header="Generar Token de Usuario"
+    [modal]="true"
+    [closable]="true"
+    (onHide)="closeTokenDialog()"
+>
+
+<form [formGroup]="tokenForm" class="p-4 space-y-6">
+<!-- Selector de Rol -->
+<div>
+<label for="role" class="block text-sm font-semibold text-white mb-1">Rol</label>
+
+<p-dropdown
+  inputId="role"
+  [options]="roles"
+  formControlName="role"
+  optionLabel="label"
+  optionValue="value"
+  placeholder="Selecciona un rol"
+  appendTo="body"
+  class="w-full"
+/>
+
+<small *ngIf="tokenForm.get('role')?.invalid && tokenForm.get('role')?.touched" class="text-red-400">
+El rol es requerido
+</small>
+</div>
+
+<!-- Token Generado -->
+<div *ngIf="generatedToken" class="space-y-2">
+<label class="block text-sm font-semibold text-white">Token generado</label>
+<input pInputText [value]="generatedToken" readonly class="w-full" />
+<p-button label="Copiar Token" icon="pi pi-copy" (click)="copyToken()" text />
+</div>
+</form>
+
+    <ng-template #footer>
+        <div class="flex justify-end gap-2 p-4">
+            <p-button label="Cancelar" icon="pi pi-times" text (click)="closeTokenDialog()" />
+            <p-button label="Generar Token" icon="pi pi-check" (click)="generateToken()" [disabled]="!tokenForm.valid" />
+        </div>
+    </ng-template>
+</p-dialog>
+<p-confirmdialog [style]="{ width: '450px' }" />
+
+
