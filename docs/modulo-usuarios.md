@@ -6,121 +6,143 @@ Implementar un sistema de gestión de usuarios que permita controlar el acceso a
 
 ## Entidades Principales
 
-- **Usuarios (`users`)**
-  - Representan a las personas que utilizan la plataforma.
-- **Roles (`roles`)**
-  - Agrupan conjuntos de permisos comunes.
-- **Permisos (`permissions`)**
+- **Usuarios (`users`)**  
+  Representan a las personas que utilizan la plataforma.
 
-  - Definen acciones específicas que se pueden realizar en el sistema.
+- **Roles (`roles`)**  
+  Agrupan conjuntos de permisos comunes.
+
+- **Permisos (`permissions`)**  
+  Definen acciones específicas que se pueden realizar en el sistema.
 
 - **Tablas intermedias**
-  - `user_roles`: Relaciona usuarios con roles (Many-to-Many).
+  - `user_roles`: Relaciona usuarios con roles (Many-to-Many).  
+    _(Nota: actualmente solo se asigna un rol por usuario, pero se deja abierta la posibilidad de extenderlo a múltiples roles en el futuro)._
   - `role_permissions`: Relaciona roles con permisos (Many-to-Many).
-
----
 
 ## Modelo de Base de Datos
 
 ### Tabla: `users`
 
-| Campo      | Tipo      | Descripción            |
-| :--------- | :-------- | :--------------------- |
-| id         | int (PK)  | Identificador único    |
-| name       | string    | Nombre del usuario     |
-| email      | string    | Correo electrónico     |
-| password   | string    | Contraseña encriptada  |
-| created_at | timestamp | Fecha de creación      |
-| updated_at | timestamp | Fecha de actualización |
+| Campo      | Tipo        | Descripción                |
+| ---------- | ----------- | -------------------------- |
+| id         | int (PK)    | Identificador único        |
+| name       | string      | Nombre del usuario         |
+| email      | string      | Correo electrónico         |
+| password   | string      | Contraseña encriptada      |
+| role_id    | string (FK) | Referencia al rol asignado |
+| company_id | string (FK) | Empresa asociada           |
+| created_at | timestamp   | Fecha de creación          |
+| updated_at | timestamp   | Fecha de actualización     |
 
 ### Tabla: `roles`
 
-| Campo       | Tipo     | Descripción         |
-| :---------- | :------- | :------------------ |
-| id          | int (PK) | Identificador único |
-| name        | string   | Nombre del rol      |
-| description | string   | Descripción del rol |
+| Campo      | Tipo        | Descripción                                 |
+| ---------- | ----------- | ------------------------------------------- |
+| id         | string (PK) | Identificador único                         |
+| name       | enum        | Nombre del rol (`admin`, `logistica`, etc.) |
+| created_at | timestamp   | Fecha de creación                           |
+| updated_at | timestamp   | Fecha de actualización                      |
 
 ### Tabla: `permissions`
 
-| Campo       | Tipo     | Descripción             |
-| :---------- | :------- | :---------------------- |
-| id          | int (PK) | Identificador único     |
-| name        | string   | Nombre del permiso      |
-| description | string   | Descripción del permiso |
-
-### Tabla: `user_roles`
-
-| Campo   | Tipo     | Descripción             |
-| :------ | :------- | :---------------------- |
-| id      | int (PK) | Identificador único     |
-| user_id | int (FK) | Referencia a `users.id` |
-| role_id | int (FK) | Referencia a `roles.id` |
+| Campo      | Tipo        | Descripción                             |
+| ---------- | ----------- | --------------------------------------- |
+| id         | string (PK) | Identificador único                     |
+| name       | string      | Nombre del permiso (ej. `ver_usuarios`) |
+| created_at | timestamp   | Fecha de creación                       |
+| updated_at | timestamp   | Fecha de actualización                  |
 
 ### Tabla: `role_permissions`
 
-| Campo         | Tipo     | Descripción                   |
-| :------------ | :------- | :---------------------------- |
-| id            | int (PK) | Identificador único           |
-| role_id       | int (FK) | Referencia a `roles.id`       |
-| permission_id | int (FK) | Referencia a `permissions.id` |
-
----
+| Campo         | Tipo   | Descripción                   |
+| ------------- | ------ | ----------------------------- |
+| role_id       | string | Referencia a `roles.id`       |
+| permission_id | string | Referencia a `permissions.id` |
 
 ## Diagrama Entidad-Relación
 
-users ───< user_roles >─── roles ───< role_permissions >─── permissions
-
----
+```
+users ────┬──► roles ────┬──► permissions
+          │              │
+          │              └─ Tabla intermedia: role_permissions
+          └─ Relación actual: user tiene un solo rol (pero extensible)
+```
 
 ## Flujos de Procesos
 
 ### 1. Creación de un Permiso
 
-- Definir nombre y descripción del permiso.
-- Guardar en tabla `permissions`.
+- Se recibe nombre del permiso.
+- Se guarda en la tabla `permissions`.
 
 ### 2. Creación de un Rol
 
-- Definir nombre y descripción del rol.
-- Asignar uno o varios permisos al rol.
-- Guardar en tabla `roles` y tabla `role_permissions`.
+- Se define un nombre (`admin`, `logistica`, etc.).
+- Se asocian uno o más permisos.
+- Se registra en `roles` y `role_permissions`.
 
-### 3. Creación de un Usuario
+### 3. Registro de un Usuario
 
-- Registrar usuario con nombre, email y contraseña.
-- Asignar uno o varios roles al usuario.
-- Guardar en tabla `users` y tabla `user_roles`.
-
----
+- Se registra el usuario vía formulario o token.
+- Se asigna un rol al usuario.
+- Se registra en `users` (vía `role_id`).
 
 ## Autenticación y Autorización
 
-- **Autenticación**: Se realiza mediante JWT Tokens.
-- **Autorización**:
-  - Validar si el usuario tiene el rol requerido.
-  - Validar si el rol del usuario contiene los permisos necesarios.
-- **Guards de NestJS**:
-  - `RolesGuard`: Protege rutas basadas en roles.
-  - `PermissionsGuard`: Protege rutas basadas en permisos.
+- **Autenticación**:  
+  Mediante JWT emitido en el login (`/auth/login`), donde el `sub` del token contiene el `user.id`.
 
----
+- **Autorización**:
+  - Se evalúa el `role` del usuario.
+  - Se validan los `permissions` del rol.
+  - Se puede proteger cada ruta con decoradores personalizados.
+
+### ✅ Guards de NestJS
+
+- `PermissionsGuard`: Evalúa los permisos del rol asociado al usuario autenticado.
+- `JwtAuthGuard`: Protege rutas por token.
+- Decorador `@Permissions(...)`: Se usa así:
+
+```ts
+@UseGuards(JwtAuthGuard, PermissionsGuard)
+@Permissions('ver_usuarios')
+@Get()
+findAll() {
+  return this.usersService.getAll();
+}
+```
 
 ## Consideraciones Especiales
 
-- El primer usuario creado debe ser de tipo `superadmin`.
-- Los cambios en roles o permisos deben pasar por validaciones antes de impactar en producción.
-- El sistema debe permitir asignar múltiples roles a un mismo usuario (opcional para futuro).
+- El primer usuario creado se define como `superadmin`.
+- Los cambios en roles y permisos deben pasar por validación previa (especialmente en producción).
+- Aunque el modelo admite múltiples roles, actualmente se usa un solo rol por usuario para simplificar la lógica de autorización.
 
----
+## Ejemplos de Uso de Guards
 
-## Pendientes por Documentar
+```ts
+@UseGuards(JwtAuthGuard, PermissionsGuard)
+@Permissions('crear_usuario')
+@Post()
+createUser(@Body() dto: CreateUserDto) {
+  return this.userService.create(dto);
+}
+```
 
-- Ejemplo de uso de Guards (`@Roles()`, `@Permissions()`) en controladores de NestJS.
-- Política de actualizaciones de roles y permisos.
-- Diagramas de flujo detallados para procesos de creación y edición.
+## Política de Actualización
 
----
+- Cada cambio en los permisos debe documentarse y reflejarse en el sistema de seeds.
+- Los roles se pueden editar desde el panel de administración por usuarios con permisos elevados (`admin`, `superadmin`).
+
+# 📄 Documentación de Permisos por Módulo – Ventory
+
+| 🧩 Módulo              | 🔐 Permisos Asociados                                                                       | 🗒️ Descripción Breve                                                      |
+| ---------------------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| **Usuarios**           | `crear_usuario`<br>`ver_usuarios`<br>`editar_usuario`<br>`eliminar_usuario`                 | Permisos para crear, ver, editar o eliminar usuarios.                     |
+| **Roles**              | `crear_rol`<br>`ver_roles`<br>`asignar_rol`                                                 | Gestión de roles y asignación a usuarios.                                 |
+| **Pedidos**            | `crear_pedido`<br>`ver_pedidos`<br>`editar_pedido`<br>`aprobar_pedido`<br>`rechazar_pedido` | Flujo de trabajo para creación, revisión y aprobación/rechazo de pedidos. |
+| **Órdenes de Trabajo** | `ver_orden_trabajo`<br>`editar_orden_trabajo`                                               | Permisos específicos para logística para ver y modificar órdenes.         |
 
 ## Anexos
 

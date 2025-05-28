@@ -16,6 +16,7 @@ export class PermissionsGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
+    console.log("🚦 Entró al PermissionsGuard");
     const requiredPermissions = this.reflector.getAllAndOverride<string[]>(
       PERMISSIONS_KEY,
       [context.getHandler(), context.getClass()],
@@ -44,6 +45,7 @@ export class PermissionsGuard implements CanActivate {
     if (!userFromDb?.role) throw new ForbiddenException("Sin rol asignado");
 
     const userPermissions = userFromDb.role.permissions.map((p) => p.name);
+
     const hasPermission = requiredPermissions.every((p) =>
       userPermissions.includes(p),
     );

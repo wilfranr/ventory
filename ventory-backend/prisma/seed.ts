@@ -18,6 +18,9 @@ async function main() {
     "ver_pedidos",
     "editar_pedido",
     "aprobar_pedido",
+    "rechazar_pedido",
+    "ver_orden_trabajo",
+    "editar_orden_trabajo",
   ];
 
   for (const name of permissions) {
@@ -45,24 +48,56 @@ async function main() {
     });
   }
 
-  // ✅ Asociar todos los permisos al rol "superadmin"
-  const allPermissions = await prisma.permission.findMany();
-  const superadmin = await prisma.role.findUnique({
-    where: { name: "superadmin" },
-  });
+  // 🛡️ Asignar permisos a cada rol
+  const rolePermissionsMap: Record<RoleName, string[]> = {
+    superadmin: permissions,
+    admin: [
+      "crear_usuario",
+      "ver_usuarios",
+      "editar_usuario",
+      "eliminar_usuario",
+      "crear_rol",
+      "ver_roles",
+      "asignar_rol",
+      "crear_pedido",
+      "ver_pedidos",
+      "editar_pedido",
+      "aprobar_pedido",
+    ],
+    vendedor: [
+      "crear_pedido",
+      "ver_pedidos",
+      "editar_pedido",
+      "aprobar_pedido",
+      "rechazar_pedido",
+    ],
+    analistaPartes: ["ver_pedidos", "editar_pedido"],
+    logistica: ["ver_orden_trabajo", "editar_orden_trabajo"],
+  };
 
-  if (superadmin) {
+  for (const roleName of roles) {
+    const role = await prisma.role.findUnique({ where: { name: roleName } });
+    if (!role) continue;
+
+    const permissionNames = rolePermissionsMap[roleName] || [];
+
+    const rolePermissions = await prisma.permission.findMany({
+      where: {
+        name: { in: permissionNames },
+      },
+    });
+
     await prisma.role.update({
-      where: { id: superadmin.id },
+      where: { id: role.id },
       data: {
         permissions: {
-          set: allPermissions.map((p) => ({ id: p.id })),
+          set: rolePermissions.map((p) => ({ id: p.id })),
         },
       },
     });
   }
 
-  // 🔐 Crear empresa + usuario superadmin (como tenías antes)
+  // 🔐 Crear empresa + usuario superadmin
   const companyName = "Heavy Market";
   const nit = "123456789";
   const email = "admin@heavymarket.com";
@@ -74,6 +109,10 @@ async function main() {
     console.log("La empresa ya existe. Seed cancelado.");
     return;
   }
+
+  const superadminRole = await prisma.role.findUnique({
+    where: { name: "superadmin" },
+  });
 
   await prisma.company.create({
     data: {
@@ -89,13 +128,13 @@ async function main() {
           name: "Super Admin",
           email,
           password: hashedPassword,
-          roleId: superadmin?.id,
+          roleId: superadminRole?.id,
         },
       },
     },
   });
 
-  console.log("✅ Seed ejecutado correctamente con permisos.");
+  console.log("✅ Seed ejecutado correctamente con permisos por rol.");
 }
 
 main()

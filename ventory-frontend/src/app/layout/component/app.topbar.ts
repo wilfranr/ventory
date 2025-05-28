@@ -71,7 +71,7 @@ import { AuthService } from '../../services/auth.service';
                                 <p class="px-4 py-2 text-gray-700 dark:text-gray-200">{{ userName }}</p>
                                 <p class="px-4 py-2 text-gray-500 dark:text-gray-400">rol</p>
                                 <hr class="border-gray-200 dark:border-gray-700" />
-                                <button class="w-full px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-700" (click)="toggleDarkMode()"><i class="pi pi-cog mr-2"></i> Configuración</button>
+                                <button class="w-full px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-700"><i class="pi pi-cog mr-2"></i> Configuración</button>
                                 <button class="w-full px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-700" (click)="layoutService.onMenuToggle()"><i class="pi pi-users mr-2"></i> Usuarios</button>
                             </div>
                             <button class="w-full px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-700" (click)="logout()"><i class="pi pi-sign-out mr-2"></i> Cerrar sesión</button>
