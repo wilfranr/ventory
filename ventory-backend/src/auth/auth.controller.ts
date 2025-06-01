@@ -30,11 +30,13 @@ export class AuthController {
     if (!user) throw new UnauthorizedException();
 
     const access_token = await this.authService.login(user);
-
+    console.log("Login successful for user:", user.email, user.role);
     return {
       access_token,
       user: {
         name: user.name,
+        email: user.email,
+        role: user.role,
       },
     };
   }

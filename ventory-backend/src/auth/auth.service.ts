@@ -10,7 +10,9 @@ import * as bcrypt from "bcrypt";
 import { CreateUserDto } from "./dto/create-user.dto";
 import * as fs from "fs";
 import * as path from "path";
-import { User, RoleName } from "@prisma/client";
+import { User, Role, RoleName } from "@prisma/client";
+
+type UserWithRole = User & { role: Role | null };
 
 @Injectable()
 export class AuthService {
@@ -18,11 +20,12 @@ export class AuthService {
     private usersService: UsersService,
     private jwtService: JwtService,
     private prisma: PrismaService,
-  ) {
-    console.log("Modelos disponibles:", Object.keys(this.prisma));
-  }
+  ) {}
 
-  async validateUser(email: string, password: string) {
+  async validateUser(
+    email: string,
+    password: string,
+  ): Promise<UserWithRole | null> {
     const user = await this.usersService.findByEmail(email);
     if (!user) throw new UnauthorizedException("Usuario no encontrado");
 
@@ -32,7 +35,7 @@ export class AuthService {
     return user;
   }
 
-  login(user: User) {
+  login(user: UserWithRole) {
     const payload = { sub: user.id, email: user.email };
     const token = this.jwtService.sign(payload);
 
@@ -42,6 +45,7 @@ export class AuthService {
         name: user.name,
         email: user.email,
         id: user.id,
+        role: user.role,
       },
     };
   }

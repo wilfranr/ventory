@@ -7,7 +7,7 @@ import { tap } from 'rxjs/operators';
     providedIn: 'root'
 })
 export class AuthService {
-    private baseUrl = 'http://localhost:3001/auth';
+    private baseUrl = '/api/auth';
 
     constructor(
         private http: HttpClient,
@@ -15,7 +15,7 @@ export class AuthService {
     ) {}
 
     login(credentials: { email: string; password: string }) {
-        return this.http.post<{ access_token: string; user: { name: string } }>(`${this.baseUrl}/login`, credentials).pipe(
+        return this.http.post<{ access_token: string; user: any }>(`${this.baseUrl}/login`, credentials).pipe(
             tap((res: any) => {
                 const token = res?.access_token ?? '';
                 if (typeof token === 'object') {
@@ -24,10 +24,10 @@ export class AuthService {
                 } else {
                     localStorage.setItem('access_token', token);
                 }
-
+                // 💡 Guarda el usuario completo
+                localStorage.setItem('user', JSON.stringify(res?.user ?? {}));
                 localStorage.setItem('userName', res?.user?.name ?? '');
                 localStorage.setItem('Bienvenido', 'true');
-
                 this.router.navigate(['/']);
             })
         );

@@ -69,7 +69,7 @@ import { AuthService } from '../../services/auth.service';
                         <div class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded shadow z-50 hidden">
                             <div class="py-2">
                                 <p class="px-4 py-2 text-gray-700 dark:text-gray-200">{{ userName }}</p>
-                                <p class="px-4 py-2 text-gray-500 dark:text-gray-400">rol</p>
+                                <p class="px-4 py-2 text-gray-500 dark:text-gray-400">{{ rol }}</p>
                                 <hr class="border-gray-200 dark:border-gray-700" />
                                 <button class="w-full px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-700"><i class="pi pi-cog mr-2"></i> Configuración</button>
                                 <button class="w-full px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-700" (click)="layoutService.onMenuToggle()"><i class="pi pi-users mr-2"></i> Usuarios</button>
@@ -92,6 +92,7 @@ export class AppTopbar {
         private auth: AuthService
     ) {
         this.userName = localStorage.getItem('userName');
+        this.rol = localStorage.getItem('role');
     }
 
     toggleDarkMode() {

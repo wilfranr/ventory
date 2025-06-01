@@ -42,7 +42,8 @@ export class AppMenu {
                     { label: 'Chart', icon: 'pi pi-fw pi-chart-bar', routerLink: ['/uikit/charts'] },
                     { label: 'Timeline', icon: 'pi pi-fw pi-calendar', routerLink: ['/uikit/timeline'] },
                     { label: 'Misc', icon: 'pi pi-fw pi-circle', routerLink: ['/uikit/misc'] },
-                    { label: 'Users', icon: 'pi pi-fw pi-users', routerLink: ['/users'] }
+                    { label: 'Users', icon: 'pi pi-fw pi-users', routerLink: ['/users'] },
+                    { label: 'Roles', icon: 'pi pi-fw pi-shield', routerLink: ['/roles'] }
                 ]
             },
             {

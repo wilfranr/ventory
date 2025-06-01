@@ -3,6 +3,7 @@ import { Documentation } from './documentation/documentation';
 import { Crud } from './crud/crud';
 import { Empty } from './empty/empty';
 import { UsersComponent } from './users/users.component';
+import { AuthGuard } from '../guards/auth.guard';
 
 export default [
     { path: 'documentation', component: Documentation },
