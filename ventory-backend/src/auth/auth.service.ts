@@ -12,7 +12,14 @@ import * as fs from "fs";
 import * as path from "path";
 import { User, Role, RoleName } from "@prisma/client";
 
-type UserWithRole = User & { role: Role | null };
+type CompanyShort = {
+  id: string;
+  name: string;
+};
+type UserWithRoleAndCompany = User & {
+  role: Role | null;
+  company?: CompanyShort;
+};
 
 @Injectable()
 export class AuthService {
@@ -25,17 +32,25 @@ export class AuthService {
   async validateUser(
     email: string,
     password: string,
-  ): Promise<UserWithRole | null> {
+  ): Promise<
+    (UserWithRoleAndCompany & { permissions: Array<{ name: string }> }) | null
+  > {
     const user = await this.usersService.findByEmail(email);
     if (!user) throw new UnauthorizedException("Usuario no encontrado");
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) throw new UnauthorizedException("Contraseña incorrecta");
 
-    return user;
+    const permissions =
+      user.role?.permissions?.map((perm) => ({ name: perm.name })) || [];
+
+    return {
+      ...user,
+      permissions,
+    };
   }
 
-  login(user: UserWithRole) {
+  login(user: UserWithRoleAndCompany) {
     const payload = { sub: user.id, email: user.email };
     const token = this.jwtService.sign(payload);
 
@@ -46,6 +61,10 @@ export class AuthService {
         email: user.email,
         id: user.id,
         role: user.role,
+        company: {
+          id: user.company?.id || null,
+          name: user.company?.name || null,
+        },
       },
     };
   }

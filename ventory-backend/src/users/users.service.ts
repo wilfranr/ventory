@@ -28,11 +28,24 @@ export class UsersService {
   async findByEmail(email: string) {
     return this.prisma.user.findUnique({
       where: { email },
-      include: { role: true },
+      include: {
+        role: {
+          include: {
+            permissions: true,
+          },
+        },
+        company: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
     });
   }
 
   async findAll(currentUser: any) {
+    console.log("currentUser recibido:", currentUser);
     const VENTORY_COMPANY_ID = "cma05z0m90000c6juketn1hgr";
     if (
       currentUser.role?.name === "superadmin" ||

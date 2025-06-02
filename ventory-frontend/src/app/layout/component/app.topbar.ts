@@ -18,7 +18,7 @@ import { AuthService } from '../../services/auth.service';
             </button>
             <a class="layout-topbar-logo" routerLink="/">
                 <img src="assets/images/logo_ventory.png" alt="Ventory Logo" style="height: 70px;" />
-                <span>VENTORY</span>
+                <span>{{ companyName }}</span>
             </a>
         </div>
 
@@ -86,13 +86,23 @@ export class AppTopbar {
     items!: MenuItem[];
     userName: string | null = null;
     rol: string | null = null;
+    companyName: string | null = null;
 
     constructor(
         public layoutService: LayoutService,
         private auth: AuthService
     ) {
         this.userName = localStorage.getItem('userName');
-        this.rol = localStorage.getItem('role');
+
+        const userJson = localStorage.getItem('user');
+        if (userJson) {
+            const user = JSON.parse(userJson);
+            this.rol = user?.role?.name || 'Sin rol';
+            this.companyName = user?.company?.name || 'VENTORY';
+        } else {
+            this.rol = 'Sin rol';
+            this.companyName = 'VENTORY';
+        }
     }
 
     toggleDarkMode() {

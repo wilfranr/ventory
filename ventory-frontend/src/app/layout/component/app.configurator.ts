@@ -112,6 +112,17 @@ export class AppConfigurator {
 
     ngOnInit() {
         if (isPlatformBrowser(this.platformId)) {
+            // Leer primary color guardado
+            const storedPrimary = localStorage.getItem('primaryColor');
+            if (storedPrimary) {
+                this.layoutService.layoutConfig.update((state) => ({ ...state, primary: storedPrimary }));
+            }
+            // Leer surface color guardado
+            const storedSurface = localStorage.getItem('surfaceColor');
+            if (storedSurface) {
+                this.layoutService.layoutConfig.update((state) => ({ ...state, surface: storedSurface }));
+            }
+            // Mantén lo que ya tienes para el preset
             this.onPresetChange(this.layoutService.layoutConfig().preset);
         }
     }
@@ -412,8 +423,10 @@ export class AppConfigurator {
     updateColors(event: any, type: string, color: any) {
         if (type === 'primary') {
             this.layoutService.layoutConfig.update((state) => ({ ...state, primary: color.name }));
+            localStorage.setItem('primaryColor', color.name);
         } else if (type === 'surface') {
             this.layoutService.layoutConfig.update((state) => ({ ...state, surface: color.name }));
+            localStorage.setItem('surfaceColor', color.name);
         }
         this.applyTheme(type, color);
 

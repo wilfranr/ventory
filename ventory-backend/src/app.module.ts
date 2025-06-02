@@ -8,6 +8,9 @@ import { RegistrationTokenModule } from "./registration-token/registration-token
 import { RolesController } from "./roles/roles.controller";
 import { RolesModule } from "./roles/roles.module";
 import { PermissionsModule } from "./permissions/permissions.module";
+import { APP_GUARD } from "@nestjs/core";
+import { PermissionsGuard } from "./permissions/permissions.guard";
+import { JwtAuthGuard } from "./auth/jwt-auth.guard";
 
 @Module({
   imports: [
@@ -19,6 +22,16 @@ import { PermissionsModule } from "./permissions/permissions.module";
     PermissionsModule,
   ],
   controllers: [AppController, RolesController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: PermissionsGuard,
+    },
+  ],
 })
 export class AppModule {}

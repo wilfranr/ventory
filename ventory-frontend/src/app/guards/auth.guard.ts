@@ -24,12 +24,12 @@ export const AuthGuard: CanActivateFn = (route: ActivatedRouteSnapshot) => {
 
     // Validación de rol
     if (requiredRoles && (!user.role || !requiredRoles.includes(user.role.name))) {
-        return router.parseUrl('/access');
+        return router.parseUrl('/auth/access');
     }
 
     // Validación de permisos (si tienes user.permissions como array de strings)
     if (requiredPermissions && (!user.permissions || !requiredPermissions.every((perm: string) => user.permissions.includes(perm)))) {
-        return router.parseUrl('/access');
+        return router.parseUrl('/auth/access');
     }
 
     return true;

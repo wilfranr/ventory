@@ -17,7 +17,7 @@ import { CreateUserDto } from "./dto/create-user.dto";
 import { CurrentUser } from "src/auth/current-user.decorator";
 
 @Controller("users")
-@UseGuards(JwtAuthGuard, PermissionsGuard)
+//@UseGuards(JwtAuthGuard, PermissionsGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
