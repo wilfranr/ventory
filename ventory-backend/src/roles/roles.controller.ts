@@ -16,6 +16,11 @@ export class RolesController {
     return this.rolesService.createRole(name);
   }
 
+  @Get(":id")
+  getRoleById(@Param("id") id: string) {
+    return this.rolesService.getRoleById(id);
+  }
+
   @Post(":userId/assign/:roleId")
   assignRole(@Param("userId") userId: string, @Param("roleId") roleId: string) {
     return this.rolesService.assignRoleToUser(userId, roleId);
@@ -24,8 +29,8 @@ export class RolesController {
   @Patch(":roleId/permissions")
   updatePermissions(
     @Param("roleId") roleId: string,
-    @Body("permisssionIds") permisssionIds: string[],
+    @Body("permissionIds") permissionIds: string[],
   ) {
-    return this.rolesService.assignPermissionsToRole(roleId, permisssionIds);
+    return this.rolesService.assignPermissionsToRole(roleId, permissionIds);
   }
 }

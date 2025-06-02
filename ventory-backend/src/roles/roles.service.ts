@@ -12,6 +12,15 @@ export class RolesService {
     });
   }
 
+  async getRoleById(id: string) {
+    return this.prisma.role.findUnique({
+      where: { id },
+      include: {
+        permissions: true, // Incluye los permisos si lo necesitas
+      },
+    });
+  }
+
   async createRole(name: RoleName): Promise<Role> {
     return this.prisma.role.create({
       data: { name },
