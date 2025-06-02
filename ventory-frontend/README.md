@@ -1,59 +1,60 @@
-# Sakai19
+# Ventory Frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.0.6.
+Este proyecto es el frontend de **Ventory**, un sistema moderno de gestión empresarial, desarrollado en [Angular 19](https://angular.io/), usando PrimeNG, TailwindCSS y siguiendo las mejores prácticas de arquitectura frontend.
 
-## Development server
+---
 
-To start a local development server, run:
+## 🚀 Servidor de desarrollo
+
+Para iniciar el servidor de desarrollo, ejecuta:
 
 ```bash
 ng serve
-```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Cuando el servidor esté corriendo, abre tu navegador en http://localhost:4200/.
+La aplicación se recargará automáticamente cada vez que modifiques los archivos fuente.
+🛠️ Generación de código (Scaffolding)
 
-## Code scaffolding
+Angular CLI incluye herramientas poderosas para generar código automáticamente. Por ejemplo, para crear un nuevo componente:
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
 ng generate component component-name
-```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+Para ver la lista completa de esquemas disponibles (componentes, directivas, pipes, etc.):
 
-```bash
 ng generate --help
-```
 
-## Building
+🏗️ Construcción del proyecto
 
-To build the project run:
+Para compilar el proyecto ejecuta:
 
-```bash
 ng build
-```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+Esto almacenará los artefactos de construcción en el directorio dist/.
+Por defecto, el build de producción optimiza la aplicación para mejor desempeño y velocidad.
+🧪 Pruebas unitarias
 
-## Running unit tests
+Para ejecutar pruebas unitarias con Karma:
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
 ng test
-```
 
-## Running end-to-end tests
+🤖 Pruebas end-to-end
 
-For end-to-end (e2e) testing, run:
+Para pruebas end-to-end (e2e):
 
-```bash
 ng e2e
-```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+    Angular CLI no incluye por defecto un framework de e2e. (Pendiente definir framework).
 
-## Additional Resources
+📚 Recursos adicionales
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+    Documentación oficial de Angular
+
+    Referencia de Angular CLI
+
+    PrimeNG
+
+    TailwindCSS
+
+    Compodoc (documentación automática)
+
+Desarrollado por Yoseth Rivera -  +573137038949 - Bogotá, Colombia.

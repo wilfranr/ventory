@@ -1,26 +1,18 @@
-import {
-  Controller,
-  Get,
-  UseGuards,
-  Put,
-  Param,
-  Body,
-  Delete,
-  Post,
-} from "@nestjs/common";
-import { JwtAuthGuard } from "../auth/jwt-auth.guard";
-import { PermissionsGuard } from "src/permissions/permissions.guard";
+import { Controller, Get, Put, Param, Body } from "@nestjs/common";
 import { Permissions } from "src/permissions/permissions.decorator";
 import { UsersService } from "./users.service";
 import { UpdateUserDto } from "./dto/update-user.dto";
-import { CreateUserDto } from "./dto/create-user.dto";
 import { CurrentUser } from "src/auth/current-user.decorator";
+import { ApiTags, ApiBearerAuth, ApiOperation } from "@nestjs/swagger";
 
+@ApiTags("Usuarios")
+@ApiBearerAuth()
 @Controller("users")
 //@UseGuards(JwtAuthGuard, PermissionsGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @ApiOperation({ summary: "Obtener todos los usuarios" })
   @Permissions("ver_usuarios")
   @Get()
   async findAll(@CurrentUser() user: any) {
