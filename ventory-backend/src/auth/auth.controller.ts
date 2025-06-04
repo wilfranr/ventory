@@ -9,21 +9,23 @@ import {
 import { AuthService } from "./auth.service";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { FileInterceptor } from "@nestjs/platform-express";
+import { Public } from "./public.decorator";
 
 @Controller("auth")
 export class AuthController {
   constructor(private authService: AuthService) {}
 
+  @Public()
   @Post("register")
   @UseInterceptors(FileInterceptor("logo"))
   register(
     @Body() createUserDto: CreateUserDto,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     return this.authService.register({ ...createUserDto, logo: file });
   }
 
+  @Public()
   @Post("login")
   async login(@Body() body: { email: string; password: string }) {
     const user = await this.authService.validateUser(body.email, body.password);

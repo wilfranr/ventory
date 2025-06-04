@@ -61,17 +61,18 @@ export class RolesComponent implements OnInit {
         this.submitted = true;
         if (!this.role.name) return;
 
-        const payload = {
-            name: this.role.name,
-            permissions: this.role.permissions.map((p: any) => (typeof p === 'string' ? p : p.name))
-        };
-
         if (this.role.id) {
-            this.http.patch(`/api/roles/${this.role.id}`, payload).subscribe(() => {
+            const payload = {
+                permissionIds: this.role.permissions.map((p: any) => (typeof p === 'string' ? p : p.id))
+            };
+            this.http.patch(`/api/roles/${this.role.id}/permissions`, payload).subscribe(() => {
                 this.loadRoles();
                 this.roleDialog = false;
             });
         } else {
+            const payload = {
+                name: this.role.name
+            };
             this.http.post('/api/roles', payload).subscribe(() => {
                 this.loadRoles();
                 this.roleDialog = false;

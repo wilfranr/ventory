@@ -45,7 +45,6 @@ export class UsersService {
   }
 
   async findAll(currentUser: any) {
-    console.log("currentUser recibido:", currentUser);
     const VENTORY_COMPANY_ID = "cma05z0m90000c6juketn1hgr";
     if (
       currentUser.role?.name === "superadmin" ||

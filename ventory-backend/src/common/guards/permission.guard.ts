@@ -13,7 +13,6 @@ export class PermissionGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
-    console.log("PermissionGuard: canActivate llamado");
     const requiredPermissions = this.reflector.getAllAndOverride<string[]>(
       PERMISSIONS_KEY,
       [context.getHandler(), context.getClass()],
@@ -25,14 +24,6 @@ export class PermissionGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const user = request.user;
 
-    console.log(
-      "Guard ejecutándose | user:",
-      user,
-      "| requiredPermissions:",
-      requiredPermissions,
-    );
-
-    console.log("Usuario que llega al guard:", user);
     if (!user) {
       throw new ForbiddenException("usuario no autenticado");
     }
