@@ -36,10 +36,12 @@ export class AuthService {
     (UserWithRoleAndCompany & { permissions: Array<{ name: string }> }) | null
   > {
     const user = await this.usersService.findByEmail(email);
-    if (!user) throw new UnauthorizedException("Usuario no encontrado");
+    if (!user)
+      throw new UnauthorizedException("Correo o contraseña incorrectos");
 
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) throw new UnauthorizedException("Contraseña incorrecta");
+    if (!isMatch)
+      throw new UnauthorizedException("Correo o contraseña incorrectos");
 
     const permissions =
       user.role?.permissions?.map((perm) => ({ name: perm.name })) || [];

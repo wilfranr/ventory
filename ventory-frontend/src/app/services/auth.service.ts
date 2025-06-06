@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { tap } from 'rxjs/operators';
+import { tap, catchError } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 
 @Injectable({
     providedIn: 'root'
@@ -19,7 +20,6 @@ export class AuthService {
             tap((res: any) => {
                 const token = res?.access_token ?? '';
                 if (typeof token === 'object') {
-                    console.warn('Access token es un objeto. Corrigiendo...');
                     localStorage.setItem('access_token', token.access_token);
                 } else {
                     localStorage.setItem('access_token', token);
@@ -29,9 +29,21 @@ export class AuthService {
                 localStorage.setItem('userName', res?.user?.name ?? '');
                 localStorage.setItem('Bienvenido', 'true');
                 this.router.navigate(['/']);
+            }),
+            catchError((error) => {
+                let msg = 'Ocurrió un error inesperado. Intenta de nuevo';
+                if (error.status === 0) {
+                    msg = 'No se pudo conectar al servidor. Verifica tu conexión a internet.';
+                } else if (error.status === 401) {
+                    msg = 'Correo o contraseña incorrectos';
+                } else if (error.status === 403) {
+                    msg = 'No tienes permiso para acceder a esta sección';
+                }
+                return throwError(() => new Error(msg));
             })
         );
     }
+
     logout() {
         localStorage.removeItem('access_token');
         this.router.navigate(['/auth/login']);

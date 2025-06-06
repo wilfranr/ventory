@@ -8,11 +8,13 @@ import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { RippleModule } from 'primeng/ripple';
 import { AppFloatingConfigurator } from '../../layout/component/app.floatingconfigurator';
+import { MessageModule } from 'primeng/message';
+import { CommonModule } from '@angular/common';
 
 @Component({
     selector: 'app-login',
     standalone: true,
-    imports: [ButtonModule, CheckboxModule, InputTextModule, PasswordModule, FormsModule, RouterModule, RippleModule, AppFloatingConfigurator],
+    imports: [ButtonModule, CheckboxModule, InputTextModule, PasswordModule, FormsModule, RouterModule, RippleModule, AppFloatingConfigurator, MessageModule, CommonModule],
     template: `
         <app-floating-configurator />
         <div class="bg-surface-50 dark:bg-surface-950 flex items-center justify-center min-h-screen min-w-[100vw] overflow-hidden">
@@ -41,6 +43,7 @@ import { AppFloatingConfigurator } from '../../layout/component/app.floatingconf
                                 <span class="font-medium no-underline ml-2 text-right cursor-pointer text-primary">Olvidó su contraseña?</span>
                             </div>
 
+                            <p-message *ngIf="errorMessage" severity="error" [text]="errorMessage"></p-message>
                             <p-button label="Iniciar sesión" styleClass="w-full mt-3" (onClick)="onSubmit()" [loading]="loading"> </p-button>
                             <p-button label="¿No te encuentras registrado?" styleClass="w-full mt-3" routerLink="/auth/register" outlined></p-button>
                         </div>
@@ -59,16 +62,30 @@ export class Login {
 
     loading: boolean = false;
 
+    errorMessage: string = '';
+
     constructor(private auth: AuthService) {}
 
     onSubmit() {
+        // Validar que los campos no estén vacíos
+        if (!this.email || !this.password) {
+            this.errorMessage = 'Por favor, completa todos los campos correctamente.';
+            return;
+        }
+
         this.loading = true;
-        this.auth.login({ email: this.email, password: this.password }).subscribe({
+        this.errorMessage = ''; // Limpiar mensaje anterior
+
+        const credentials = { email: this.email, password: this.password };
+
+        this.auth.login(credentials).subscribe({
             next: () => {
                 this.loading = false;
+                // El redireccionamiento ya lo hace el AuthService (por el tap)
             },
-            error: () => {
+            error: (err) => {
                 this.loading = false;
+                this.errorMessage = err.message || 'Ocurrió un error inesperado.';
             }
         });
     }
