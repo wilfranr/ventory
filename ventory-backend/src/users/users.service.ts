@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { Prisma, RoleName } from "@prisma/client";
+import { AuthUser } from "./interfaces/auth-user.interface";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import * as bcrypt from "bcrypt";
@@ -44,7 +45,7 @@ export class UsersService {
     });
   }
 
-  async findAll(currentUser: any) {
+  async findAll(currentUser: AuthUser) {
     const VENTORY_COMPANY_ID = "cma05z0m90000c6juketn1hgr";
     if (
       currentUser.role?.name === "superadmin" ||
