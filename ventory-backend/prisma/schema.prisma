@@ -1,0 +1,78 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  roleId    String?
+  role      Role?    @relation("RoleToUsers", fields: [roleId], references: [id])
+  companyId String
+  company   Company  @relation(fields: [companyId], references: [id])
+  status    String   @default("active")
+  refreshToken String? @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Company {
+  id                 String              @id @default(cuid())
+  name               String
+  slug               String              @unique
+  nit                String              @unique
+  address            String?
+  phones             String?
+  email              String?
+  website            String?
+  logo               String?
+  users              User[] //lo relacioné uno a muchos con usuarios
+  registrationTokens RegistrationToken[] //lo relacioné uno a muchos con registrationTokens
+  createdAt          DateTime            @default(now())
+}
+
+model RegistrationToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  role      String
+  companyId String
+  company   Company  @relation(fields: [companyId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+model Role {
+  id          String       @id @default(cuid())
+  name        RoleName     @unique
+  users       User[]       @relation("RoleToUsers")
+  permissions Permission[] @relation("RoleToPermissions")
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+enum RoleName {
+  superadmin
+  admin
+  vendedor
+  analistaPartes
+  logistica
+}
+
+model Permission {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  roles     Role[]   @relation("RoleToPermissions")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
