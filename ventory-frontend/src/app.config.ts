@@ -1,5 +1,5 @@
 import { authInterceptor } from './app/interceptors/auth.interceptor';
-import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
+import { provideHttpClient, withFetch, withInterceptors, withInterceptorsFromDi } from '@angular/common/http';
 import { ApplicationConfig } from '@angular/core';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { provideRouter, withEnabledBlockingInitialNavigation, withInMemoryScrolling } from '@angular/router';
@@ -15,6 +15,7 @@ export const appConfig: ApplicationConfig = {
         provideHttpClient(withFetch(), withInterceptors([authInterceptor])),
         provideAnimationsAsync(),
         providePrimeNG({ theme: { preset: Aura, options: { darkModeSelector: '.app-dark' } } }),
-        importProvidersFrom(FormsModule)
+        importProvidersFrom(FormsModule),
+        provideHttpClient(withInterceptorsFromDi())
     ]
 };
