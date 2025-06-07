@@ -18,7 +18,7 @@ import { AuthService } from '../../services/auth.service';
             </button>
             <a class="layout-topbar-logo" routerLink="/">
                 <img src="assets/images/logo_ventory.png" alt="Ventory Logo" style="height: 70px;" />
-                <span>VENTORY</span>
+                <span>{{ companyName }}</span>
             </a>
         </div>
 
@@ -69,9 +69,9 @@ import { AuthService } from '../../services/auth.service';
                         <div class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded shadow z-50 hidden">
                             <div class="py-2">
                                 <p class="px-4 py-2 text-gray-700 dark:text-gray-200">{{ userName }}</p>
-                                <p class="px-4 py-2 text-gray-500 dark:text-gray-400">rol</p>
+                                <p class="px-4 py-2 text-gray-500 dark:text-gray-400">{{ rol }}</p>
                                 <hr class="border-gray-200 dark:border-gray-700" />
-                                <button class="w-full px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-700" (click)="toggleDarkMode()"><i class="pi pi-cog mr-2"></i> Configuración</button>
+                                <button class="w-full px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-700"><i class="pi pi-cog mr-2"></i> Configuración</button>
                                 <button class="w-full px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-700" (click)="layoutService.onMenuToggle()"><i class="pi pi-users mr-2"></i> Usuarios</button>
                             </div>
                             <button class="w-full px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-700" (click)="logout()"><i class="pi pi-sign-out mr-2"></i> Cerrar sesión</button>
@@ -86,12 +86,23 @@ export class AppTopbar {
     items!: MenuItem[];
     userName: string | null = null;
     rol: string | null = null;
+    companyName: string | null = null;
 
     constructor(
         public layoutService: LayoutService,
         private auth: AuthService
     ) {
         this.userName = localStorage.getItem('userName');
+
+        const userJson = localStorage.getItem('user');
+        if (userJson) {
+            const user = JSON.parse(userJson);
+            this.rol = user?.role?.name || 'Sin rol';
+            this.companyName = user?.company?.name || 'VENTORY';
+        } else {
+            this.rol = 'Sin rol';
+            this.companyName = 'VENTORY';
+        }
     }
 
     toggleDarkMode() {

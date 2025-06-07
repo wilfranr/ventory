@@ -13,6 +13,7 @@ import { MessageService } from 'primeng/api';
     selector: 'app-layout',
     standalone: true,
     imports: [CommonModule, AppTopbar, AppSidebar, RouterModule, AppFooter, ToastModule],
+    providers: [MessageService],
     template: `<div class="layout-wrapper" [ngClass]="containerClass">
         <p-toast></p-toast>
         <app-topbar></app-topbar>

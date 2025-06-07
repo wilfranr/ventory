@@ -15,6 +15,7 @@ import { TagModule } from 'primeng/tag';
 import { IconFieldModule } from 'primeng/iconfield';
 import { UserService } from '../../services/user.service';
 import { InputSwitchModule } from 'primeng/inputswitch';
+import { ToastModule } from 'primeng/toast';
 
 interface User {
     id?: string;
@@ -27,16 +28,16 @@ interface User {
 @Component({
     selector: 'app-users',
     standalone: true,
-    imports: [ToolbarModule, ButtonModule, TableModule, InputTextModule, InputIconModule, DropdownModule, DialogModule, ConfirmDialogModule, TagModule, IconFieldModule, FormsModule, CommonModule, ReactiveFormsModule, InputSwitchModule],
+    imports: [ToolbarModule, ButtonModule, TableModule, InputTextModule, InputIconModule, DropdownModule, DialogModule, ConfirmDialogModule, TagModule, IconFieldModule, FormsModule, CommonModule, ReactiveFormsModule, InputSwitchModule, ToastModule],
     templateUrl: './users.component.html',
-    providers: [MessageService, ConfirmationService]
+    providers: [ConfirmationService]
 })
 export class UsersComponent implements OnInit {
     // 🔹 Token para invitación
     tokenForm!: FormGroup;
     displayTokenDialog: boolean = false;
     generatedToken: string = '';
-
+    loading: boolean = false;
     // 🔹 Datos de Usuarios
     users: User[] = []; // Aquí se almacenan todos los usuarios
     selectedUsers: User[] = [];
@@ -147,47 +148,65 @@ export class UsersComponent implements OnInit {
     saveUser() {
         this.submitted = true;
 
-        if (this.user.name && this.user.email && this.user.role && this.user.status) {
-            if (!this.user.id) {
+        // Validación de campos obligatorios
+        if (!this.user.name || !this.user.email || !this.user.role || !this.user.status) {
+            this.messageService.add({
+                severity: 'error',
+                summary: 'Campos obligatorios',
+                detail: 'Por favor, completa todos los campos.'
+            });
+            return;
+        }
+
+        // Solo edición (por tu lógica actual)
+        if (!this.user.id) {
+            this.messageService.add({
+                severity: 'error',
+                summary: 'Error',
+                detail: 'No se puede crear un nuevo usuario desde este formulario.'
+            });
+            return;
+        }
+
+        // Adaptar formato de rol
+        const role = typeof this.user.role === 'object' ? this.user.role.name : this.user.role;
+
+        const userPayload = {
+            name: this.user.name,
+            email: this.user.email,
+            role,
+            status: this.user.status ?? 'activo'
+        };
+
+        this.loading = true;
+
+        this.userService.updateUser(this.user.id, userPayload).subscribe({
+            next: () => {
+                this.loading = false;
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Éxito',
+                    detail: 'Usuario actualizado',
+                    life: 3000
+                });
+                this.loadUsers();
+                this.userDialog = false;
+                this.user = {};
+            },
+            error: (err) => {
+                this.loading = false;
+                // Mensaje adaptado según posible error del backend
+                let detail = 'No se pudo actualizar el usuario.';
+                if (err.status === 409) {
+                    detail = 'El correo electrónico ya está en uso.';
+                }
                 this.messageService.add({
                     severity: 'error',
                     summary: 'Error',
-                    detail: 'No se puede crear un nuevo usuario desde este formulario.'
+                    detail
                 });
-                return;
             }
-
-            const role = typeof this.user.role === 'object' ? this.user.role.name : this.user.role;
-
-            const userPayload = {
-                name: this.user.name,
-                email: this.user.email,
-                role,
-                status: this.user.status ?? 'activo'
-            };
-
-            this.userService.updateUser(this.user.id, userPayload).subscribe({
-                next: () => {
-                    this.messageService.add({
-                        severity: 'success',
-                        summary: 'Éxito',
-                        detail: 'Usuario actualizado',
-                        life: 3000
-                    });
-                    this.loadUsers();
-                },
-                error: () => {
-                    this.messageService.add({
-                        severity: 'error',
-                        summary: 'Error',
-                        detail: 'No se pudo actualizar el usuario.'
-                    });
-                }
-            });
-
-            this.userDialog = false;
-            this.user = {};
-        }
+        });
     }
 
     editUser(user: User) {

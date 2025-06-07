@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
     providedIn: 'root'
 })
 export class RegistrationTokenService {
-    private apiUrl = 'http://localhost:3001/registration-token';
+    private apiUrl = '/api/registration-token';
 
     constructor(private http: HttpClient) {}
 

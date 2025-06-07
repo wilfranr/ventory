@@ -17,7 +17,13 @@ export const appRoutes: Routes = [
             { path: 'uikit', loadChildren: () => import('./app/pages/uikit/uikit.routes') },
             { path: 'documentation', component: Documentation },
             { path: 'pages', loadChildren: () => import('./app/pages/pages.routes') },
-            { path: 'users', component: UsersComponent }
+            { path: 'users', component: UsersComponent },
+            {
+                path: 'roles',
+                loadComponent: () => import('./app/pages/admin/roles.component').then((m) => m.RolesComponent),
+                canActivate: [AuthGuard],
+                data: { requiredRole: 'superadmin' }
+            }
         ]
     },
     { path: 'landing', component: Landing },
