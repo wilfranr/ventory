@@ -52,12 +52,21 @@ export class AuthService {
     };
   }
 
-  login(user: UserWithRoleAndCompany) {
+  login = async (user: UserWithRoleAndCompany) => {
     const payload = { sub: user.id, email: user.email };
-    const token = this.jwtService.sign(payload);
+    const accessToken = this.jwtService.sign(payload, { expiresIn: "15m" });
+    const refreshToken = this.jwtService.sign(payload, { expiresIn: "7d" });
+
+    // Guarda el refresh token hasheado en la BD
+    const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: { refreshToken: hashedRefreshToken },
+    });
 
     return {
-      access_token: token,
+      access_token: accessToken,
+      refresh_token: refreshToken,
       user: {
         name: user.name,
         email: user.email,
@@ -69,7 +78,8 @@ export class AuthService {
         },
       },
     };
-  }
+  };
+
   async register(
     data: CreateUserDto & { logo?: Express.Multer.File; token?: string },
   ) {
@@ -196,5 +206,52 @@ export class AuthService {
       companyId: company.id,
       userId: user.id,
     };
+  }
+
+  async refreshTokens(userId: number, refreshToken: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      include: { role: true, company: true },
+    });
+
+    if (!user || !user.refreshToken)
+      throw new UnauthorizedException("Usuario o token no válidos");
+
+    const isValid = await bcrypt.compare(refreshToken, user.refreshToken);
+    if (!isValid) throw new UnauthorizedException("Refresh token inválido");
+
+    // Genera nuevos tokens
+    const payload = { sub: user.id, email: user.email };
+    const newAccessToken = this.jwtService.sign(payload, { expiresIn: "15m" });
+    const newRefreshToken = this.jwtService.sign(payload, { expiresIn: "7d" });
+
+    // Guarda el nuevo refresh token hasheado
+    const hashedRefreshToken = await bcrypt.hash(newRefreshToken, 10);
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: { refreshToken: hashedRefreshToken },
+    });
+
+    return {
+      access_token: newAccessToken,
+      refresh_token: newRefreshToken,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role ? { id: user.role.id, name: user.role.name } : null,
+        company: user.company
+          ? { id: user.company.id, name: user.company.name }
+          : null,
+      },
+    };
+  }
+
+  async logout(userId: number) {
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { refreshToken: null },
+    });
+    return { message: "Logout exitoso" };
   }
 }

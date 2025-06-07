@@ -31,18 +31,26 @@ export class AuthController {
     const user = await this.authService.validateUser(body.email, body.password);
     if (!user) throw new UnauthorizedException();
 
-    const access_token = await this.authService.login(user);
+    const loginResponse = await this.authService.login(user);
+
+    // Devuelve access_token, refresh_token y user (ya tienes el id garantizado)
     return {
-      access_token,
-      user: {
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        company: {
-          id: user.company?.id || null,
-          name: user.company?.name || null,
-        },
-      },
+      access_token: loginResponse.access_token,
+      refresh_token: loginResponse.refresh_token,
+      user: loginResponse.user,
     };
+  }
+
+  @Post("refresh")
+  async refreshTokens(@Body() data: { userId: string; refreshToken: string }) {
+    return this.authService.refreshTokens(
+      Number(data.userId),
+      data.refreshToken,
+    );
+  }
+
+  @Post("logout")
+  async logout(@Body() data: { userId: string }) {
+    return this.authService.logout(Number(data.userId));
   }
 }
