@@ -3,6 +3,7 @@ import { Permissions } from "src/permissions/permissions.decorator";
 import { UsersService } from "./users.service";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { CurrentUser } from "src/auth/current-user.decorator";
+import { AuthUser } from "./interfaces/auth-user.interface";
 import { ApiTags, ApiBearerAuth, ApiOperation } from "@nestjs/swagger";
 
 @ApiTags("Usuarios")
@@ -14,7 +15,7 @@ export class UsersController {
   @ApiOperation({ summary: "Obtener todos los usuarios" })
   @Permissions("ver_usuarios")
   @Get()
-  async findAll(@CurrentUser() user: any) {
+  async findAll(@CurrentUser() user: AuthUser) {
     return this.usersService.findAll(user);
   }
 
@@ -26,7 +27,7 @@ export class UsersController {
 
   @Permissions("ver_usuarios") // o un permiso especial si quieres que sea solo para admins
   @Get("admin-only")
-  adminAccess(@CurrentUser() user: any) {
+  adminAccess(@CurrentUser() user: AuthUser) {
     return {
       message: "Ruta protegida para admin y superadmin",
       user,
