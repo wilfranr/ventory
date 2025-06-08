@@ -27,7 +27,12 @@ async function bootstrap() {
   });
 
   // Luego configuramos pipes, etc.
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+      whitelist: true,
+    }),
+  );
 
   // Y por último arrancamos el servidor
   await app.listen(process.env.PORT ?? 3001);
