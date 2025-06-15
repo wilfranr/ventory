@@ -9,6 +9,10 @@ export default [
     { path: 'documentation', component: Documentation },
     { path: 'crud', component: Crud },
     { path: 'empty', component: Empty },
-    { path: 'users', component: UsersComponent }
+    { path: 'users', component: UsersComponent },
+    {
+        path: 'listas',
+        loadChildren: () => import('./lists/lists.routes').then((m) => m.listsRoutes)
+    }
     //{ path: '**', redirectTo: '/notfound' }
 ] as Routes;

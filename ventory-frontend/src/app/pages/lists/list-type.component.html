@@ -1,0 +1,51 @@
+<div class="card">
+    <div class="flex justify-between items-center mb-2">
+        <h2 class="text-xl">Tipos de Lista</h2>
+        <!-- <button pButton type="button" label="Nuevo" icon="pi pi-plus" (click)="openNew()"></button> -->
+    </div>
+
+    <div class="flex justify-between items-center mb-2">
+    <p-table [value]="listTypes" [paginator]="true" [rows]="10" [responsiveLayout]="'scroll'">
+        <ng-template pTemplate="header">
+            <tr>
+                <th>Nombre</th>
+                <!-- <th>Descripción</th> -->
+                <th>Acciones</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-listType>
+            <tr>
+                <td>{{ listType.name }}</td>
+                <!-- <td>{{ listType.description }}</td> -->
+                <td>
+                    <button pButton icon="pi pi-pencil" class="p-button-sm p-button-text" (click)="openEdit(listType)"></button>
+                    <button pButton icon="pi pi-trash" class="p-button-sm p-button-danger p-button-text" (click)="delete(listType)"></button>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+    </div>
+</div>
+
+<p-dialog header="{{ isEdit ? 'Editar' : 'Nuevo' }} Tipo de Lista" [(visible)]="displayDialog" [modal]="true" [closable]="true" [dismissableMask]="true" [responsive]="true">
+    <form [formGroup]="listTypeForm" (ngSubmit)="save()">
+        <div class="p-fluid">
+            <div class="field">
+                <label>Código</label>
+                <input pInputText formControlName="code" />
+            </div>
+            <div class="field">
+                <label>Nombre</label>
+                <input pInputText formControlName="name" />
+            </div>
+            <div class="field">
+                <label>Descripción</label>
+                <input pInputText formControlName="description" />
+            </div>
+        </div>
+        <div class="flex justify-end mt-4">
+            <button pButton label="Cancelar" type="button" class="p-button-text mr-2" (click)="displayDialog = false"></button>
+            <button pButton label="Guardar" type="submit" [disabled]="listTypeForm.invalid"></button>
+        </div>
+    </form>
+</p-dialog>

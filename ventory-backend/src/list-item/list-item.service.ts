@@ -12,7 +12,9 @@ export class ListItemService {
   }
 
   findAll() {
-    return this.prisma.listItem.findMany();
+    return this.prisma.listItem.findMany({
+      include: { listType: true },
+    });
   }
 
   findByTypeId(listTypeId: number) {

@@ -1,0 +1,168 @@
+<p-toolbar styleClass="mb-6">
+  <ng-template #start>
+    <p-button label="Nueva Lista" icon="pi pi-plus" severity="secondary" class="mr-2" (onClick)="openNew()" />
+    <p-button severity="secondary" label="Eliminar" icon="pi pi-trash" outlined (onClick)="deleteSelectedItems()" [disabled]="!selectedItems || !selectedItems.length" />
+  </ng-template>
+  <ng-template #end>
+    <p-iconfield>
+      <p-inputicon styleClass="pi pi-search" />
+      <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Buscar..." />
+    </p-iconfield>
+  </ng-template>
+</p-toolbar>
+
+
+<p-table
+  #dt
+  [value]="listItems"
+  [rows]="10"
+  [columns]="cols"
+  [paginator]="true"
+  [globalFilterFields]="['name', 'description', 'listType.name']"
+  [tableStyle]="{ 'min-width': '65rem' }"
+  [(selection)]="selectedItems"
+  [rowHover]="true"
+  dataKey="id"
+  currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} listas"
+  [showCurrentPageReport]="true"
+  [rowsPerPageOptions]="[10, 20, 30]"
+>
+  <ng-template #caption>
+    <div class="flex items-center justify-between">
+      <h5 class="m-0">Administrar Listas</h5>
+    </div>
+  </ng-template>
+
+  <ng-template #header>
+    <tr>
+      <th style="width: 3rem">
+        <p-tableHeaderCheckbox />
+      </th>
+      <th style="min-width: 14rem">Nombre</th>
+      <th style="min-width: 18rem">Descripción</th>
+      <th style="min-width: 12rem">Tipo</th>
+      <th style="min-width: 8rem"></th>
+    </tr>
+  </ng-template>
+
+  <ng-template #body let-item>
+    <tr>
+      <td style="width: 3rem">
+        <p-tableCheckbox [value]="item" />
+      </td>
+      <td>{{ item.name }}</td>
+      <td>{{ item.description }}</td>
+      <td>
+        <p-tag [value]="item.listType?.name" />
+      </td>
+      <td>
+        <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" (click)="openEdit(item)" />
+        <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true" (click)="delete(item)" />
+      </td>
+    </tr>
+  </ng-template>
+</p-table>
+
+
+<p-dialog
+    [(visible)]="displayDialog"
+    [style]="{ width: '420px' }"
+    [modal]="true"
+    header="{{ isEdit ? 'Editar' : 'Nueva' }} Lista"
+>
+    <form [formGroup]="listItemForm" (ngSubmit)="save()" class="flex flex-col gap-6">
+        <!-- Dropdown y botón nuevo tipo -->
+        <div class="flex items-center gap-2 mb-4">
+            <p-dropdown
+                [options]="listTypes"
+                formControlName="listTypeId"
+                optionLabel="name"
+                optionValue="id"
+                placeholder="Seleccione tipo de lista"
+                class="w-full"
+            ></p-dropdown>
+            <button
+                pButton
+                icon="pi pi-plus"
+                outlined
+                type="button"
+                (click)="typeDialogVisible = true"
+                [style.width.px]="40"
+                [style.height.px]="40"
+                title="Agregar nuevo tipo de lista"
+            ></button>
+        </div>
+
+        <!-- Campos del ítem -->
+        <div>
+            <label class="block font-bold mb-2">Nombre</label>
+            <input pInputText formControlName="name" class="w-full" />
+        </div>
+        <div>
+            <label class="block font-bold mb-2">Descripción</label>
+            <input pInputText formControlName="description" class="w-full" />
+        </div>
+
+        <!-- Tabla de tipos de lista -->
+        <div>
+            <h3 class="font-bold mb-2 mt-6">Tipos de Lista</h3>
+            <p-table [value]="listTypes" [paginator]="true" [rows]="3">
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Acciones</th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-type>
+                    <tr>
+                        <td>{{ type.name }}</td>
+                        <td>
+                            <button pButton icon="pi pi-pencil" class="p-button-sm p-button-text" (click)="editType(type)"></button>
+                            <button pButton icon="pi pi-trash" class="p-button-sm p-button-danger p-button-text" (click)="deleteType(type)"></button>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+    </form>
+
+    <!-- Footer con botones -->
+    <ng-template #footer>
+        <div class="flex justify-end gap-2 w-full">
+            <p-button label="Cancelar" icon="pi pi-times" text (click)="displayDialog = false"></p-button>
+            <p-button label="Guardar" icon="pi pi-check" (click)="save()" [disabled]="listItemForm.invalid"></p-button>
+        </div>
+    </ng-template>
+
+    <!-- Modal pequeño para crear nuevo tipo de lista -->
+    <p-dialog
+        [(visible)]="typeDialogVisible"
+        header="Nuevo Tipo de Lista"
+        [modal]="true"
+        [closable]="true"
+        [dismissableMask]="true"
+        [style]="{ width: '400px' }"
+    >
+        <form [formGroup]="typeForm" (ngSubmit)="saveType()">
+            <div class="mb-4">
+                <div class="field">
+  <label>Código</label>
+  <input pInputText formControlName="code" />
+</div>
+<div class="field">
+  <label>Nombre</label>
+  <input pInputText formControlName="name" />
+</div>
+<div class="field">
+  <label>Descripción</label>
+  <input pInputText formControlName="description" />
+</div>            </div>
+            <div class="flex justify-end gap-2">
+                <p-button label="Cancelar" icon="pi pi-times" text (click)="typeDialogVisible = false"></p-button>
+                <p-button label="Guardar" icon="pi pi-check" type="submit" [disabled]="typeForm.invalid"></p-button>
+            </div>
+        </form>
+    </p-dialog>
+</p-dialog>
+<p-confirmdialog [style]="{ width: '450px' }" />
+

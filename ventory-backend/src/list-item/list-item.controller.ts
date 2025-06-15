@@ -12,7 +12,7 @@ import { CreateListItemDto } from "./dto/create-list-item.dto";
 import { UpdateListItemDto } from "./dto/update-list-item.dto";
 import { Public } from "src/auth/public.decorator";
 
-@Controller("list-item")
+@Controller("list-items")
 @Public()
 export class ListItemController {
   constructor(private readonly listItemService: ListItemService) {}

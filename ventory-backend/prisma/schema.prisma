@@ -92,7 +92,7 @@ model ListItem {
 
 model ListType {
     id      Int     @id @default(autoincrement())
-    code    String   @unique
+    code    String?   @unique
     name    String
     description String?
     items   ListItem[]
