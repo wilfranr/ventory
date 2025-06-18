@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ConfirmationService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
@@ -13,12 +13,13 @@ import { InputTextModule } from 'primeng/inputtext';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
+import { ToastModule } from 'primeng/toast';
 import { ToolbarModule } from 'primeng/toolbar';
 
 @Component({
     standalone: true,
     selector: 'app-roles',
-    imports: [CommonModule, FormsModule, TableModule, ButtonModule, DialogModule, InputTextModule, CheckboxModule, ConfirmDialogModule, MultiSelectModule, ToolbarModule, TagModule, InputIconModule, IconFieldModule],
+    imports: [CommonModule, FormsModule, TableModule, ButtonModule, DialogModule, InputTextModule, CheckboxModule, ConfirmDialogModule, MultiSelectModule, ToolbarModule, TagModule, InputIconModule, IconFieldModule, ToastModule],
     templateUrl: './roles.component.html',
     providers: [HttpClient, ConfirmationService]
 })
@@ -30,7 +31,11 @@ export class RolesComponent implements OnInit {
     roleDialog = false;
     submitted = false;
 
-    constructor(private http: HttpClient) {}
+    constructor(
+        private http: HttpClient,
+        private confirmationService: ConfirmationService,
+        private messageService: MessageService
+    ) {}
 
     ngOnInit() {
         this.loadRoles();

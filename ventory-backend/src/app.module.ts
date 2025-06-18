@@ -11,6 +11,8 @@ import { PermissionsModule } from "./permissions/permissions.module";
 import { APP_GUARD } from "@nestjs/core";
 import { PermissionsGuard } from "./permissions/permissions.guard";
 import { JwtAuthGuard } from "./auth/jwt-auth.guard";
+import { ListItemModule } from "./list-item/list-item.module";
+import { ListTypeModule } from './list-type/list-type.module';
 
 @Module({
   imports: [
@@ -20,6 +22,8 @@ import { JwtAuthGuard } from "./auth/jwt-auth.guard";
     PrismaModule,
     RegistrationTokenModule,
     PermissionsModule,
+    ListItemModule,
+    ListTypeModule,
   ],
   controllers: [AppController, RolesController],
   providers: [
