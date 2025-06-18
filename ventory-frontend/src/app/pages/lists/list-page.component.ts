@@ -4,11 +4,11 @@ import { DropdownModule } from 'primeng/dropdown';
 import { ListItemComponent } from './list-item.component';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ListTypeComponent } from './list-type.component';
+// import { ListTypeComponent } from './list-type.component';
 
 @Component({
     selector: 'app-list-page',
-    imports: [DropdownModule, ListItemComponent, CommonModule, FormsModule, ListTypeComponent],
+    imports: [DropdownModule, ListItemComponent, CommonModule, FormsModule],
     templateUrl: './list-page.component.html',
     styleUrl: './list-page.component.scss',
     standalone: true

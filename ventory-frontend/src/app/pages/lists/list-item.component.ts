@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { Component, OnChanges, OnInit, SimpleChanges, input } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ListItemService } from './list-item.service';
 import { ListItem } from './list-item.model';
@@ -13,7 +13,7 @@ import { CommonModule } from '@angular/common';
 import { ToolbarModule } from 'primeng/toolbar';
 import { DropdownModule } from 'primeng/dropdown';
 import { ListTypeService } from './list-type.service';
-import { ListTypeComponent } from './list-type.component';
+// import { ListTypeComponent } from './list-type.component';
 import { ListType } from './list-type.model';
 import { IconFieldModule } from 'primeng/iconfield';
 import { TagModule } from 'primeng/tag';
@@ -25,28 +25,11 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
     selector: 'app-list-item',
     templateUrl: './list-item.component.html',
     standalone: true,
-    imports: [
-        ListTypeComponent,
-        TableModule,
-        ConfirmDialogModule,
-        DialogModule,
-        InputTextModule,
-        ButtonModule,
-        ToastModule,
-        FormsModule,
-        ReactiveFormsModule,
-        FormsModule,
-        CommonModule,
-        ToolbarModule,
-        DropdownModule,
-        IconFieldModule,
-        TagModule,
-        InputIconModule
-    ],
+    imports: [TableModule, ConfirmDialogModule, DialogModule, InputTextModule, ButtonModule, ToastModule, FormsModule, ReactiveFormsModule, FormsModule, CommonModule, ToolbarModule, DropdownModule, IconFieldModule, TagModule, InputIconModule],
     providers: [MessageService, ConfirmationService]
 })
 export class ListItemComponent implements OnInit, OnChanges {
-    @Input() listTypeId: number | null = null;
+    readonly listTypeId = input<number | null>(null);
     listItems: ListItem[] = [];
     listTypes: any[] = [];
     typeDialogVisible = false;
@@ -84,19 +67,21 @@ export class ListItemComponent implements OnInit, OnChanges {
 
     ngOnInit(): void {
         this.listTypeServices.getAll().subscribe((types) => (this.listTypes = types));
-        if (this.listTypeId == null) {
+        const listTypeId = this.listTypeId();
+        if (listTypeId == null) {
             this.loadAllItems();
         } else {
-            this.loadListItemsByType(this.listTypeId);
+            this.loadListItemsByType(listTypeId);
         }
     }
 
     ngOnChanges(changes: SimpleChanges): void {
         if (changes['listTypeId']) {
-            if (this.listTypeId == null) {
+            const listTypeId = this.listTypeId();
+            if (listTypeId == null) {
                 this.loadAllItems();
             } else {
-                this.loadListItemsByType(this.listTypeId);
+                this.loadListItemsByType(listTypeId);
             }
         }
     }
@@ -131,17 +116,18 @@ export class ListItemComponent implements OnInit, OnChanges {
 
     save() {
         if (this.listItemForm.invalid) return;
-        const itemData = { ...this.listItemForm.value, listTypeId: this.listTypeId };
+        const itemData = { ...this.listItemForm.value, listTypeId: this.listTypeId() };
 
         if (this.isEdit && this.selectedListItem) {
             this.listItemService.update(this.selectedListItem.id, itemData).subscribe({
                 next: () => {
                     this.messageService.add({ severity: 'success', summary: 'Actualizado', detail: 'Ítem actualizado' });
                     this.displayDialog = false;
-                    if (this.listTypeId == null) {
+                    const listTypeId = this.listTypeId();
+                    if (listTypeId == null) {
                         this.loadAllItems();
                     } else {
-                        this.loadListItemsByType(this.listTypeId);
+                        this.loadListItemsByType(listTypeId);
                     }
                 },
                 error: () => this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudo actualizar' })
@@ -151,10 +137,11 @@ export class ListItemComponent implements OnInit, OnChanges {
                 next: () => {
                     this.messageService.add({ severity: 'success', summary: 'Creado', detail: 'Ítem creado' });
                     this.displayDialog = false;
-                    if (this.listTypeId == null) {
+                    const listTypeId = this.listTypeId();
+                    if (listTypeId == null) {
                         this.loadAllItems();
                     } else {
-                        this.loadListItemsByType(this.listTypeId);
+                        this.loadListItemsByType(listTypeId);
                     }
                 },
                 error: () => this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudo crear' })
@@ -268,7 +255,6 @@ export class ListItemComponent implements OnInit, OnChanges {
             }
         });
     }
-
     onGlobalFilter(table: any, event: Event) {
         const input = (event.target as HTMLInputElement).value;
         table.filterGlobal(input, 'contains');
