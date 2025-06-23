@@ -6,8 +6,14 @@ import { UpdateListTypeDto } from "./dto/update-list-type.dto";
 @Injectable()
 export class ListTypeService {
   constructor(private readonly prisma: PrismaService) {}
-  create(data: CreateListTypeDto) {
-    return this.prisma.listType.create({ data });
+
+  create(data: CreateListTypeDto, companyId: string) {
+    return this.prisma.listType.create({
+      data: {
+        ...data,
+        companyId,
+      },
+    });
   }
 
   findAll() {
@@ -21,19 +27,19 @@ export class ListTypeService {
     return this.prisma.listType.findUnique({
       where: { id },
       include: { items: true },
-    })
+    });
   }
 
   update(id: number, data: UpdateListTypeDto) {
     return this.prisma.listType.update({
       where: { id },
-      data
-    })
+      data,
+    });
   }
 
   remove(id: number) {
     return this.prisma.listType.delete({
       where: { id },
-    })
+    });
   }
 }

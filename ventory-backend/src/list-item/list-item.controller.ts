@@ -11,6 +11,7 @@ import { ListItemService } from "./list-item.service";
 import { CreateListItemDto } from "./dto/create-list-item.dto";
 import { UpdateListItemDto } from "./dto/update-list-item.dto";
 import { Public } from "src/auth/public.decorator";
+import { CurrentUser } from "src/auth/current-user.decorator";
 
 @Controller("list-items")
 @Public()
@@ -18,13 +19,13 @@ export class ListItemController {
   constructor(private readonly listItemService: ListItemService) {}
 
   @Post()
-  create(@Body() createListItemDto: CreateListItemDto) {
-    return this.listItemService.create(createListItemDto);
+  create(@Body() dto: CreateListItemDto, @CurrentUser() user: any) {
+    return this.listItemService.create(dto, user.companyId);
   }
 
   @Get()
-  findAll() {
-    return this.listItemService.findAll();
+  findAll(@CurrentUser() user: any) {
+    return this.listItemService.findAll(user.companyId);
   }
 
   @Get("type/:listTypeId")

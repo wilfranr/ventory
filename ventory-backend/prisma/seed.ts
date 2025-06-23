@@ -98,10 +98,10 @@ async function main() {
   }
 
   // 🔐 Crear empresa + usuario superadmin
-  const companyName = "Heavy Market";
-  const nit = "123456789";
-  const email = "admin@heavymarket.com";
-  const password = "admin123";
+  const companyName = "VENTORY";
+  const nit = "80896995-0";
+  const email = "info@ventory.com";
+  const password = "896995";
   const hashedPassword = await bcrypt.hash(password, 10);
 
   const existing = await prisma.company.findUnique({ where: { nit } });
@@ -119,13 +119,13 @@ async function main() {
       name: companyName,
       slug: slugify(companyName, { lower: true, strict: true }),
       nit,
-      email: "info@heavymarket.com",
+      email: "info@ventory.com",
       address: "Calle 123",
       phones: "3001234567",
-      website: "https://heavymarket.com",
+      website: "https://ventory.com",
       users: {
         create: {
-          name: "Super Admin",
+          name: "Yoseth",
           email,
           password: hashedPassword,
           roleId: superadminRole?.id,

@@ -7,12 +7,18 @@ import { UpdateListItemDto } from "./dto/update-list-item.dto";
 export class ListItemService {
   constructor(private prisma: PrismaService) {}
 
-  create(data: CreateListItemDto) {
-    return this.prisma.listItem.create({ data });
+  create(data: CreateListItemDto, companyId: string) {
+    return this.prisma.listItem.create({
+      data: {
+        ...data,
+        companyId,
+      },
+    });
   }
 
-  findAll() {
+  findAll(companyId: string) {
     return this.prisma.listItem.findMany({
+      where: { companyId },
       include: { listType: true },
     });
   }
