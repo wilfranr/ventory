@@ -1,0 +1,1 @@
+# Referencias externas (documentación oficial de Angular, NestJS, Prisma, etc.)

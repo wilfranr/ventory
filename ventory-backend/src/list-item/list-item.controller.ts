@@ -6,15 +6,17 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
 } from "@nestjs/common";
 import { ListItemService } from "./list-item.service";
 import { CreateListItemDto } from "./dto/create-list-item.dto";
 import { UpdateListItemDto } from "./dto/update-list-item.dto";
 import { Public } from "src/auth/public.decorator";
 import { CurrentUser } from "src/auth/current-user.decorator";
+import { AuthGuard } from "@nestjs/passport";
 
+@UseGuards(AuthGuard("jwt"))
 @Controller("list-items")
-@Public()
 export class ListItemController {
   constructor(private readonly listItemService: ListItemService) {}
 

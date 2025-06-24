@@ -16,17 +16,16 @@ export class ListTypeService {
     });
   }
 
-  findAll() {
+  findAll(companyId: string) {
     return this.prisma.listType.findMany({
-      include: { items: true },
-      orderBy: { name: "asc" },
+      where: { companyId },
+      // ...otros includes si quieres
     });
   }
 
-  findOne(id: number) {
-    return this.prisma.listType.findUnique({
-      where: { id },
-      include: { items: true },
+  findOne(id: number, companyId: string) {
+    return this.prisma.listType.findFirst({
+      where: { id, companyId },
     });
   }
 

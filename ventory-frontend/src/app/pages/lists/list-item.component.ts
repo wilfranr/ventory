@@ -59,7 +59,7 @@ export class ListItemComponent implements OnInit, OnChanges {
         });
 
         this.typeForm = this.fb.group({
-            code: ['', Validators.required],
+            code: [''],
             name: ['', Validators.required],
             description: ['']
         });
@@ -116,18 +116,18 @@ export class ListItemComponent implements OnInit, OnChanges {
 
     save() {
         if (this.listItemForm.invalid) return;
-        const itemData = { ...this.listItemForm.value, listTypeId: this.listTypeId() };
+        const itemData = this.listItemForm.value; // <-- Usa solo el valor del formulario
 
         if (this.isEdit && this.selectedListItem) {
             this.listItemService.update(this.selectedListItem.id, itemData).subscribe({
                 next: () => {
                     this.messageService.add({ severity: 'success', summary: 'Actualizado', detail: 'Ítem actualizado' });
                     this.displayDialog = false;
-                    const listTypeId = this.listTypeId();
-                    if (listTypeId == null) {
+                    // Aquí puedes seguir usando tu lógica de recarga si quieres
+                    if (itemData.listTypeId == null) {
                         this.loadAllItems();
                     } else {
-                        this.loadListItemsByType(listTypeId);
+                        this.loadListItemsByType(itemData.listTypeId);
                     }
                 },
                 error: () => this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudo actualizar' })
@@ -137,11 +137,10 @@ export class ListItemComponent implements OnInit, OnChanges {
                 next: () => {
                     this.messageService.add({ severity: 'success', summary: 'Creado', detail: 'Ítem creado' });
                     this.displayDialog = false;
-                    const listTypeId = this.listTypeId();
-                    if (listTypeId == null) {
+                    if (itemData.listTypeId == null) {
                         this.loadAllItems();
                     } else {
-                        this.loadListItemsByType(listTypeId);
+                        this.loadListItemsByType(itemData.listTypeId);
                     }
                 },
                 error: () => this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudo crear' })

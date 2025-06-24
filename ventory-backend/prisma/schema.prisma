@@ -102,7 +102,7 @@ model ListItem {
 // Tipos de listas personalizables por cada compañía
 model ListType {
   id          Int        @id @default(autoincrement()) // identificador único
-  code        String?    @unique // código opcional
+  code        String?    // código opcional
   name        String     // nombre del tipo de lista
   description String?    // descripción opcional
   items       ListItem[] // elementos pertenecientes a este tipo

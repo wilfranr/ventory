@@ -144,19 +144,16 @@
         [style]="{ width: '400px' }"
     >
         <form [formGroup]="typeForm" (ngSubmit)="saveType()">
-            <div class="mb-4">
-                <div class="field">
-  <label>Código</label>
-  <input pInputText formControlName="code" />
-</div>
-<div class="field">
-  <label>Nombre</label>
-  <input pInputText formControlName="name" />
-</div>
-<div class="field">
-  <label>Descripción</label>
-  <input pInputText formControlName="description" />
-</div>            </div>
+            <div class="card flex flex-col gap-4">
+                <div class="flex flex-col gap-2">
+                    <label for="name">Nombre</label>
+                    <input pInputText formControlName="name" id="name" type="text" />
+                </div>
+                <div class="flex flex-col gap-2">
+                    <label for="description">Descripción</label>
+                    <input pInputText formControlName="description" id="description" type="text" />
+                </div>
+            </div>
             <div class="flex justify-end gap-2">
                 <p-button label="Cancelar" icon="pi pi-times" text (click)="typeDialogVisible = false"></p-button>
                 <p-button label="Guardar" icon="pi pi-check" type="submit" [disabled]="typeForm.invalid"></p-button>

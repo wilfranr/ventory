@@ -1,0 +1,37 @@
+﻿Task,Description,Tipo,Status,Assigned To,Team,Priority,Due Date
+" Definido el flujo de generación de tokens de invitación para nuevos usuarios.
+",,Feature,Done,Yoseth Rivera,Back-End,Moderate,30 de enero de 2025
+Confirmada la existencia y correcto diseño de la tabla RegistrationToken en Prisma.,,Feature,Done,Yoseth Rivera,Back-End,Moderate,30 de enero de 2025
+Creada la carpeta y archivo create-registration-token.dto.ts.,,Feature,Done,Yoseth Rivera,Back-End,Moderate,30 de enero de 2025
+Implementado el DTO CreateRegistrationTokenDto.,,Feature,Done,Yoseth Rivera,Back-End,Moderate,30 de enero de 2025
+Creado el RegistrationTokenController con el endpoint POST /registration-tokens.,,Feature,Done,Yoseth Rivera,Back-End,Moderate,30 de enero de 2025
+Creado el RegistrationTokenService para generar y guardar tokens aleatorios.,,Feature,Done,Yoseth Rivera,Back-End,Moderate,30 de enero de 2025
+Configurado el RegistrationTokenModule e importado en AppModule.,,Feature,Done,Yoseth Rivera,Back-End,Moderate,30 de enero de 2025
+Probado exitosamente el endpoint en Postman (token generado y guardado en base de datos).,,Feature,Done,Yoseth Rivera,Back-End,Moderate,30 de enero de 2025
+Subida la rama feature/dto-users-roles-permissions al repositorio remoto en GitHub.,,Feature,Done,Yoseth Rivera,Back-End,Moderate,30 de enero de 2025
+"Un formulario sencillo: elegir rol → botón ""Generar Token"".",,Feature,Done,Yoseth Rivera,,,
+Mostrar el token generado para que el admin lo copie fácilmente.,,Feature,Done,Yoseth Rivera,,,
+"Crear vista usuarios ",,Feature,Done,Yoseth Rivera,,High,27 de abril de 2025
+Crear Tabla roles en Prisma,"Tabla de roles (admin, superadmin, vendedor, etc)",Feature,Done,Yoseth Rivera,Prisma,High,28 de abril de 2025
+Crear tabla permissions en Prisma,"Tabla de permisos (crear usuarios, ver pedidos, etc)",Feature,Done,Yoseth Rivera,Prisma,High,28 de abril de 2025
+Crear tabla role_permissions,Relacionar roles y permisos (muchos a muchos),Feature,Done,Yoseth Rivera,Prisma,High,28 de abril de 2025
+Ajustar User para asociarlo a Role,Relación User -> Role,Feature,Done,Yoseth Rivera,Prisma,Moderate,28 de abril de 2025
+Modificar login para devolver rol del usuario,"Que al loguearse, Angular sepa qué rol tiene el usuario",Feature,Done,Yoseth Rivera,Back-End,Moderate,28 de abril de 2025
+Crear servicio RolesService en NestJS,"Para crear, listar, asignar roles a usuarios",Feature,Done,Yoseth Rivera,Back-End,Moderate,28 de abril de 2025
+Crear servicio PermissionsService en NestJS,Para listar permisos disponibles,Feature,Done,Yoseth Rivera,Back-End,Moderate,28 de abril de 2025
+Crear Guardias de Rol (RoleGuards mejorados),Para proteger rutas según permisos,Feature,Done,Yoseth Rivera,Back-End,Moderate,28 de abril de 2025
+"Asociar permisos base a cada rol (admin, vendedor, logistica, etc.)",Crear un seed inicial de permisos por rol para que cada usuario tenga sus accesos definidos,Feature,Done,Yoseth Rivera,Back-End,,
+Aplicar guards a rutas existentes,"Proteger rutas usando @UseGuards(JwtAuthGuard, PermissionsGuard) y @Permissions(...)",Feature,Done,Yoseth Rivera,Back-End,,
+Validar acceso según rol y permisos asignados (usuario con y sin permisos),Verificar comportamiento de acceso según permisos asignados al rol actual del usuario,Feature,Done,Yoseth Rivera,Back-End,,
+(Opcional) Documentar permisos activos por módulo en Notion o Postman,Listar qué permisos existen y a qué módulos se aplican para referencia de desarrollo,Feature,Done,Yoseth Rivera,Back-End,,
+Aplicar guards por permisos en otros módulos,"Proteger rutas de Roles, Pedidos, Órdenes de Trabajo usando @Permissions(...)",Feature,Done,Yoseth Rivera,Back-End,,
+Verificar que los permisos usados estén en la tabla permissions,Validar que todos los permisos requeridos en los guards existan y estén correctamente nombrados,Feature,Done,Yoseth Rivera,Back-End,,
+Crear helper opcional para validar permisos desde servicios,Crear helper opcional para validar permisos desde servicios,Feature,Done,Yoseth Rivera,Back-End,,
+Implementar tests para rutas con y sin permisos,Probar acceso permitido y denegado usando usuarios con diferentes permisos,Feature,Done,Yoseth Rivera,Back-End,,
+"
+Registrar en Notion las rutas protegidas por permiso (opcional)","Documentar qué rutas están protegidas y con qué permiso, por módulo",Documentation,Done,Yoseth Rivera,Back-End,,
+Validar y corregir el selector de permisos en el formulario de roles (frontend),"Revisar visualización y usabilidad del select de permisos (p-multiselect, p-dropdown o el componente que uses).Corregir posibles problemas de scroll, overflow, estilos o duplicidad de valores al editar/crear roles.Comparar la configuración con la del formulario de usuarios (referencia de casos similares).",Refactor,Done,Yoseth Rivera,Front-End,,
+Crear helper opcional para validar permisos desde servicios,Implementar función reutilizable en el backend para validar permisos antes de ejecutar lógica de negocio en los servicios.,Feature,Done,Yoseth Rivera,Back-End,,
+(Opcional) Probar asignación y edición de permisos a roles desde el frontend,Simular creación y edición de roles cambiando permisos para validar que el flujo es correcto y persistente.Notificar con toast o mensaje visual al usuario si se produce algún error o si el cambio fue exitoso.,Feature,Done,Yoseth Rivera,Front-End,,
+(Opcional) Mejorar feedback visual en formularios de edición/creación,"Verificar que los campos muestran validaciones claras (errores de obligatorio, formato, etc.).Asegurar que los modales y selectores tengan tamaño adecuado y no se corten (ajustar estilos si es necesario).",Feature,Done,Yoseth Rivera,Front-End,,
+1. Preparación del entorno,,,Not started,Yoseth Rivera,,,

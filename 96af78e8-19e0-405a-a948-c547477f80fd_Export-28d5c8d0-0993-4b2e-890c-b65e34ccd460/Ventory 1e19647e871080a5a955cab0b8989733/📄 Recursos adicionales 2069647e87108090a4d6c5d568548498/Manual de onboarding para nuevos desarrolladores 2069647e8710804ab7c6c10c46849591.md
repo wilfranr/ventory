@@ -1,0 +1,1 @@
+# Manual de onboarding para nuevos desarrolladores
