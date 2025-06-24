@@ -1,62 +1,70 @@
+// Genera el cliente de Prisma para acceder a la base de datos
 generator client {
   provider = "prisma-client-js"
 }
 
+// Fuente de datos principal. En este caso se utiliza SQLite y la URL se
+// define mediante la variable de entorno DATABASE_URL
 datasource db {
   provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
+// Usuarios del sistema
 model User {
-  id        Int      @id @default(autoincrement())
-  name      String
-  email     String   @unique
-  password  String
-  roleId    String?
-  role      Role?    @relation("RoleToUsers", fields: [roleId], references: [id])
-  companyId String
-  company   Company  @relation(fields: [companyId], references: [id])
-  status    String   @default("active")
-  refreshToken String? @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            Int      @id @default(autoincrement()) // identificador único
+  name          String   // nombre del usuario
+  email         String   @unique // correo electrónico
+  password      String   // contraseña encriptada
+  roleId        String?  // referencia opcional al rol
+  role          Role?    @relation("RoleToUsers", fields: [roleId], references: [id]) // relación con Role
+  companyId     String   // empresa a la que pertenece
+  company       Company  @relation(fields: [companyId], references: [id]) // relación con Company
+  status        String   @default("active") // estado del usuario
+  refreshToken  String?  @unique // token para refrescar sesión
+  createdAt     DateTime @default(now()) // fecha de creación
+  updatedAt     DateTime @updatedAt // fecha de actualización
 }
 
+// Empresas registradas
 model Company {
-  id                 String              @id @default(cuid())
-  name               String
-  slug               String              @unique
-  nit                String              @unique
-  address            String?
-  phones             String?
-  email              String?
-  website            String?
-  logo               String?
-  users              User[]
-  registrationTokens RegistrationToken[]
-  listItems          ListItem[]          // Relación con ListItem
-  listTypes          ListType[]          // Relación con ListType
-  createdAt          DateTime            @default(now())
+  id                 String              @id @default(cuid()) // identificador único
+  name               String              // nombre de la empresa
+  slug               String              @unique // slug para URLs
+  nit                String              @unique // número de identificación tributaria
+  address            String?             // dirección física
+  phones             String?             // teléfonos de contacto
+  email              String?             // correo de contacto
+  website            String?             // sitio web
+  logo               String?             // URL del logo
+  users              User[]              // usuarios asociados
+  registrationTokens RegistrationToken[] // tokens de registro de usuarios
+  listItems          ListItem[]          // relación con ListItem
+  listTypes          ListType[]          // relación con ListType
+  createdAt          DateTime            @default(now()) // fecha de creación
 }
 
+// Tokens de registro utilizados para invitar a nuevos usuarios
 model RegistrationToken {
-  id        String   @id @default(cuid())
-  token     String   @unique
-  role      String
-  companyId String
-  company   Company  @relation(fields: [companyId], references: [id])
-  createdAt DateTime @default(now())
+  id        String   @id @default(cuid()) // identificador único
+  token     String   @unique // token único de invitación
+  role      String   // rol que se asignará al usuario
+  companyId String   // empresa a la que pertenece
+  company   Company  @relation(fields: [companyId], references: [id]) // relación con Company
+  createdAt DateTime @default(now()) // fecha de creación
 }
 
+// Roles disponibles dentro de la aplicación
 model Role {
-  id          String       @id @default(cuid())
-  name        RoleName     @unique
-  users       User[]       @relation("RoleToUsers")
-  permissions Permission[] @relation("RoleToPermissions")
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  id          String       @id @default(cuid()) // identificador único
+  name        RoleName     @unique // nombre del rol
+  users       User[]       @relation("RoleToUsers") // usuarios que poseen este rol
+  permissions Permission[] @relation("RoleToPermissions") // permisos asociados
+  createdAt   DateTime     @default(now()) // fecha de creación
+  updatedAt   DateTime     @updatedAt // fecha de actualización
 }
 
+// Enumeración de nombres de roles
 enum RoleName {
   superadmin
   admin
@@ -65,40 +73,43 @@ enum RoleName {
   logistica
 }
 
+// Permisos que pueden asociarse a los roles
 model Permission {
-  id        String   @id @default(cuid())
-  name      String   @unique
-  roles     Role[]   @relation("RoleToPermissions")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id        String   @id @default(cuid()) // identificador único
+  name      String   @unique // nombre del permiso
+  roles     Role[]   @relation("RoleToPermissions") // roles que poseen este permiso
+  createdAt DateTime @default(now()) // fecha de creación
+  updatedAt DateTime @updatedAt // fecha de actualización
 }
 
+// Elementos de las listas personalizadas
 model ListItem {
-  id          Int      @id @default(autoincrement())
-  listTypeId  Int
-  listType    ListType @relation(fields: [listTypeId], references: [id])
-  name        String
-  description String?
-  companyId   String
-  company     Company  @relation(fields: [companyId], references: [id])
-  active      Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id          Int      @id @default(autoincrement()) // identificador único
+  listTypeId  Int      // referencia al tipo de lista
+  listType    ListType @relation(fields: [listTypeId], references: [id]) // relación con ListType
+  name        String   // nombre del elemento
+  description String?  // descripción opcional
+  companyId   String   // empresa a la que pertenece
+  company     Company  @relation(fields: [companyId], references: [id]) // relación con Company
+  active      Boolean  @default(true) // indica si está activo
+  createdAt   DateTime @default(now()) // fecha de creación
+  updatedAt   DateTime @updatedAt // fecha de actualización
 
   @@index([listTypeId])
   @@index([companyId])
 }
 
+// Tipos de listas personalizables por cada compañía
 model ListType {
-  id          Int        @id @default(autoincrement())
-  code        String?    @unique
-  name        String
-  description String?
-  items       ListItem[]
-  companyId   String
-  company     Company    @relation(fields: [companyId], references: [id])
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  id          Int        @id @default(autoincrement()) // identificador único
+  code        String?    @unique // código opcional
+  name        String     // nombre del tipo de lista
+  description String?    // descripción opcional
+  items       ListItem[] // elementos pertenecientes a este tipo
+  companyId   String     // empresa propietaria
+  company     Company    @relation(fields: [companyId], references: [id]) // relación con Company
+  createdAt   DateTime   @default(now()) // fecha de creación
+  updatedAt   DateTime   @updatedAt // fecha de actualización
 
   @@index([companyId])
 }
