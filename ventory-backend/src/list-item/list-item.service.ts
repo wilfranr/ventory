@@ -4,9 +4,16 @@ import { CreateListItemDto } from "./dto/create-list-item.dto";
 import { UpdateListItemDto } from "./dto/update-list-item.dto";
 
 @Injectable()
+/**
+ * Servicio que encapsula la lógica de acceso a datos para los
+ * elementos de lista.
+ */
 export class ListItemService {
   constructor(private prisma: PrismaService) {}
 
+  /**
+   * Crea un nuevo elemento de lista para la compañía indicada.
+   */
   create(data: CreateListItemDto, companyId: string) {
     return this.prisma.listItem.create({
       data: {
@@ -16,6 +23,10 @@ export class ListItemService {
     });
   }
 
+  /**
+   * Obtiene todos los elementos de una compañía filtrando por
+   * estado o tipo de lista si se proporcionan.
+   */
   findAll(companyId: string, active?: boolean, listTypeId?: number) {
     console.log("Buscando con:", { companyId, active, listTypeId });
     return this.prisma.listItem.findMany({
@@ -29,6 +40,9 @@ export class ListItemService {
     });
   }
 
+  /**
+   * Devuelve los elementos activos de un tipo de lista específico.
+   */
   findByTypeId(listTypeId: number) {
     return this.prisma.listItem.findMany({
       where: { listTypeId, active: true },
@@ -37,10 +51,16 @@ export class ListItemService {
     });
   }
 
+  /**
+   * Busca un elemento por su identificador único.
+   */
   findOne(id: number) {
     return this.prisma.listItem.findUnique({ where: { id } });
   }
 
+  /**
+   * Actualiza los datos de un elemento de lista existente.
+   */
   update(id: number, data: UpdateListItemDto) {
     return this.prisma.listItem.update({
       where: { id },
@@ -48,6 +68,9 @@ export class ListItemService {
     });
   }
 
+  /**
+   * Deshabilita lógicamente un elemento, dejándolo inactivo.
+   */
   remove(id: number) {
     return this.prisma.listItem.update({
       where: { id },
