@@ -17,10 +17,18 @@ import { AuthGuard } from "@nestjs/passport";
 
 @UseGuards(AuthGuard("jwt"))
 @Controller("list-items")
+/**
+ * Controlador encargado de exponer las rutas HTTP relacionadas
+ * con la gestión de los elementos de las listas.
+ */
 export class ListItemController {
   constructor(private readonly listItemService: ListItemService) {}
 
   @Post()
+  /**
+   * Crea un nuevo elemento de lista asociado a la compañía
+   * del usuario autenticado.
+   */
   create(
     @Body() dto: CreateListItemDto,
     @CurrentUser() user: { companyId: string },
@@ -29,6 +37,10 @@ export class ListItemController {
   }
 
   @Get()
+  /**
+   * Obtiene todos los elementos de una compañía con la
+   * posibilidad de filtrar por estado y tipo de lista.
+   */
   findAll(
     @CurrentUser() user: { companyId: string },
     @Query("active") active?: string,
@@ -50,16 +62,25 @@ export class ListItemController {
   }
 
   @Get("type/:listTypeId")
+  /**
+   * Devuelve los elementos activos pertenecientes a un tipo de lista.
+   */
   fuindByType(@Param("listTypeId") listTypeId: number) {
     return this.listItemService.findByTypeId(listTypeId);
   }
 
   @Get(":id")
+  /**
+   * Busca un elemento concreto por su identificador.
+   */
   findOne(@Param("id") id: string) {
     return this.listItemService.findOne(+id);
   }
 
   @Patch(":id")
+  /**
+   * Actualiza un elemento de lista a partir de su identificador.
+   */
   update(
     @Param("id") id: string,
     @Body() updateListItemDto: UpdateListItemDto,
@@ -68,6 +89,10 @@ export class ListItemController {
   }
 
   @Delete(":id")
+  /**
+   * Marca un elemento de lista como inactivo en lugar de eliminarlo
+   * definitivamente de la base de datos.
+   */
   remove(@Param("id") id: string) {
     return this.listItemService.remove(+id);
   }
