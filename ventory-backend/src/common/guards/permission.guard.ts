@@ -1,3 +1,6 @@
+/**
+ * Guard que comprueba los permisos asignados al usuario.
+ */
 import {
   CanActivate,
   ExecutionContext,
@@ -12,6 +15,9 @@ import { hasAnyPermission } from "../helpers/permission.helper";
 export class PermissionGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
 
+  /**
+   * Valida si el usuario posee alguno de los permisos requeridos.
+   */
   canActivate(context: ExecutionContext): boolean {
     const requiredPermissions = this.reflector.getAllAndOverride<string[]>(
       PERMISSIONS_KEY,

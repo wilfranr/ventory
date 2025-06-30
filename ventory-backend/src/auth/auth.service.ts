@@ -1,3 +1,6 @@
+/**
+ * Servicio encargado de la lógica de autenticación y registro.
+ */
 import {
   Injectable,
   UnauthorizedException,
@@ -28,6 +31,9 @@ export class AuthService {
     private jwtService: JwtService,
     private prisma: PrismaService,
   ) {}
+  /**
+   * Valida las credenciales de un usuario.
+   */
 
   async validateUser(
     email: string,
@@ -51,6 +57,9 @@ export class AuthService {
       permissions,
     };
   }
+  /**
+   * Genera tokens de acceso para un usuario autenticado.
+   */
 
   login = async (user: UserWithRoleAndCompany) => {
     const payload = { sub: user.id, email: user.email };
@@ -79,6 +88,9 @@ export class AuthService {
       },
     };
   };
+  /**
+   * Registra un usuario o empresa según los datos suministrados.
+   */
 
   async register(
     data: CreateUserDto & { logo?: Express.Multer.File; token?: string },
@@ -89,6 +101,9 @@ export class AuthService {
       return this.registerWithCompany(data);
     }
   }
+  /**
+   * Registra un usuario usando un token de invitación.
+   */
 
   private async registerWithToken(data: CreateUserDto & { token: string }) {
     // 1. busco el token
@@ -133,6 +148,9 @@ export class AuthService {
       companyId: token.companyId,
     };
   }
+  /**
+   * Registra una nueva empresa y su usuario administrador.
+   */
 
   private async registerWithCompany(
     data: CreateUserDto & { logo?: Express.Multer.File },
@@ -207,6 +225,9 @@ export class AuthService {
       userId: user.id,
     };
   }
+  /**
+   * Genera nuevos tokens usando un refresh token válido.
+   */
 
   async refreshTokens(userId: number, refreshToken: string) {
     const user = await this.prisma.user.findUnique({
@@ -246,6 +267,9 @@ export class AuthService {
       },
     };
   }
+  /**
+   * Invalida el refresh token para cerrar la sesión.
+   */
 
   async logout(userId: number) {
     await this.prisma.user.update({

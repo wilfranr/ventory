@@ -1,3 +1,6 @@
+/**
+ * Servicio que gestiona la lógica de los elementos de listas.
+ */
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { CreateListItemDto } from "./dto/create-list-item.dto";

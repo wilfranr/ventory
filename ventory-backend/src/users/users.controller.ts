@@ -1,3 +1,6 @@
+/**
+ * Controlador para la administración de usuarios.
+ */
 import { Controller, Get, Put, Param, Body } from "@nestjs/common";
 import { Permissions } from "src/permissions/permissions.decorator";
 import { UsersService } from "./users.service";
@@ -9,23 +12,35 @@ import { ApiTags, ApiBearerAuth, ApiOperation } from "@nestjs/swagger";
 @ApiTags("Usuarios")
 @ApiBearerAuth()
 @Controller("users")
+  /**
+   * Endpoints relacionados con los usuarios.
+   */
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @ApiOperation({ summary: "Obtener todos los usuarios" })
   @Permissions("ver_usuarios")
+  /**
+   * Obtiene la lista de usuarios visibles para el solicitante.
+   */
   @Get()
   async findAll(@CurrentUser() user: AuthUser) {
     return this.usersService.findAll(user);
   }
 
   @Permissions("editar_usuario")
+  /**
+   * Actualiza los datos de un usuario.
+   */
   @Put(":id")
   update(@Param("id") id: number, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.updateUser(id, updateUserDto);
   }
 
   @Permissions("ver_usuarios") // o un permiso especial si quieres que sea solo para admins
+  /**
+   * Ruta de prueba solo accesible por administradores.
+   */
   @Get("admin-only")
   adminAccess(@CurrentUser() user: AuthUser) {
     return {

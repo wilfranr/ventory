@@ -1,3 +1,6 @@
+/**
+ * Guard que verifica permisos contra la base de datos.
+ */
 import {
   CanActivate,
   ExecutionContext,
@@ -15,6 +18,9 @@ export class PermissionsGuard implements CanActivate {
     private prisma: PrismaService,
   ) {}
 
+  /**
+   * Comprueba si el usuario posee los permisos necesarios.
+   */
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const requiredPermissions = this.reflector.getAllAndOverride<string[]>(
       PERMISSIONS_KEY,

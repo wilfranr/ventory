@@ -1,3 +1,6 @@
+/**
+ * Servicio para la gestión de tipos de lista.
+ */
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { CreateListTypeDto } from "./dto/create-list-type.dto";
@@ -7,6 +10,9 @@ import { UpdateListTypeDto } from "./dto/update-list-type.dto";
 export class ListTypeService {
   constructor(private readonly prisma: PrismaService) {}
 
+  /**
+   * Crea un nuevo tipo de lista asociado a la compañía.
+   */
   create(data: CreateListTypeDto, companyId: string) {
     return this.prisma.listType.create({
       data: {
@@ -16,6 +22,9 @@ export class ListTypeService {
     });
   }
 
+  /**
+   * Obtiene todos los tipos de lista de una compañía.
+   */
   findAll(companyId: string) {
     return this.prisma.listType.findMany({
       where: { companyId },
@@ -23,12 +32,18 @@ export class ListTypeService {
     });
   }
 
+  /**
+   * Busca un tipo de lista por su identificador.
+   */
   findOne(id: number, companyId: string) {
     return this.prisma.listType.findFirst({
       where: { id, companyId },
     });
   }
 
+  /**
+   * Actualiza la información de un tipo de lista.
+   */
   update(id: number, data: UpdateListTypeDto) {
     return this.prisma.listType.update({
       where: { id },
@@ -36,6 +51,9 @@ export class ListTypeService {
     });
   }
 
+  /**
+   * Elimina un tipo de lista de la base de datos.
+   */
   remove(id: number) {
     return this.prisma.listType.delete({
       where: { id },

@@ -1,3 +1,6 @@
+/**
+ * DTO para creación de roles.
+ */
 import { IsString, IsNotEmpty, IsArray, IsInt } from "class-validator";
 
 export class createRoleDto {

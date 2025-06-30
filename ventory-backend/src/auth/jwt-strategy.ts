@@ -1,3 +1,6 @@
+/**
+ * Estrategia Passport para validar tokens JWT.
+ */
 import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { PassportStrategy } from "@nestjs/passport";
 import { ExtractJwt, Strategy } from "passport-jwt";
@@ -12,6 +15,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       secretOrKey: process.env.JWT_SECRET as string,
     });
   }
+  /**
+   * Valida el token JWT y adjunta el usuario a la petición.
+   */
 
   async validate(payload: any) {
     const user = await this.prisma.user.findUnique({

@@ -1,3 +1,6 @@
+/**
+ * Funciones de ayuda para la validación de permisos.
+ */
 import { User, Permission } from "@prisma/client";
 
 /**
