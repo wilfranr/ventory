@@ -16,6 +16,11 @@ import { SessionService } from '../../services/session.service';
     styleUrl: './list-page.component.scss',
     standalone: true
 })
+/**
+ * Página principal para la administración de listas.
+ * Permite filtrar los ítems por tipo y gestionar
+ * la visualización de elementos activos o eliminados.
+ */
 export class ListPageComponent {
     listTypes: any[] = [];
     selectedTypeId: number | null = null;
@@ -31,12 +36,19 @@ export class ListPageComponent {
         private session: SessionService
     ) {}
 
+    /**
+     * Inicializa la página cargando tipos e ítems.
+     */
     ngOnInit() {
         this.reloadListTypes();
         this.companyId = this.session.companyId ?? '';
         this.loadListItems();
     }
 
+    /**
+     * Obtiene nuevamente todos los tipos de lista y
+     * establece el tab y tipo seleccionado por defecto.
+     */
     reloadListTypes() {
         this.listTypeService.getAll().subscribe((types) => {
             this.listTypes = [{ id: null, name: 'Todos' }, ...types, { id: '__deleted__', name: 'Eliminadas' }];
@@ -45,6 +57,10 @@ export class ListPageComponent {
         });
     }
 
+    /**
+     * Maneja el cambio de pestaña para filtrar ítems.
+     * @param i índice de la pestaña seleccionada
+     */
     onTabChange(i: number) {
         this.selectedTabIndex = i;
         const tipo = this.listTypes[i]?.id;
@@ -59,10 +75,15 @@ export class ListPageComponent {
         this.loadListItems();
     }
 
+    /** Abre el diálogo para crear un nuevo tipo de lista */
     openTypeDialog() {
         this.typeDialogVisible = true;
     }
 
+    /**
+     * Callback luego de guardar un tipo.
+     * @param newType tipo creado opcionalmente
+     */
     onTypeSaved(newType?: any) {
         this.typeDialogVisible = false;
         this.reloadListTypes();
@@ -72,6 +93,7 @@ export class ListPageComponent {
         }
     }
 
+    /** Carga los ítems según el filtro actual */
     loadListItems() {
         const active = this.showDelete ? 'false' : 'true';
         this.listItemService.getAll(active, this.selectedTypeId ?? undefined).subscribe((items) => {

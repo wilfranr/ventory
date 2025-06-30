@@ -6,6 +6,10 @@ import { ListType } from './list-type.model';
 @Injectable({
     providedIn: 'root'
 })
+/**
+ * Servicio encargado de gestionar las operaciones
+ * CRUD relacionadas con los tipos de lista.
+ */
 export class ListTypeService {
     private apiUrl = '/api/list-type';
 

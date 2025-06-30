@@ -16,6 +16,11 @@ import { ToastModule } from 'primeng/toast';
     imports: [TableModule, DialogModule, InputTextModule, ButtonModule, ToastModule, FormsModule, ReactiveFormsModule],
     providers: [MessageService]
 })
+/**
+ * Componente para la gestión de los tipos de lista.
+ * Permite crear, editar y eliminar diferentes categorías
+ * a las que luego se asocian los elementos (ListItem).
+ */
 export class ListTypeComponent implements OnInit {
     @Input() visible: boolean = false;
     @Output() visibleChange = new EventEmitter<boolean>();
@@ -38,10 +43,12 @@ export class ListTypeComponent implements OnInit {
         });
     }
 
+    /** Inicializa la carga de tipos de lista */
     ngOnInit(): void {
         this.loadListTypes();
     }
 
+    /** Obtiene los tipos de lista desde el backend */
     loadListTypes() {
         this.listTypeService.getAll().subscribe({
             next: (types) => (this.listTypes = types),
@@ -49,6 +56,7 @@ export class ListTypeComponent implements OnInit {
         });
     }
 
+    /** Abre el diálogo para crear un nuevo tipo */
     openNew() {
         this.listTypeForm.reset();
         this.isEdit = false;
@@ -56,6 +64,7 @@ export class ListTypeComponent implements OnInit {
         this.displayDialog = true;
     }
 
+    /** Muestra el formulario de creación de tipo */
     openTypeDialog() {
         this.listTypeForm.reset();
         this.isEdit = false;
@@ -63,6 +72,10 @@ export class ListTypeComponent implements OnInit {
         this.displayDialog = true;
     }
 
+    /**
+     * Abre el formulario para editar un tipo existente
+     * @param listType tipo seleccionado
+     */
     openEdit(listType: ListType) {
         this.isEdit = true;
         this.selectedListType = listType;
@@ -70,6 +83,7 @@ export class ListTypeComponent implements OnInit {
         this.displayDialog = true;
     }
 
+    /** Guarda los cambios del formulario de tipo */
     save() {
         if (this.listTypeForm.invalid) return;
 
@@ -94,6 +108,10 @@ export class ListTypeComponent implements OnInit {
         }
     }
 
+    /**
+     * Elimina un tipo de lista tras confirmación
+     * @param listType tipo a eliminar
+     */
     delete(listType: ListType) {
         if (!confirm(`¿Seguro que deseas eliminar "${listType.name}"?`)) return;
 
