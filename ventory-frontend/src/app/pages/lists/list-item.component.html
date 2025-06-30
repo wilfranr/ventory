@@ -1,3 +1,4 @@
+<!-- Barra de acciones principales -->
 <p-toolbar styleClass="mb-6">
   <ng-template #start>
     <p-button label="Nueva Lista" icon="pi pi-plus" severity="secondary" class="mr-2" (onClick)="openNew()" />
@@ -11,6 +12,7 @@
   </ng-template>
 </p-toolbar>
 
+<!-- Tabla de ítems de lista -->
 <p-table
   #dt
   [value]="listItems"
@@ -23,7 +25,7 @@
   [rowsPerPageOptions]="[10, 20, 30]"
   [tableStyle]="{ 'min-width': '65rem' }"
 >
-  <!-- CABECERA -->
+  <!-- Cabecera de la tabla -->
   <ng-template pTemplate="header">
     <tr>
       <th style="width: 3rem"><p-tableHeaderCheckbox /></th>
@@ -34,7 +36,7 @@
     </tr>
   </ng-template>
 
-  <!-- FILTRO POR COLUMNA -->
+  <!-- Filtros por columna -->
   <ng-template pTemplate="filter">
     <tr>
       <th></th>
@@ -72,7 +74,7 @@
     </tr>
   </ng-template>
 
-  <!-- CUERPO -->
+  <!-- Cuerpo de la tabla -->
   <ng-template pTemplate="body" let-item>
     <tr>
       <td style="width: 3rem">
@@ -92,6 +94,7 @@
 </p-table>
 
 
+<!-- Diálogo principal para crear o editar un ítem -->
 <p-dialog
     [(visible)]="displayDialog"
     [style]="{ width: '420px' }"
@@ -99,7 +102,7 @@
     header="{{ isEdit ? 'Editar' : 'Nueva' }} Lista"
 >
     <form [formGroup]="listItemForm" (ngSubmit)="save()" class="flex flex-col gap-6">
-        <!-- Dropdown y botón nuevo tipo -->
+        <!-- Selector de tipo y botón para crear uno nuevo -->
         <div class="flex items-center gap-2 mb-4">
             <p-dropdown
                 [options]="listTypes"
@@ -121,7 +124,7 @@
             ></button>
         </div>
 
-        <!-- Campos del ítem -->
+        <!-- Campos de nombre y descripción del ítem -->
         <div>
             <label class="block font-bold mb-2">Nombre</label>
             <input pInputText formControlName="name" class="w-full" />
@@ -131,7 +134,7 @@
             <input pInputText formControlName="description" class="w-full" />
         </div>
 
-        <!-- Tabla de tipos de lista -->
+        <!-- Tabla interna para administrar tipos de lista -->
         <div>
             <h3 class="font-bold mb-2 mt-6">Tipos de Lista</h3>
             <p-table [value]="listTypes" [paginator]="true" [rows]="3">
@@ -154,7 +157,7 @@
         </div>
     </form>
 
-    <!-- Footer con botones -->
+    <!-- Pie del diálogo con los botones de acción -->
     <ng-template #footer>
         <div class="flex justify-end gap-2 w-full">
             <p-button label="Cancelar" icon="pi pi-times" text (click)="displayDialog = false"></p-button>
@@ -162,7 +165,7 @@
         </div>
     </ng-template>
 
-    <!-- Modal pequeño para crear nuevo tipo de lista -->
+    <!-- Diálogo secundario para crear un tipo de lista -->
     <p-dialog
         [(visible)]="typeDialogVisible"
         header="Nuevo Tipo de Lista"
@@ -189,5 +192,6 @@
         </form>
     </p-dialog>
 </p-dialog>
+<!-- Diálogo de confirmación para acciones de borrado -->
 <p-confirmdialog [style]="{ width: '450px' }" />
 

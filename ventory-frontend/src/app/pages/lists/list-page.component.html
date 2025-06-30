@@ -1,4 +1,4 @@
-<!-- Tabs visuales (p-tabs) para elegir tipo -->
+<!-- Pestañas para filtrar por tipo de lista -->
 <div class="card mb-4">
     <div class="font-semibold text-xl mb-4">Filtros</div>
     <p-tabs [(value)]="selectedTabIndex">
@@ -12,6 +12,6 @@
     </p-tabs>
 </div>
 
-<!-- El hijo recibe el tipo seleccionado -->
+<!-- Componente que muestra los ítems de acuerdo al filtro -->
 <app-list-item [listTypeId]="selectedTypeId" [showDelete]="showDelete"></app-list-item>
 

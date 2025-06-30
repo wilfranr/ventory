@@ -1,3 +1,4 @@
+<!-- Listado de tipos de lista -->
 <div class="card">
     <div class="flex justify-between items-center mb-2">
         <h2 class="text-xl">Tipos de Lista</h2>
@@ -27,8 +28,10 @@
     </div>
 </div>
 
+<!-- Diálogo para crear o editar un tipo de lista -->
 <p-dialog header="{{ isEdit ? 'Editar' : 'Nuevo' }} Tipo de Lista" [(visible)]="displayDialog" [modal]="true" [closable]="true" [dismissableMask]="true" [responsive]="true">
     <form [formGroup]="listTypeForm" (ngSubmit)="save()">
+        <!-- Campos del formulario de tipo -->
         <div class="p-fluid">
             <!-- <div class="field"> -->
             <!--     <label>Código</label> -->
@@ -43,6 +46,7 @@
                 <input pInputText formControlName="description" />
             </div>
         </div>
+        <!-- Botones de acción del diálogo -->
         <div class="flex justify-end mt-4">
             <button pButton label="Cancelar" type="button" class="p-button-text mr-2" (click)="displayDialog = false"></button>
             <button pButton label="Guardar" type="submit" [disabled]="listTypeForm.invalid"></button>

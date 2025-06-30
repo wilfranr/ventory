@@ -28,6 +28,12 @@ import { SessionService } from '../../services/session.service';
     imports: [TableModule, ConfirmDialogModule, DialogModule, InputTextModule, ButtonModule, ToastModule, FormsModule, ReactiveFormsModule, CommonModule, ToolbarModule, DropdownModule, IconFieldModule, TagModule, InputIconModule],
     providers: [MessageService, ConfirmationService]
 })
+/**
+ * Componente encargado de mostrar y gestionar los
+ * elementos que pertenecen a un tipo de lista.
+ * Incluye formularios de creación y edición,
+ * así como la eliminación simple y múltiple.
+ */
 export class ListItemComponent implements OnInit {
     // Inputs reactivos del padre
     readonly listTypeId = input<number | null>(null);
@@ -74,6 +80,9 @@ export class ListItemComponent implements OnInit {
         });
     }
 
+    /**
+     * Carga la información inicial del componente.
+     */
     ngOnInit(): void {
         this.listTypeService.getAll().subscribe((types) => (this.listTypes = types));
         this.companyId = this.session.companyId ?? '';
@@ -82,7 +91,9 @@ export class ListItemComponent implements OnInit {
         this.loadAllItems(filtro.active, filtro.listTypeId);
     }
 
-    /** Centraliza el filtro actual según tabs */
+    /**
+     * Obtiene los valores de filtro según la pestaña seleccionada.
+     */
     private getFiltroActual(): { active: string; listTypeId?: number } {
         const eliminar = this.showDelete();
         const typeId = this.listTypeId();
@@ -92,7 +103,9 @@ export class ListItemComponent implements OnInit {
         };
     }
 
-    /** Carga los ítems según el filtro actual */
+    /**
+     * Consulta y carga los ítems aplicando los filtros indicados.
+     */
     loadAllItems(active: string, listTypeId?: number) {
         this.listItemService.getAll(active, listTypeId).subscribe({
             next: (items) => {
@@ -109,6 +122,7 @@ export class ListItemComponent implements OnInit {
     }
 
     // 🎨 CRUD UI
+    /** Muestra el formulario para crear un nuevo ítem */
     openNew() {
         this.listItemForm.reset();
         this.isEdit = false;
@@ -116,6 +130,9 @@ export class ListItemComponent implements OnInit {
         this.displayDialog = true;
     }
 
+    /**
+     * Abre el formulario de edición para un ítem existente.
+     */
     openEdit(item: ListItem) {
         this.isEdit = true;
         this.selectedListItem = item;
@@ -123,6 +140,7 @@ export class ListItemComponent implements OnInit {
         this.displayDialog = true;
     }
 
+    /** Guarda un nuevo ítem o actualiza uno existente */
     save() {
         if (this.listItemForm.invalid) return;
         const itemData = this.listItemForm.value;
@@ -153,6 +171,9 @@ export class ListItemComponent implements OnInit {
         }
     }
 
+    /**
+     * Elimina un ítem individual tras confirmación.
+     */
     delete(item: ListItem) {
         this.confirmationService.confirm({
             message: `¿Seguro que deseas eliminar "${item.name}"?`,
@@ -185,6 +206,9 @@ export class ListItemComponent implements OnInit {
     }
 
     // ---- Borrado múltiple ----
+    /**
+     * Elimina todos los ítems seleccionados en la tabla.
+     */
     deleteSelectedItems() {
         if (!this.selectedItems || this.selectedItems.length === 0) {
             this.messageService.add({ severity: 'warn', summary: 'Atención', detail: 'Selecciona al menos un elemento.' });
@@ -215,17 +239,22 @@ export class ListItemComponent implements OnInit {
     }
 
     // ---- Filtro global (input de búsqueda de la tabla PrimeNG) ----
+    /**
+     * Aplica un filtro global a la tabla PrimeNG.
+     */
     onGlobalFilter(table: any, event: Event) {
         const input = (event.target as HTMLInputElement).value;
         table.filterGlobal(input, 'contains');
     }
 
     // ----- Tipos -----
+    /** Abre el formulario para crear un nuevo tipo */
     openTypeDialog() {
         this.typeForm.reset();
         this.typeDialogVisible = true;
     }
 
+    /** Guarda un nuevo tipo de lista */
     saveType() {
         if (this.typeForm.invalid) return;
         this.listTypeService.create(this.typeForm.value).subscribe({
@@ -236,17 +265,24 @@ export class ListItemComponent implements OnInit {
         });
     }
 
+    /**
+     * Carga en el formulario el tipo seleccionado para editarlo.
+     */
     editType(type: ListType) {
         this.typeForm.patchValue(type);
         this.typeDialogVisible = true;
     }
 
+    /** Recarga la lista de tipos disponibles */
     loadListTypes() {
         this.listTypeService.getAll().subscribe((types) => {
             this.listTypes = types;
         });
     }
 
+    /**
+     * Elimina un tipo de lista específico.
+     */
     deleteType(type: ListType) {
         this.confirmationService.confirm({
             message: `¿Seguro que deseas eliminar "${type.name}"?`,
