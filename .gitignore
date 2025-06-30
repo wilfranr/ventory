@@ -52,6 +52,4 @@ ventory-backend-backup/
 *~
 
 # 👉 Test files (si no los quieres versionar)
-**/*.spec.ts
-**/*.test.ts
 
