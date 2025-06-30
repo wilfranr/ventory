@@ -205,6 +205,30 @@ export class ListItemComponent implements OnInit {
         });
     }
 
+    /**
+     * Restaura un ítem previamente eliminado.
+     */
+    restore(item: ListItem) {
+        this.listItemService.restore(item.id).subscribe({
+            next: () => {
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Restaurado',
+                    detail: 'Lista restaurada correctamente'
+                });
+                const filtro = this.getFiltroActual();
+                this.loadAllItems(filtro.active, filtro.listTypeId);
+            },
+            error: () => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: 'No se pudo restaurar la lista'
+                });
+            }
+        });
+    }
+
     // ---- Borrado múltiple ----
     /**
      * Elimina todos los ítems seleccionados en la tabla.
@@ -234,6 +258,29 @@ export class ListItemComponent implements OnInit {
                         this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Ocurrió un error al eliminar' });
                     }
                 });
+            }
+        });
+    }
+
+    /**
+     * Restaura todos los ítems seleccionados.
+     */
+    restoreSelectedItems() {
+        if (!this.selectedItems || this.selectedItems.length === 0) {
+            this.messageService.add({ severity: 'warn', summary: 'Atención', detail: 'Selecciona al menos un elemento.' });
+            return;
+        }
+
+        const restoreObservables = this.selectedItems.map((item) => this.listItemService.restore(item.id));
+        forkJoin(restoreObservables).subscribe({
+            next: () => {
+                this.messageService.add({ severity: 'success', summary: 'Restaurado', detail: 'Ítems restaurados correctamente' });
+                const filtro = this.getFiltroActual();
+                this.loadAllItems(filtro.active, filtro.listTypeId);
+                this.selectedItems = [];
+            },
+            error: () => {
+                this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Ocurrió un error al restaurar' });
             }
         });
     }

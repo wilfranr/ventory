@@ -99,4 +99,12 @@ export class ListItemController {
   remove(@Param("id") id: string) {
     return this.listItemService.remove(+id);
   }
+
+  @Patch(":id/restore")
+  /**
+   * Restaura un elemento de lista previamente eliminado.
+   */
+  restore(@Param("id") id: string) {
+    return this.listItemService.restore(+id);
+  }
 }

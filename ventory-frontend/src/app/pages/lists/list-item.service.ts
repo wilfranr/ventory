@@ -69,4 +69,11 @@ export class ListItemService {
     delete(id: number): Observable<void> {
         return this.http.delete<void>(`${this.apiUrl}/${id}`);
     }
+
+    /**
+     * Restaura un ítem previamente eliminado.
+     */
+    restore(id: number): Observable<ListItem> {
+        return this.http.patch<ListItem>(`${this.apiUrl}/${id}/restore`, {});
+    }
 }

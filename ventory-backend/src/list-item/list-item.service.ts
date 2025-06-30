@@ -80,4 +80,14 @@ export class ListItemService {
       data: { active: false },
     });
   }
+
+  /**
+   * Restaura un elemento previamente desactivado.
+   */
+  restore(id: number) {
+    return this.prisma.listItem.update({
+      where: { id },
+      data: { active: true },
+    });
+  }
 }
