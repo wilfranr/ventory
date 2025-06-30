@@ -17,11 +17,24 @@ import { UserService } from '../../services/user.service';
 import { InputSwitchModule } from 'primeng/inputswitch';
 import { ToastModule } from 'primeng/toast';
 
+/**
+ * Modelo que representa un usuario dentro del sistema.
+ * Cada propiedad es opcional ya que se utiliza tanto para la creación
+ * como para la edición de usuarios.
+ */
 interface User {
+    /** Identificador único del usuario */
     id?: string;
+    /** Nombre para mostrar */
     name?: string;
+    /** Correo electrónico del usuario */
     email?: string;
+    /**
+     * Rol asignado al usuario. Puede ser el nombre del rol o un
+     * objeto con la propiedad `name` proveniente del backend.
+     */
     role?: string | { name: string };
+    /** Estado de la cuenta: activo/inactivo */
     status?: string;
 }
 
@@ -32,27 +45,43 @@ interface User {
     templateUrl: './users.component.html',
     providers: [ConfirmationService]
 })
+/**
+ * Componente encargado de la gestión de usuarios.
+ * Permite generar tokens de registro y ejecutar operaciones CRUD
+ * sobre los usuarios registrados.
+ */
 export class UsersComponent implements OnInit {
     // 🔹 Token para invitación
+    /** Formulario reactivo para seleccionar el rol del nuevo usuario */
     tokenForm!: FormGroup;
+    /** Controla la visibilidad del diálogo de generación de token */
     displayTokenDialog: boolean = false;
+    /** Token generado para invitar a un nuevo usuario */
     generatedToken: string = '';
+    /** Indica si hay una operación en proceso */
     loading: boolean = false;
     // 🔹 Datos de Usuarios
-    users: User[] = []; // Aquí se almacenan todos los usuarios
+    /** Arreglo con todos los usuarios obtenidos del backend */
+    users: User[] = [];
+    /** Usuarios seleccionados en la tabla */
     selectedUsers: User[] = [];
+    /** Columnas que se muestran en la tabla de usuarios */
     cols = [
         { field: 'name', header: 'Nombre' },
         { field: 'email', header: 'Email' },
         { field: 'role', header: 'Rol' },
         { field: 'status', header: 'Estado' }
     ];
+    /** Controla la visibilidad del formulario de usuario */
     userDialog: boolean = false;
-    user: User = {}; // Usuario que se crea o edita
+    /** Usuario actual que se crea o edita */
+    user: User = {};
+    /** Indica si se envió el formulario para mostrar mensajes de error */
     submitted: boolean = false;
 
     // 🔹 Roles y estados
 
+    /** Opciones de roles disponibles para los usuarios */
     roles = [
         { label: 'Superadmin', value: 'superadmin' },
         { label: 'Admin', value: 'admin' },
@@ -60,12 +89,15 @@ export class UsersComponent implements OnInit {
         { label: 'Analista de Partes', value: 'analistaPartes' },
         { label: 'Logística', value: 'logistica' }
     ];
-
+    /** Estados posibles del usuario */
     statuses = [
         { label: 'Activo', value: 'activo' },
         { label: 'Inactivo', value: 'inactivo' }
     ];
 
+    /**
+     * Inyecta los servicios necesarios para el componente.
+     */
     constructor(
         private fb: FormBuilder,
         private registrationTokenService: RegistrationTokenService,
@@ -74,6 +106,7 @@ export class UsersComponent implements OnInit {
         private userService: UserService
     ) {}
 
+    /** Inicializa el formulario y carga los usuarios */
     ngOnInit() {
         this.tokenForm = this.fb.group({
             role: ['', Validators.required]
@@ -81,6 +114,7 @@ export class UsersComponent implements OnInit {
 
         this.loadUsers();
     }
+    /** Obtiene los usuarios del backend y los asigna a la tabla */
     loadUsers() {
         this.userService.getUsers().subscribe({
             next: (users) => {
@@ -96,15 +130,18 @@ export class UsersComponent implements OnInit {
     }
 
     // 🔹 Lógica para Tokens
+    /** Abre el diálogo para generar un nuevo token */
     showTokenDialog() {
         this.displayTokenDialog = true;
         this.generatedToken = '';
     }
 
+    /** Cierra el diálogo de generación de token */
     closeTokenDialog() {
         this.displayTokenDialog = false;
     }
 
+    /** Solicita al backend la creación de un token de registro */
     generateToken() {
         if (this.tokenForm.valid) {
             this.registrationTokenService.createToken(this.tokenForm.value).subscribe({
@@ -119,6 +156,7 @@ export class UsersComponent implements OnInit {
         }
     }
 
+    /** Copia el token generado al portapapeles */
     copyToken() {
         navigator.clipboard.writeText(this.generatedToken);
         this.messageService.add({ severity: 'info', summary: 'Copiado', detail: 'Token copiado al portapapeles.' });
@@ -126,17 +164,23 @@ export class UsersComponent implements OnInit {
 
     // 🔹 Lógica para Usuarios (CRUD)
 
+    /** Abre el formulario para editar un usuario */
     openNew() {
         this.user = {};
         this.submitted = false;
         this.userDialog = true;
     }
 
+    /** Cierra el diálogo de edición/creación de usuario */
     hideDialog() {
         this.userDialog = false;
         this.submitted = false;
     }
 
+    /**
+     * Objeto base que se envía al backend para crear o actualizar usuarios.
+     * Se actualiza con los datos del formulario antes de enviarse.
+     */
     userPayload = {
         id: this.user.id ?? this.createId(),
         name: this.user.name,
@@ -145,6 +189,7 @@ export class UsersComponent implements OnInit {
         status: this.user.status ?? 'activo'
     };
 
+    /** Guarda la información del usuario editado */
     saveUser() {
         this.submitted = true;
 
@@ -209,6 +254,7 @@ export class UsersComponent implements OnInit {
         });
     }
 
+    /** Carga los datos de un usuario en el formulario para su edición */
     editUser(user: User) {
         this.user = {
             ...user,
@@ -217,6 +263,7 @@ export class UsersComponent implements OnInit {
         };
         this.userDialog = true;
     }
+    /** Pregunta confirmación y elimina un usuario de la tabla */
     deleteUser(user: User) {
         this.confirmationService.confirm({
             message: `¿Seguro que quieres eliminar a ${user.name}?`,
@@ -229,6 +276,7 @@ export class UsersComponent implements OnInit {
         });
     }
 
+    /** Elimina todos los usuarios seleccionados tras confirmación */
     deleteSelectedUsers() {
         this.confirmationService.confirm({
             message: '¿Seguro que quieres eliminar los usuarios seleccionados?',
@@ -242,11 +290,16 @@ export class UsersComponent implements OnInit {
         });
     }
 
+    /** Aplica el filtro global de la tabla */
     onGlobalFilter(dt: any, event: Event) {
         const input = event.target as HTMLInputElement;
         dt.filterGlobal(input.value, 'contains');
     }
 
+    /**
+     * Devuelve la severidad del tag según el estado del usuario
+     * para mostrar estilos en la tabla.
+     */
     getStatusSeverity(status: string) {
         switch (status) {
             case 'activo':
@@ -258,6 +311,7 @@ export class UsersComponent implements OnInit {
         }
     }
 
+    /** Genera un identificador aleatorio para usuarios locales */
     private createId(): string {
         return Math.random().toString(36).substring(2, 9);
     }
