@@ -1,3 +1,8 @@
+<!--
+  Vista para la administración de usuarios.
+  Contiene la tabla de usuarios y los diálogos de edición y token.
+-->
+<!-- Barra de herramientas con acciones principales -->
 <p-toolbar styleClass="mb-6">
   <ng-template #start>
     <p-button label="Nuevo" icon="pi pi-plus" severity="secondary" class="mr-2" (click)="showTokenDialog()" />
@@ -5,6 +10,8 @@
   </ng-template>
 
 </p-toolbar>
+
+<!-- Tabla de usuarios -->
 
 
 <p-table
@@ -22,6 +29,7 @@
   [showCurrentPageReport]="true"
   [rowsPerPageOptions]="[10, 20, 30]"
 >
+  <!-- Encabezado con filtro y título -->
   <ng-template #caption>
     <div class="flex items-center justify-between">
       <h5 class="m-0">Administrar Usuarios</h5>
@@ -32,6 +40,7 @@
     </div>
   </ng-template>
 
+  <!-- Cabecera de la tabla -->
   <ng-template #header>
     <tr>
       <th style="width: 3rem">
@@ -45,6 +54,7 @@
     </tr>
   </ng-template>
 
+  <!-- Filas de usuarios -->
   <ng-template #body let-user>
     <tr>
       <td style="width: 3rem">
@@ -65,6 +75,7 @@
 </p-table>
 
 
+<!-- Diálogo para crear o editar usuarios -->
 <p-dialog
   [(visible)]="userDialog"
   [style]="{ width: '450px' }"
@@ -148,6 +159,8 @@
     </div>
   </ng-template>
 </p-dialog>
+
+<!-- Diálogo para generar tokens de registro -->
 <p-dialog
     [(visible)]="displayTokenDialog"
     [style]="{ width: '400px' }"
@@ -157,6 +170,7 @@
     (onHide)="closeTokenDialog()"
 >
 
+<!-- Formulario para elegir rol y generar un nuevo token -->
 <form [formGroup]="tokenForm" class="p-4 space-y-6">
 <!-- Selector de Rol -->
 <div>
@@ -193,6 +207,7 @@ El rol es requerido
         </div>
     </ng-template>
 </p-dialog>
+<!-- Ventana de confirmación para eliminar elementos -->
 <p-confirmdialog [style]="{ width: '450px' }" />
 
 
