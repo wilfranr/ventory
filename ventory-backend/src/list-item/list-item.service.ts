@@ -16,9 +16,15 @@ export class ListItemService {
     });
   }
 
-  findAll(companyId: string) {
+  findAll(companyId: string, active?: boolean, listTypeId?: number) {
+    console.log("Buscando con:", { companyId, active, listTypeId });
     return this.prisma.listItem.findMany({
-      where: { companyId },
+      where: {
+        companyId,
+        ...(active === true ? { active: true } : {}),
+        ...(active === false ? { active: false } : {}),
+        ...(listTypeId !== undefined ? { listTypeId } : {}),
+      },
       include: { listType: true },
     });
   }
@@ -27,6 +33,7 @@ export class ListItemService {
     return this.prisma.listItem.findMany({
       where: { listTypeId, active: true },
       orderBy: { name: "asc" },
+      include: { listType: true },
     });
   }
 

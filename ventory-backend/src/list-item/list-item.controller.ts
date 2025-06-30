@@ -7,11 +7,11 @@ import {
   Param,
   Delete,
   UseGuards,
+  Query,
 } from "@nestjs/common";
 import { ListItemService } from "./list-item.service";
 import { CreateListItemDto } from "./dto/create-list-item.dto";
 import { UpdateListItemDto } from "./dto/update-list-item.dto";
-import { Public } from "src/auth/public.decorator";
 import { CurrentUser } from "src/auth/current-user.decorator";
 import { AuthGuard } from "@nestjs/passport";
 
@@ -21,13 +21,32 @@ export class ListItemController {
   constructor(private readonly listItemService: ListItemService) {}
 
   @Post()
-  create(@Body() dto: CreateListItemDto, @CurrentUser() user: any) {
+  create(
+    @Body() dto: CreateListItemDto,
+    @CurrentUser() user: { companyId: string },
+  ) {
     return this.listItemService.create(dto, user.companyId);
   }
 
   @Get()
-  findAll(@CurrentUser() user: any) {
-    return this.listItemService.findAll(user.companyId);
+  findAll(
+    @CurrentUser() user: { companyId: string },
+    @Query("active") active?: string,
+    @Query("listTypeId") listTypeId?: string,
+  ) {
+    let isActive: boolean | undefined;
+    if (active === "true") isActive = true;
+    else if (active === "false") isActive = false;
+    // Si no viene el param, deja undefined y el servicio trae todo
+
+    const typeId = listTypeId ? Number(listTypeId) : undefined;
+
+    console.log("Filtro recibido:", {
+      companyId: user.companyId,
+      isActive,
+      typeId,
+    });
+    return this.listItemService.findAll(user.companyId, isActive, typeId);
   }
 
   @Get("type/:listTypeId")

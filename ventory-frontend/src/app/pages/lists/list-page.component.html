@@ -1,1 +1,17 @@
-<app-list-item [listTypeId]="selectedTypeId"></app-list-item>
+<!-- Tabs visuales (p-tabs) para elegir tipo -->
+<div class="card mb-4">
+    <div class="font-semibold text-xl mb-4">Filtros</div>
+    <p-tabs [(value)]="selectedTabIndex">
+        <p-tablist>
+            <p-tab *ngFor="let type of listTypes; let i = index"
+                [value]="i"
+                (click)="onTabChange(i)">
+                {{ type.name }}
+            </p-tab>
+        </p-tablist>
+    </p-tabs>
+</div>
+
+<!-- El hijo recibe el tipo seleccionado -->
+<app-list-item [listTypeId]="selectedTypeId" [showDelete]="showDelete"></app-list-item>
+

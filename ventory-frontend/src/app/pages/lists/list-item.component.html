@@ -11,33 +11,22 @@
   </ng-template>
 </p-toolbar>
 
-
 <p-table
   #dt
   [value]="listItems"
-  [rows]="10"
-  [columns]="cols"
   [paginator]="true"
+  [rows]="10"
   [globalFilterFields]="['name', 'description', 'listType.name']"
-  [tableStyle]="{ 'min-width': '65rem' }"
   [(selection)]="selectedItems"
   [rowHover]="true"
   dataKey="id"
-  currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} listas"
-  [showCurrentPageReport]="true"
   [rowsPerPageOptions]="[10, 20, 30]"
+  [tableStyle]="{ 'min-width': '65rem' }"
 >
-  <ng-template #caption>
-    <div class="flex items-center justify-between">
-      <h5 class="m-0">Administrar Listas</h5>
-    </div>
-  </ng-template>
-
-  <ng-template #header>
+  <!-- CABECERA -->
+  <ng-template pTemplate="header">
     <tr>
-      <th style="width: 3rem">
-        <p-tableHeaderCheckbox />
-      </th>
+      <th style="width: 3rem"><p-tableHeaderCheckbox /></th>
       <th style="min-width: 14rem">Nombre</th>
       <th style="min-width: 18rem">Descripción</th>
       <th style="min-width: 12rem">Tipo</th>
@@ -45,7 +34,46 @@
     </tr>
   </ng-template>
 
-  <ng-template #body let-item>
+  <!-- FILTRO POR COLUMNA -->
+  <ng-template pTemplate="filter">
+    <tr>
+      <th></th>
+      <th>
+        <input
+          #filterNombre
+          pInputText
+          type="text"
+          (input)="dt.filter(filterNombre.value, 'name', 'contains')"
+          placeholder="Filtrar..."
+          class="p-column-filter"
+        />
+      </th>
+      <th>
+        <input
+          #filterDescripcion
+          pInputText
+          type="text"
+          (input)="dt.filter(filterDescripcion.value, 'description', 'contains')"
+          placeholder="Filtrar..."
+          class="p-column-filter"
+        />
+      </th>
+      <th>
+        <input
+          #filterTipo
+          pInputText
+          type="text"
+          (input)="dt.filter(filterTipo.value, 'listType.name', 'contains')"
+          placeholder="Filtrar..."
+          class="p-column-filter"
+        />
+      </th>
+      <th></th>
+    </tr>
+  </ng-template>
+
+  <!-- CUERPO -->
+  <ng-template pTemplate="body" let-item>
     <tr>
       <td style="width: 3rem">
         <p-tableCheckbox [value]="item" />

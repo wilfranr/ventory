@@ -76,4 +76,18 @@ export class AuthService {
     getToken(): string | null {
         return localStorage.getItem('access_token');
     }
+
+    get currentUser(): any {
+        const userStr = localStorage.getItem('user');
+        if (!userStr) return null;
+        try {
+            return JSON.parse(userStr);
+        } catch {
+            return null;
+        }
+    }
+
+    get companyId(): string | null {
+        return this.currentUser?.companyId || null;
+    }
 }

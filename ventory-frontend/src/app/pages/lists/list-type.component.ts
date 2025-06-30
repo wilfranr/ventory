@@ -32,7 +32,7 @@ export class ListTypeComponent implements OnInit {
         private messageService: MessageService
     ) {
         this.listTypeForm = this.fb.group({
-            code: ['', Validators.required],
+            code: [''],
             name: ['', Validators.required],
             description: ['']
         });
