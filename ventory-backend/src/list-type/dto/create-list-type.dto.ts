@@ -1,3 +1,6 @@
+/**
+ * DTO para la creación de tipos de lista.
+ */
 import { IsString, IsOptional } from "class-validator";
 
 export class CreateListTypeDto {

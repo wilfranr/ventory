@@ -1,3 +1,6 @@
+/**
+ * DTO para actualizar la información de un usuario.
+ */
 import { IsOptional, IsEmail, IsEnum, IsIn } from "class-validator";
 import { RoleName } from "@prisma/client"; // 👈 tu enum de Prisma
 

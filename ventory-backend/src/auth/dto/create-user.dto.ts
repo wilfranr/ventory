@@ -1,3 +1,6 @@
+/**
+ * DTO para la creación de usuarios.
+ */
 import { IsEmail, IsOptional, IsString, MinLength } from "class-validator";
 
 export class CreateUserDto {

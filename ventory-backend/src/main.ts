@@ -1,8 +1,14 @@
+/**
+ * Punto de entrada de la aplicación backend.
+ */
 import { ValidationPipe } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
 import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger";
 
+/**
+ * Configura la aplicación Nest y levanta el servidor HTTP.
+ */
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 

@@ -1,3 +1,6 @@
+/**
+ * Servicio para generar y almacenar tokens de registro.
+ */
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service"; // Tu servicio Prisma
 import { CreateRegistrationTokenDto } from "./dto/create-registration-token.dto";
@@ -6,6 +9,9 @@ import { randomBytes } from "crypto"; // Para generar el token
 @Injectable()
 export class RegistrationTokenService {
   constructor(private readonly prisma: PrismaService) {}
+  /**
+   * Crea y persiste un token de registro asociado a una empresa.
+   */
 
   async create(
     createRegistrationTokenDto: CreateRegistrationTokenDto,
@@ -21,6 +27,9 @@ export class RegistrationTokenService {
       },
     });
   }
+  /**
+   * Genera un token aleatorio de seis caracteres.
+   */
 
   private generateRandomToken(): string {
     // 6 caracteres alfanuméricos aleatorios

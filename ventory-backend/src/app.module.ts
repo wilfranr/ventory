@@ -1,3 +1,7 @@
+/**
+ * Módulo raíz de la aplicación que importa y configura
+ * los módulos principales del sistema.
+ */
 import { Module } from "@nestjs/common";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
@@ -38,4 +42,7 @@ import { ListTypeModule } from './list-type/list-type.module';
     },
   ],
 })
+/**
+ * Define el módulo de aplicación y registra los guards globales.
+ */
 export class AppModule {}

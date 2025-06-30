@@ -1,3 +1,6 @@
+/**
+ * Servicio que maneja la lógica relacionada con usuarios.
+ */
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { Prisma, RoleName } from "@prisma/client";
@@ -11,6 +14,9 @@ import { BadRequestException } from "@nestjs/common";
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
+  /**
+   * Crea un nuevo usuario para la compañía indicada.
+   */
   async create(createUserDto: CreateUserDto, companyId: string) {
     const { name, email, password } = createUserDto;
 
@@ -26,6 +32,9 @@ export class UsersService {
     });
   }
 
+  /**
+   * Busca un usuario por su correo electrónico.
+   */
   async findByEmail(email: string) {
     return this.prisma.user.findUnique({
       where: { email },
@@ -45,6 +54,9 @@ export class UsersService {
     });
   }
 
+  /**
+   * Obtiene usuarios visibles dependiendo de la empresa y rol.
+   */
   async findAll(currentUser: AuthUser) {
     const VENTORY_COMPANY_ID = "cma05z0m90000c6juketn1hgr";
     if (
@@ -81,6 +93,9 @@ export class UsersService {
     });
   }
 
+  /**
+   * Actualiza la información de un usuario existente.
+   */
   async updateUser(id: number, data: UpdateUserDto) {
     const updateData: Prisma.UserUpdateInput = {
       name: data.name,
@@ -108,6 +123,9 @@ export class UsersService {
     });
   }
 
+  /**
+   * Guarda el refresh token hasheado para el usuario.
+   */
   async updateRefreshToken(userId: number, refreshToken: string) {
     const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
     await this.prisma.user.update({

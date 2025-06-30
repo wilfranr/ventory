@@ -1,3 +1,6 @@
+/**
+ * DTO para crear usuarios dentro del sistema.
+ */
 import { IsEmail, IsNotEmpty, MinLength, IsOptional } from "class-validator";
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 

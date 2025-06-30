@@ -1,3 +1,6 @@
+/**
+ * DTO para crear nuevos permisos.
+ */
 import { IsString, IsNotEmpty } from "class-validator";
 
 export class CreatePermissionDto {

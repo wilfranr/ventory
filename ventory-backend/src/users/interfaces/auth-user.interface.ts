@@ -1,3 +1,6 @@
+/**
+ * Interfaz extendida del usuario autenticado.
+ */
 import { User, Role, Company } from '@prisma/client';
 
 export interface AuthUser extends User {

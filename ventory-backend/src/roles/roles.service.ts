@@ -1,3 +1,6 @@
+/**
+ * Servicio de gestión de roles y asignación de permisos.
+ */
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { Role, RoleName } from "@prisma/client";
@@ -6,12 +9,18 @@ import { Role, RoleName } from "@prisma/client";
 export class RolesService {
   constructor(private prisma: PrismaService) {}
 
+  /**
+   * Devuelve todos los roles con sus permisos.
+   */
   async getAllRoles(): Promise<Role[]> {
     return this.prisma.role.findMany({
       include: { permissions: true },
     });
   }
 
+  /**
+   * Obtiene un rol y sus permisos por ID.
+   */
   async getRoleById(id: string) {
     return this.prisma.role.findUnique({
       where: { id },
@@ -21,12 +30,18 @@ export class RolesService {
     });
   }
 
+  /**
+   * Crea un rol con el nombre especificado.
+   */
   async createRole(name: RoleName): Promise<Role> {
     return this.prisma.role.create({
       data: { name },
     });
   }
 
+  /**
+   * Asocia un rol a un usuario existente.
+   */
   async assignRoleToUser(userId: string, roleId: string) {
     const user = await this.prisma.user.findUnique({
       where: { id: parseInt(userId) },
@@ -39,6 +54,9 @@ export class RolesService {
     });
   }
 
+  /**
+   * Asigna un conjunto de permisos a un rol.
+   */
   async assignPermissionsToRole(roleId: string, permissionId: string[]) {
     return this.prisma.role.update({
       where: { id: roleId },
@@ -53,5 +71,3 @@ export class RolesService {
     });
   }
 }
-//**
-// This code defines a RolesService class that interacts with a Prisma database to manage user roles and permissions.

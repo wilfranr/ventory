@@ -1,3 +1,6 @@
+/**
+ * Controlador para operaciones sobre elementos de listas.
+ */
 import {
   Controller,
   Get,

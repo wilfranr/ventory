@@ -1,3 +1,6 @@
+/**
+ * Módulo encargado de agrupar los componentes de autenticación.
+ */
 import { Module } from "@nestjs/common";
 import { JwtModule } from "@nestjs/jwt";
 import { PassportModule } from "@nestjs/passport";
@@ -20,4 +23,7 @@ import { PrismaModule } from "../prisma/prisma.module";
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy],
 })
+/**
+ * Define el módulo de autenticación de la aplicación.
+ */
 export class AuthModule {}

@@ -1,3 +1,6 @@
+/**
+ * Controlador que gestiona las operaciones de autenticación.
+ */
 import {
   Controller,
   Post,
@@ -17,6 +20,9 @@ export class AuthController {
 
   @Public()
   @Post("register")
+  /**
+   * Registra un nuevo usuario en el sistema.
+   */
   @UseInterceptors(FileInterceptor("logo"))
   register(
     @Body() createUserDto: CreateUserDto,
@@ -26,6 +32,9 @@ export class AuthController {
   }
 
   @Public()
+  /**
+   * Inicia sesión y devuelve los tokens de acceso y renovación.
+   */
   @Post("login")
   async login(@Body() body: { email: string; password: string }) {
     const user = await this.authService.validateUser(body.email, body.password);
@@ -41,6 +50,9 @@ export class AuthController {
     };
   }
 
+  /**
+   * Genera un nuevo par de tokens a partir del refresh token.
+   */
   @Post("refresh")
   async refreshTokens(@Body() data: { userId: string; refreshToken: string }) {
     return this.authService.refreshTokens(
@@ -49,6 +61,9 @@ export class AuthController {
     );
   }
 
+  /**
+   * Cierra la sesión del usuario eliminando su refresh token.
+   */
   @Post("logout")
   async logout(@Body() data: { userId: string }) {
     return this.authService.logout(Number(data.userId));
