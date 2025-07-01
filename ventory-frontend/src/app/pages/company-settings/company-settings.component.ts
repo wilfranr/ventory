@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DropdownModule } from 'primeng/dropdown';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { ButtonModule } from 'primeng/button';
@@ -14,21 +14,16 @@ import { AuthService } from '../../services/auth.service';
     standalone: true,
     templateUrl: './company-settings.component.html',
     styleUrl: './company-settings.component.scss',
-    imports: [CommonModule, ReactiveFormsModule, DropdownModule, InputNumberModule, ButtonModule, ToastModule],
+    imports: [CommonModule, DropdownModule, InputNumberModule, ButtonModule, ToastModule, ReactiveFormsModule],
     providers: [MessageService]
 })
 export class CompanySettingsComponent implements OnInit {
-    form = this.fb.group({
-        currency: ['', Validators.required],
-        vatPercent: [0, [Validators.required, Validators.min(0), Validators.max(100)]]
-    });
-
+    form: FormGroup;
     currencies = [
         { label: 'COP', value: 'COP' },
         { label: 'USD', value: 'USD' },
         { label: 'EUR', value: 'EUR' }
     ];
-
     readonlyMode = false;
 
     constructor(
@@ -36,7 +31,12 @@ export class CompanySettingsComponent implements OnInit {
         private companyService: CompanyService,
         private messageService: MessageService,
         private auth: AuthService
-    ) {}
+    ) {
+        this.form = this.fb.group({
+            currency: ['', Validators.required],
+            vatPercent: [0, [Validators.required, Validators.min(0), Validators.max(100)]]
+        });
+    }
 
     ngOnInit() {
         const role = this.auth.currentUser?.role?.name || this.auth.currentUser?.role;
@@ -44,7 +44,6 @@ export class CompanySettingsComponent implements OnInit {
         if (this.readonlyMode) {
             this.form.disable();
         }
-
         const companyId = this.auth.companyId;
         if (companyId) {
             this.companyService.getSettings(companyId).subscribe({

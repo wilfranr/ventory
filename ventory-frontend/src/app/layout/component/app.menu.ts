@@ -44,7 +44,8 @@ export class AppMenu {
                     //{ label: 'Misc', icon: 'pi pi-fw pi-circle', routerLink: ['/uikit/misc'] },
                     { label: 'Listas', icon: 'pi pi-fw pi-list', routerLink: ['pages/listas'] },
                     { label: 'Usuarios', icon: 'pi pi-fw pi-users', routerLink: ['/users'] },
-                    { label: 'Roles', icon: 'pi pi-fw pi-shield', routerLink: ['/roles'] }
+                    { label: 'Roles', icon: 'pi pi-fw pi-shield', routerLink: ['/roles'] },
+                    { label: 'Empresa', icon: 'pi pi-fw pi-shield', routerLink: ['/company-settings'] }
                 ]
             },
             {
