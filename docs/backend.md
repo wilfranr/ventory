@@ -18,3 +18,10 @@ Puedes ejecutar las pruebas con:
 ```bash
 npm run test
 ```
+
+## Módulo Company
+
+Gestión de los parámetros generales de la empresa.
+
+- `PUT /companies/:id/settings` actualiza moneda y porcentaje de IVA.
+- Utiliza el DTO `UpdateCompanySettingsDto`.

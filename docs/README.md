@@ -8,3 +8,4 @@ Esta carpeta agrupa las guías y notas del proyecto.
 - [Backend](./backend.md)
 - [Frontend](./frontend.md)
 - [Módulo de Usuarios](./modulo-usuarios.md)
+- [Módulo de Company](./modulo-company.md)
