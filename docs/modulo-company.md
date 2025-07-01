@@ -2,12 +2,12 @@
 
 ## Objetivo
 
-Gestionar los parámetros generales de cada empresa, tales como la moneda de operaciones y el porcentaje de IVA.
+Gestionar los parámetros generales de cada empresa.
 
 ## Backend
 
 - **Ruta** `PUT /companies/:id/settings` para actualizar los ajustes de la empresa.
-- **DTO** `UpdateCompanySettingsDto` con campos `currency` y `vatPercent`.
+- **DTO** `UpdateCompanySettingsDto` con campos `name`, `nit`, `email`, `address`, `phones`, `website`, `currency`, `vatPercent` y `logo`.
 - **Servicio** `CompanyService.updateGeneralParams` encargado de persistir los cambios.
 
 ## Frontend

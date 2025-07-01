@@ -23,5 +23,6 @@ npm run test
 
 Gestión de los parámetros generales de la empresa.
 
-- `PUT /companies/:id/settings` actualiza moneda y porcentaje de IVA.
-- Utiliza el DTO `UpdateCompanySettingsDto`.
+- `PUT /companies/:id/settings` permite modificar nombre, NIT, email, dirección,
+  teléfonos, sitio web, moneda, porcentaje de IVA y logo.
+- Utiliza el DTO `UpdateCompanySettingsDto` con todas esas propiedades.
