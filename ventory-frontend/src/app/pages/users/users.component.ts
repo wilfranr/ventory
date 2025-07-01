@@ -16,6 +16,7 @@ import { IconFieldModule } from 'primeng/iconfield';
 import { UserService } from '../../services/user.service';
 import { InputSwitchModule } from 'primeng/inputswitch';
 import { ToastModule } from 'primeng/toast';
+import { toTitleCase } from '../../utils/string-utils';
 
 /**
  * Modelo que representa un usuario dentro del sistema.
@@ -217,7 +218,7 @@ export class UsersComponent implements OnInit {
         const role = typeof this.user.role === 'object' ? this.user.role.name : this.user.role;
 
         const userPayload = {
-            name: this.user.name,
+            name: toTitleCase(this.user.name),
             email: this.user.email,
             role,
             status: this.user.status ?? 'activo'

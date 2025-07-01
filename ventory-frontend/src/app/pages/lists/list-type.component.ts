@@ -8,6 +8,7 @@ import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
 import { ToastModule } from 'primeng/toast';
+import { toTitleCase } from '../../utils/string-utils';
 
 @Component({
     selector: 'app-list-type',
@@ -86,6 +87,8 @@ export class ListTypeComponent implements OnInit {
     /** Guarda los cambios del formulario de tipo */
     save() {
         if (this.listTypeForm.invalid) return;
+        const formValue = { ...this.listTypeForm.value };
+        if (formValue.name) formValue.name = toTitleCase(formValue.name);
 
         if (this.isEdit && this.selectedListType) {
             this.listTypeService.update(this.selectedListType.id, this.listTypeForm.value).subscribe({

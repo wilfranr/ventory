@@ -8,14 +8,16 @@ import { ToastModule } from 'primeng/toast';
 import { TabsModule } from 'primeng/tabs';
 import { ListItemService } from './list-item.service';
 import { SessionService } from '../../services/session.service';
-import { MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 @Component({
     selector: 'app-list-page',
-    imports: [DropdownModule, ListItemComponent, CommonModule, FormsModule, ToastModule, TabsModule],
+    imports: [DropdownModule, ListItemComponent, CommonModule, FormsModule, ToastModule, TabsModule, ConfirmDialogModule],
     templateUrl: './list-page.component.html',
     styleUrl: './list-page.component.scss',
-    standalone: true
+    standalone: true,
+    providers: [ConfirmationService]
 })
 /**
  * Página principal para la administración de listas.
@@ -54,11 +56,7 @@ export class ListPageComponent {
     reloadListTypes() {
         this.listTypeService.getAll().subscribe({
             next: (types) => {
-                this.listTypes = [
-                    { id: null, name: 'Todos' },
-                    ...types,
-                    { id: '__deleted__', name: 'Eliminadas' }
-                ];
+                this.listTypes = [{ id: null, name: 'Todos' }, ...types, { id: '__deleted__', name: 'Eliminadas' }];
                 this.selectedTabIndex = 0;
                 this.selectedTypeId = this.listTypes[0].id;
             },
@@ -110,19 +108,17 @@ export class ListPageComponent {
     /** Carga los ítems según el filtro actual */
     loadListItems() {
         const active = this.showDelete ? 'false' : 'true';
-        this.listItemService
-            .getAll(active, this.selectedTypeId ?? undefined)
-            .subscribe({
-                next: (items) => {
-                    console.log('🔍 Datos recibidos para la tabla:', items);
-                    this.listItems = items;
-                },
-                error: () =>
-                    this.messageService.add({
-                        severity: 'error',
-                        summary: 'Error',
-                        detail: 'No se pudieron cargar los ítems de la lista.'
-                    })
-            });
+        this.listItemService.getAll(active, this.selectedTypeId ?? undefined).subscribe({
+            next: (items) => {
+                console.log('🔍 Datos recibidos para la tabla:', items);
+                this.listItems = items;
+            },
+            error: () =>
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: 'No se pudieron cargar los ítems de la lista.'
+                })
+        });
     }
 }

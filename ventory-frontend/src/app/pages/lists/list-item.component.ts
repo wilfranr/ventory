@@ -20,13 +20,14 @@ import { forkJoin } from 'rxjs';
 import { InputIconModule } from 'primeng/inputicon';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { SessionService } from '../../services/session.service';
+import { toTitleCase } from '../../utils/string-utils';
 
 @Component({
     selector: 'app-list-item',
     templateUrl: './list-item.component.html',
     standalone: true,
     imports: [TableModule, ConfirmDialogModule, DialogModule, InputTextModule, ButtonModule, ToastModule, FormsModule, ReactiveFormsModule, CommonModule, ToolbarModule, DropdownModule, IconFieldModule, TagModule, InputIconModule],
-    providers: [MessageService, ConfirmationService]
+    providers: [ConfirmationService]
 })
 /**
  * Componente encargado de mostrar y gestionar los
@@ -143,7 +144,11 @@ export class ListItemComponent implements OnInit {
     /** Guarda un nuevo ítem o actualiza uno existente */
     save() {
         if (this.listItemForm.invalid) return;
-        const itemData = this.listItemForm.value;
+
+        const itemData = { ...this.listItemForm.value };
+
+        //Convierto a Title Case porque no falta el que mete todo en minúsculas
+        if (itemData.name) itemData.name = toTitleCase(itemData.name);
 
         const reload = () => {
             const filtro = this.getFiltroActual();
@@ -304,7 +309,10 @@ export class ListItemComponent implements OnInit {
     /** Guarda un nuevo tipo de lista */
     saveType() {
         if (this.typeForm.invalid) return;
-        this.listTypeService.create(this.typeForm.value).subscribe({
+        const typeForm = { ...this.typeForm.value };
+        if (typeForm.name) typeForm.name = toTitleCase(typeForm.name); // Convertir a Title Case
+        this.listTypeService.create(typeForm).subscribe({
+            // <--- Aquí!
             next: () => {
                 this.typeDialogVisible = false;
                 this.loadListTypes();
