@@ -62,7 +62,12 @@ export class AuthService {
    */
 
   login = async (user: UserWithRoleAndCompany) => {
-    const payload = { sub: user.id, email: user.email };
+    const payload = {
+      sub: user.id,
+      email: user.email,
+      role: user.role?.name, // <- SOLO el nombre del rol como string
+      companyId: user.company?.id || null,
+    };
     const accessToken = this.jwtService.sign(payload, { expiresIn: "15m" });
     const refreshToken = this.jwtService.sign(payload, { expiresIn: "7d" });
 

@@ -56,11 +56,6 @@ export class ListItemController {
 
     const typeId = listTypeId ? Number(listTypeId) : undefined;
 
-    console.log("Filtro recibido:", {
-      companyId: user.companyId,
-      isActive,
-      typeId,
-    });
     return this.listItemService.findAll(user.companyId, isActive, typeId);
   }
 

@@ -31,7 +31,6 @@ export class ListItemService {
    * estado o tipo de lista si se proporcionan.
    */
   findAll(companyId: string, active?: boolean, listTypeId?: number) {
-    console.log("Buscando con:", { companyId, active, listTypeId });
     return this.prisma.listItem.findMany({
       where: {
         companyId,

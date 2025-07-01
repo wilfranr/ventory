@@ -37,6 +37,10 @@ model Company {
   email              String?             // correo de contacto
   website            String?             // sitio web
   logo               String?             // URL del logo
+
+  currency           String?             // moneda predeterminada, ej: 'COP'
+  vatPercent         Float?              // porcentaje de IVA estándar
+
   users              User[]              // usuarios asociados
   registrationTokens RegistrationToken[] // tokens de registro de usuarios
   listItems          ListItem[]          // relación con ListItem

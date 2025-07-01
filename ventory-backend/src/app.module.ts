@@ -17,6 +17,8 @@ import { PermissionsGuard } from "./permissions/permissions.guard";
 import { JwtAuthGuard } from "./auth/jwt-auth.guard";
 import { ListItemModule } from "./list-item/list-item.module";
 import { ListTypeModule } from './list-type/list-type.module';
+import { CompanyService } from './company/company/company.service';
+import { CompanyController } from './company/company/company.controller';
 
 @Module({
   imports: [
@@ -29,7 +31,7 @@ import { ListTypeModule } from './list-type/list-type.module';
     ListItemModule,
     ListTypeModule,
   ],
-  controllers: [AppController, RolesController],
+  controllers: [AppController, RolesController, CompanyController],
   providers: [
     AppService,
     {
@@ -40,6 +42,7 @@ import { ListTypeModule } from './list-type/list-type.module';
       provide: APP_GUARD,
       useClass: PermissionsGuard,
     },
+    CompanyService,
   ],
 })
 /**

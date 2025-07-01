@@ -37,9 +37,21 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     }
 
     // Array plano de permisos (necesario para el helper/guard)
+
     const permissions =
       user.role?.permissions?.map((perm) => ({ name: perm.name })) || [];
 
+    // Crea un nuevo objeto user plano, con role como string:
+    const plainUser = {
+      ...user,
+      role:
+        user.role && typeof user.role !== "string" ? user.role.name : user.role,
+    };
+
+    return {
+      ...plainUser,
+      permissions,
+    };
     return {
       ...user,
       permissions,
