@@ -1,0 +1,18 @@
+<p-toast></p-toast>
+<div class="card max-w-xl mx-auto">
+    <form [formGroup]="form" class="flex flex-col gap-4" (ngSubmit)="save()">
+        <div class="field">
+            <label for="currency" class="font-semibold">Moneda</label>
+            <p-dropdown id="currency" [options]="currencies" formControlName="currency" optionLabel="label" class="w-full" [disabled]="readonlyMode"></p-dropdown>
+            <small *ngIf="form.get('currency')?.invalid && form.get('currency')?.touched" class="text-red-400">Requerido</small>
+        </div>
+        <div class="field">
+            <label for="vat" class="font-semibold">IVA (%)</label>
+            <p-inputNumber id="vat" formControlName="vatPercent" inputId="vat" [min]="0" [max]="100" [useGrouping]="false" class="w-full" [disabled]="readonlyMode"></p-inputNumber>
+            <small *ngIf="form.get('vatPercent')?.invalid && form.get('vatPercent')?.touched" class="text-red-400">Valor entre 0 y 100</small>
+        </div>
+        <div class="flex justify-end" *ngIf="!readonlyMode">
+            <p-button type="submit" label="Guardar" [disabled]="form.invalid"></p-button>
+        </div>
+    </form>
+</div>
