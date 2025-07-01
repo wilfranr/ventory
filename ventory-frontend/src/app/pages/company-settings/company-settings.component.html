@@ -1,6 +1,33 @@
 <p-toast></p-toast>
-<div class="card max-w-xl mx-auto">
+<div class="card max-w-2xl mx-auto">
     <form [formGroup]="form" class="flex flex-col gap-4" (ngSubmit)="save()">
+        <div class="field">
+            <label for="name" class="font-semibold">Nombre</label>
+            <input id="name" type="text" pInputText formControlName="name" class="w-full" [readonly]="readonlyMode" />
+            <small *ngIf="form.get('name')?.invalid && form.get('name')?.touched" class="text-red-400">Requerido</small>
+        </div>
+        <div class="field">
+            <label for="nit" class="font-semibold">NIT</label>
+            <input id="nit" type="text" pInputText formControlName="nit" class="w-full" [readonly]="readonlyMode" />
+            <small *ngIf="form.get('nit')?.invalid && form.get('nit')?.touched" class="text-red-400">Requerido</small>
+        </div>
+        <div class="field">
+            <label for="email" class="font-semibold">Email</label>
+            <input id="email" type="email" pInputText formControlName="email" class="w-full" [readonly]="readonlyMode" />
+            <small *ngIf="form.get('email')?.invalid && form.get('email')?.touched" class="text-red-400">Email inválido</small>
+        </div>
+        <div class="field">
+            <label for="address" class="font-semibold">Dirección</label>
+            <input id="address" type="text" pInputText formControlName="address" class="w-full" [readonly]="readonlyMode" />
+        </div>
+        <div class="field">
+            <label for="phones" class="font-semibold">Teléfonos</label>
+            <input id="phones" type="text" pInputText formControlName="phones" class="w-full" [readonly]="readonlyMode" />
+        </div>
+        <div class="field">
+            <label for="website" class="font-semibold">Sitio web</label>
+            <input id="website" type="text" pInputText formControlName="website" class="w-full" [readonly]="readonlyMode" />
+        </div>
         <div class="field">
             <label for="currency" class="font-semibold">Moneda</label>
             <p-dropdown id="currency" [options]="currencies" formControlName="currency" optionLabel="label" class="w-full" [disabled]="readonlyMode"></p-dropdown>
@@ -10,6 +37,11 @@
             <label for="vat" class="font-semibold">IVA (%)</label>
             <p-inputNumber id="vat" formControlName="vatPercent" inputId="vat" [min]="0" [max]="100" [useGrouping]="false" class="w-full" [disabled]="readonlyMode"></p-inputNumber>
             <small *ngIf="form.get('vatPercent')?.invalid && form.get('vatPercent')?.touched" class="text-red-400">Valor entre 0 y 100</small>
+        </div>
+        <div class="field">
+            <label for="logo" class="font-semibold">Logo (URL)</label>
+            <input id="logo" type="text" pInputText formControlName="logo" class="w-full" [readonly]="readonlyMode" />
+            <img *ngIf="logoPreview" [src]="logoPreview" alt="Logo" class="max-h-32 mt-2" />
         </div>
         <div class="flex justify-end" *ngIf="!readonlyMode">
             <p-button type="submit" label="Guardar" [disabled]="form.invalid"></p-button>

@@ -27,8 +27,7 @@ export const appRoutes: Routes = [
             {
                 path: 'company-settings',
                 loadComponent: () => import('./app/pages/company-settings/company-settings.component').then((m) => m.CompanySettingsComponent),
-                canActivate: [AuthGuard],
-                data: { requiredRole: ['admin', 'superadmin'] }
+                canActivate: [AuthGuard]
             }
         ]
     },
