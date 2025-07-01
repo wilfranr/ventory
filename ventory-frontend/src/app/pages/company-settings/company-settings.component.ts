@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { CommonModule } from '@angular/common';
 import { DropdownModule } from 'primeng/dropdown';
 import { InputNumberModule } from 'primeng/inputnumber';
+import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
@@ -14,7 +15,7 @@ import { AuthService } from '../../services/auth.service';
     standalone: true,
     templateUrl: './company-settings.component.html',
     styleUrl: './company-settings.component.scss',
-    imports: [CommonModule, DropdownModule, InputNumberModule, ButtonModule, ToastModule, ReactiveFormsModule],
+    imports: [CommonModule, DropdownModule, InputNumberModule, InputTextModule, ButtonModule, ToastModule, ReactiveFormsModule],
     providers: [MessageService]
 })
 export class CompanySettingsComponent implements OnInit {
@@ -33,8 +34,15 @@ export class CompanySettingsComponent implements OnInit {
         private auth: AuthService
     ) {
         this.form = this.fb.group({
+            name: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
+            nit: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(20)]],
+            email: ['', [Validators.required, Validators.email]],
+            address: ['', [Validators.maxLength(200)]],
+            phones: ['', [Validators.maxLength(100)]],
+            website: ['', [Validators.maxLength(100)]],
             currency: ['', Validators.required],
-            vatPercent: [0, [Validators.required, Validators.min(0), Validators.max(100)]]
+            vatPercent: [0, [Validators.required, Validators.min(0), Validators.max(100)]],
+            logo: ['', [Validators.maxLength(255)]]
         });
     }
 
@@ -78,5 +86,16 @@ export class CompanySettingsComponent implements OnInit {
                     detail: 'No se pudieron guardar los cambios'
                 })
         });
+    }
+
+    get logoPreview(): string | null {
+        const value = this.form.get('logo')?.value;
+        if (!value) return null;
+        try {
+            new URL(value);
+            return value;
+        } catch {
+            return null;
+        }
     }
 }

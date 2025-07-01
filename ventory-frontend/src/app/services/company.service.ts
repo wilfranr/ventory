@@ -3,8 +3,15 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 export interface CompanySettings {
+    name: string;
+    nit: string;
+    email: string;
+    address: string;
+    phones: string;
+    website: string;
     currency: string;
     vatPercent: number;
+    logo: string;
 }
 
 @Injectable({ providedIn: 'root' })

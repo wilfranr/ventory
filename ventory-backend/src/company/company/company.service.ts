@@ -7,6 +7,23 @@ import { UpdateCompanySettingsDto } from "../dto/update-company-settings.dto";
 export class CompanyService {
   constructor(private prisma: PrismaService) {}
 
+  async getGeneralParams(companyId: string) {
+    return this.prisma.company.findUnique({
+      where: { id: companyId },
+      select: {
+        name: true,
+        nit: true,
+        email: true,
+        address: true,
+        phones: true,
+        website: true,
+        currency: true,
+        vatPercent: true,
+        logo: true,
+      },
+    });
+  }
+
   async updateGeneralParams(
     companyId: string,
     dto: UpdateCompanySettingsDto,
