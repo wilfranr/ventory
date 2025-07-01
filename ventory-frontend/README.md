@@ -43,7 +43,17 @@ Para pruebas end-to-end (e2e):
 
 ng e2e
 
-    Angular CLI no incluye por defecto un framework de e2e. (Pendiente definir framework).
+Este proyecto utiliza [Cypress](https://www.cypress.io/) para las pruebas e2e. Ejecuta lo siguiente:
+
+```bash
+npx cypress open
+```
+
+Si deseas correrlas en modo headless:
+
+```bash
+npx cypress run
+```
 
 📚 Recursos adicionales
 

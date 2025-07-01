@@ -1,2 +1,6 @@
-# Agents file
-Este archivo registra los agentes en uso.
+# Registro de agents
+
+Este archivo detalla los agentes que se ejecutan en segundo plano en Ventory. Cada entrada resume su finalidad y configuración principal.
+
+- **EmailNotificationAgent**: envía correos de bienvenida cuando se crea un usuario nuevo. Requiere la variable de entorno `EMAIL_API_KEY` y se ejecuta cada hora mediante un cron.
+- **CleanupTempFilesAgent**: elimina archivos temporales del directorio `uploads/` todos los días a las 02:00 AM.

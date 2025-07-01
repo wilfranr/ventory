@@ -114,15 +114,50 @@ users ───< user_roles >─── roles ───< role_permissions >──
 
 ---
 
-## Pendientes por Documentar
+## Ejemplo de Guards en controladores
 
-- Ejemplo de uso de Guards (`@Roles()`, `@Permissions()`) en controladores de NestJS.
-- Política de actualizaciones de roles y permisos.
-- Diagramas de flujo detallados para procesos de creación y edición.
+Para proteger rutas se utilizan dos decoradores principales: `@Roles()` y `@Permissions()`. El siguiente fragmento muestra un ejemplo dentro de un controlador de NestJS:
+
+```ts
+@Controller('users')
+export class UsersController {
+  constructor(private readonly usersService: UsersService) {}
+
+  @Get(':id')
+  @Roles('admin', 'superadmin')
+  @Permissions('ver_usuarios')
+  findOne(@Param('id') id: number) {
+    return this.usersService.findOne(id);
+  }
+}
+```
+
+## Política de actualizaciones de roles y permisos
+
+- Todo cambio en roles o asignación de permisos debe realizarse mediante el módulo de administración.
+- Las modificaciones solo pueden efectuarlas usuarios con rol `superadmin`.
+- Antes de aplicar cambios en producción se recomienda validarlos en un entorno de pruebas.
+
+## Diagramas de flujo
+
+A continuación se incluyen diagramas simplificados para los procesos de creación y edición de usuarios.
+
+```
+Usuario nuevo --> Completar formulario --> Validar datos --> [¿Roles válidos?]
+    \                                   /                    
+     -----> Mostrar error <-------------                     
+        |                                        
+        | Sí                                     
+        v                                        
+  Crear usuario en base de datos --> Asignar roles --> Confirmar
+```
+
+```
+Editar usuario --> Cambiar datos --> Validar --> Guardar cambios
+```
 
 ---
 
 ## Anexos
 
-- [Diagrama de flujo de creación de usuario](./flujo-creacion-usuario.png)
-- [Modelo Entidad-Relación](./modelo-er.png)
+- Los diagramas originales `flujo-creacion-usuario.png` y `modelo-er.png` serán añadidos próximamente. Mientras tanto, utiliza los diagramas de texto anteriores como referencia.
