@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
@@ -18,7 +18,7 @@ export interface CompanySettings {
 export class CompanyService {
     private baseUrl = '/api/companies';
 
-    constructor(private http: HttpClient) {}
+    private http = inject(HttpClient);
 
     getSettings(companyId: string): Observable<CompanySettings> {
         return this.http.get<CompanySettings>(`${this.baseUrl}/${companyId}/settings`);
