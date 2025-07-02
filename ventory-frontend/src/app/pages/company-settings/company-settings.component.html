@@ -5,17 +5,23 @@
         <div class="field col-12 md:col-6">
             <label for="name" class="font-semibold">Nombre</label>
             <input id="name" type="text" pInputText formControlName="name" class="w-full" [readonly]="readonlyMode" />
-            <small *ngIf="form.get('name')?.invalid && form.get('name')?.touched" class="text-red-400">Requerido</small>
+            @if (form.get('name')?.invalid && form.get('name')?.touched) {
+                <small class="text-red-400">Requerido</small>
+            }
         </div>
         <div class="field col-12 md:col-6">
             <label for="nit" class="font-semibold">NIT</label>
             <input id="nit" type="text" pInputText formControlName="nit" class="w-full" [readonly]="readonlyMode" />
-            <small *ngIf="form.get('nit')?.invalid && form.get('nit')?.touched" class="text-red-400">Requerido</small>
+            @if (form.get('nit')?.invalid && form.get('nit')?.touched) {
+                <small class="text-red-400">Requerido</small>
+            }
         </div>
         <div class="field col-12 md:col-6">
             <label for="email" class="font-semibold">Email</label>
             <input id="email" type="email" pInputText formControlName="email" class="w-full" [readonly]="readonlyMode" />
-            <small *ngIf="form.get('email')?.invalid && form.get('email')?.touched" class="text-red-400">Email inválido</small>
+            @if (form.get('email')?.invalid && form.get('email')?.touched) {
+                <small class="text-red-400">Email inválido</small>
+            }
         </div>
         <div class="field col-12 md:col-6">
             <label for="address" class="font-semibold">Dirección</label>
@@ -32,20 +38,28 @@
         <div class="field col-12 md:col-6">
             <label for="currency" class="font-semibold">Moneda</label>
             <p-dropdown id="currency" [options]="currencies" formControlName="currency" optionLabel="label" class="w-full" [disabled]="readonlyMode"></p-dropdown>
-            <small *ngIf="form.get('currency')?.invalid && form.get('currency')?.touched" class="text-red-400">Requerido</small>
+            @if (form.get('currency')?.invalid && form.get('currency')?.touched) {
+                <small class="text-red-400">Requerido</small>
+            }
         </div>
         <div class="field col-12 md:col-6">
             <label for="vat" class="font-semibold">IVA (%)</label>
             <p-inputNumber id="vat" formControlName="vatPercent" inputId="vat" [min]="0" [max]="100" [useGrouping]="false" class="w-full" [disabled]="readonlyMode"></p-inputNumber>
-            <small *ngIf="form.get('vatPercent')?.invalid && form.get('vatPercent')?.touched" class="text-red-400">Valor entre 0 y 100</small>
+            @if (form.get('vatPercent')?.invalid && form.get('vatPercent')?.touched) {
+                <small class="text-red-400">Valor entre 0 y 100</small>
+            }
         </div>
         <div class="field col-12 md:col-6">
             <label for="logo" class="font-semibold">Logo (URL)</label>
             <input id="logo" type="text" pInputText formControlName="logo" class="w-full" [readonly]="readonlyMode" />
-            <img *ngIf="logoPreview" [src]="logoPreview" alt="Logo" class="max-h-32 mt-2" />
+            @if (logoPreview) {
+                <img [src]="logoPreview" alt="Logo" class="max-h-32 mt-2" />
+            }
         </div>
-        <div class="col-12 flex justify-end" *ngIf="!readonlyMode">
-            <p-button type="submit" label="Guardar" [disabled]="form.invalid"></p-button>
-        </div>
+        @if (!readonlyMode) {
+            <div class="col-12 flex justify-end">
+                <p-button type="submit" label="Guardar" [disabled]="form.invalid"></p-button>
+            </div>
+        }
     </form>
 </div>

@@ -12,101 +12,101 @@
                 </div>
 
                 <!-- 🟢 Registro con Token -->
-                <div *ngIf="registerMode === 'joinCompany'" class="card flex flex-col gap-4">
-                    <div class="font-semibold text-xl text-center mb-2">Registro con Token</div>
-                    <div class="flex flex-col gap-4">
-                        <div class="field">
-                            <label for="name">Nombres y Apellidos</label>
-                            <input pInputText id="name" type="name" formControlName="name" placeholder="Ingrese nombre y apellidos" />
-                        </div>
+                @if (registerMode === 'joinCompany') {
+                    <div class="card flex flex-col gap-4">
+                        <div class="font-semibold text-xl text-center mb-2">Registro con Token</div>
+                        <div class="flex flex-col gap-4">
+                            <div class="field">
+                                <label for="name">Nombres y Apellidos</label>
+                                <input pInputText id="name" type="name" formControlName="name" placeholder="Ingrese nombre y apellidos" />
+                            </div>
 
-                        <div class="field">
-                            <label for="email">Email</label>
-                            <input pInputText id="email" type="email" formControlName="email" placeholder="Email" />
+                            <div class="field">
+                                <label for="email">Email</label>
+                                <input pInputText id="email" type="email" formControlName="email" placeholder="Email" />
+                            </div>
+                            <div class="field">
+                                <label for="password">Contraseña</label>
+                                <p-password id="password" formControlName="password" placeholder="Contraseña" />
+                            </div>
+                            <div class="field">
+                                <label for="token">Token</label>
+                                <input pInputText id="token" type="text" formControlName="token" placeholder="Token" />
+                                <p-message severity="info">El token puedes solicitarlo al administrador de la empresa</p-message>
+                            </div>
+                            <p-button type="submit" label="Registrar con Token"></p-button>
                         </div>
-                        <div class="field">
-                            <label for="password">Contraseña</label>
-                            <p-password id="password" formControlName="password" placeholder="Contraseña" />
-                        </div>
-                        <div class="field">
-                            <label for="token">Token</label>
-                            <input pInputText id="token" type="text" formControlName="token" placeholder="Token" />
-                            <p-message severity="info">El token puedes solicitarlo al administrador de la empresa</p-message>
-                        </div>
-                        <p-button type="submit" label="Registrar con Token"></p-button>
                     </div>
-                </div>
+                }
 
                 <!-- 🏢 Registro de Empresa -->
-                <div *ngIf="registerMode === 'newCompany'" class="card flex flex-col gap-4 mt-6">
-                    <div class="font-semibold text-xl text-center mb-2">Registro de Empresa</div>
-                    <div class="flex flex-wrap gap-6">
-                        <div class="flex flex-col grow basis-0 gap-2">
-                            <label for="companyName">Razón Social</label>
-                            <input pInputText id="companyName" formControlName="companyName" type="text" />
+                @if (registerMode === 'newCompany') {
+                    <div class="card flex flex-col gap-4 mt-6">
+                        <div class="font-semibold text-xl text-center mb-2">Registro de Empresa</div>
+                        <div class="flex flex-wrap gap-6">
+                            <div class="flex flex-col grow basis-0 gap-2">
+                                <label for="companyName">Razón Social</label>
+                                <input pInputText id="companyName" formControlName="companyName" type="text" />
+                            </div>
+                            <div class="flex flex-col grow basis-0 gap-2">
+                                <label for="nit">NIT</label>
+                                <input pInputText id="nit" formControlName="nit" type="text" />
+                            </div>
                         </div>
-                        <div class="flex flex-col grow basis-0 gap-2">
-                            <label for="nit">NIT</label>
-                            <input pInputText id="nit" formControlName="nit" type="text" />
+                        <div class="flex flex-wrap gap-6">
+                            <div class="flex flex-col grow basis-0 gap-2">
+                                <label for="address">Dirección</label>
+                                <input pInputText id="address" formControlName="address" type="text" />
+                            </div>
+                            <div class="flex flex-col grow basis-0 gap-2">
+                                <label for="phones">Teléfono</label>
+                                <input pInputText id="phones" formControlName="phones" type="text" />
+                            </div>
                         </div>
-                    </div>
-                    <div class="flex flex-wrap gap-6">
-                        <div class="flex flex-col grow basis-0 gap-2">
-                            <label for="address">Dirección</label>
-                            <input pInputText id="address" formControlName="address" type="text" />
-                        </div>
-                        <div class="flex flex-col grow basis-0 gap-2">
-                            <label for="phones">Teléfono</label>
-                            <input pInputText id="phones" formControlName="phones" type="text" />
-                        </div>
-                    </div>
-                    <div class="flex flex-wrap gap-6">
-                        <div class="flex flex-col grow basis-0 gap-2">
-                            <label for="companyEmail">Email de la Empresa</label>
-                            <input pInputText id="companyEmail" formControlName="companyEmail" type="email" />
-                        </div>
-                        <div class="flex flex-col grow basis-0 gap-2">
-                            <label for="website">Website</label>
-                            <input pInputText id="website" formControlName="website" type="text"/>
-                        </div>
-                    </div>
-
-                    <div class="font-semibold text-xl text-center mb-2 mt-6">Registro Usuario</div>
-                    <div class="flex flex-wrap gap-6">
-                        <div class="flex flex-col grow basis-0 gap-2">
-                            <label for="name">Nombre y Apellidos</label>
-                            <input pInputText id="name" formControlName="name" type="text" />
-                        </div>
-                        <div class="flex flex-col grow basis-0 gap-2">
-                            <label for="email">Email</label>
-                            <input pInputText id="email" formControlName="email" type="email" />
+                        <div class="flex flex-wrap gap-6">
+                            <div class="flex flex-col grow basis-0 gap-2">
+                                <label for="companyEmail">Email de la Empresa</label>
+                                <input pInputText id="companyEmail" formControlName="companyEmail" type="email" />
+                            </div>
+                            <div class="flex flex-col grow basis-0 gap-2">
+                                <label for="website">Website</label>
+                                <input pInputText id="website" formControlName="website" type="text" />
+                            </div>
                         </div>
 
+                        <div class="font-semibold text-xl text-center mb-2 mt-6">Registro Usuario</div>
+                        <div class="flex flex-wrap gap-6">
+                            <div class="flex flex-col grow basis-0 gap-2">
+                                <label for="name">Nombre y Apellidos</label>
+                                <input pInputText id="name" formControlName="name" type="text" />
+                            </div>
+                            <div class="flex flex-col grow basis-0 gap-2">
+                                <label for="email">Email</label>
+                                <input pInputText id="email" formControlName="email" type="email" />
+                            </div>
+
+                            <div class="flex flex-col grow basis-0 gap-2">
+                                <label for="password">Contraseña</label>
+                                <p-password id="password" formControlName="password" />
+                            </div>
+                        </div>
                         <div class="flex flex-col grow basis-0 gap-2">
-                            <label for="password">Contraseña</label>
-                            <p-password id="password" formControlName="password" />
-                        </div>
-                    </div>
-                    <div class="flex flex-col grow basis-0 gap-2">
-                        <p-message severity="info">Al crear empresa, se asignará por defecto rol SuperUsuario</p-message>
+                            <p-message severity="info">Al crear empresa, se asignará por defecto rol SuperUsuario</p-message>
                         </div>
 
-                    <div class="flex flex-col grow basis-0 gap-2">
-                        <label for="logo">Logo</label>
-                        <input type="file" id="logo" (change)="onFileChange($event)" accept="image/*" />
+                        <div class="flex flex-col grow basis-0 gap-2">
+                            <label for="logo">Logo</label>
+                            <input type="file" id="logo" (change)="onFileChange($event)" accept="image/*" />
+                        </div>
+                        <p-button type="submit" label="Registrar Empresa"></p-button>
                     </div>
-                    <p-button type="submit" label="Registrar Empresa"></p-button>
-
-                </div>
+                }
                 <p-button label="Cancelar" type="button" routerLink="/auth/login" outlined></p-button>
 
-                <p-message
-                severity="error"
-                *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched"
-                text="Ingresa un correo válido"
-                ></p-message>
+                @if (registerForm.get('email')?.invalid && registerForm.get('email')?.touched) {
+                    <p-message severity="error" text="Ingresa un correo válido"></p-message>
+                }
             </div>
         </div>
     </form>
-
 </p-fluid>

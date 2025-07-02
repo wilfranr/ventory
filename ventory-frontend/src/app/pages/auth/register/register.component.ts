@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { Component, inject } from '@angular/core';
+import { NonNullableFormBuilder, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 import { InputTextModule } from 'primeng/inputtext';
@@ -20,34 +20,31 @@ import { MessageService } from 'primeng/api';
     providers: [AppFloatingConfigurator, MessageService]
 })
 export class RegisterComponent {
+    private fb = inject(NonNullableFormBuilder);
+    private authService = inject(AuthService);
+    private router = inject(Router);
+    private messageService = inject(MessageService);
+
     registerMode: 'newCompany' | 'joinCompany' = 'newCompany';
-    registerForm: FormGroup;
+    registerForm = this.fb.group({
+        // Comunes
+        name: ['', Validators.required],
+        email: ['', [Validators.required, Validators.email]],
+        password: ['', [Validators.required, Validators.minLength(6)]],
 
-    constructor(
-        private fb: FormBuilder,
-        private authService: AuthService,
-        private router: Router,
-        private messageService: MessageService
-    ) {
-        this.registerForm = this.fb.group({
-            // Comunes
-            name: ['', Validators.required],
-            email: ['', [Validators.required, Validators.email]],
-            password: ['', [Validators.required, Validators.minLength(6)]],
+        // Para creación de empresa
+        companyName: [''],
+        nit: [''],
+        address: [''],
+        phones: [''],
+        companyEmail: [''],
+        website: [''],
+        logo: [null],
 
-            // Para creación de empresa
-            companyName: [''],
-            nit: [''],
-            address: [''],
-            phones: [''],
-            companyEmail: [''],
-            website: [''],
-            logo: [null],
-
-            // Para unión por token
-            token: ['']
-        });
-    }
+        // Para unión por token
+        token: ['']
+    });
+    constructor() {}
 
     switchMode(mode: 'newCompany' | 'joinCompany') {
         this.registerMode = mode;
