@@ -2,6 +2,8 @@ import { Injectable } from "@nestjs/common";
 import { Prisma } from "@prisma/client";
 import { PrismaService } from "src/prisma/prisma.service";
 import { UpdateCompanySettingsDto } from "../dto/update-company-settings.dto";
+import * as path from "path";
+import * as fs from "fs";
 
 @Injectable()
 export class CompanyService {
@@ -27,7 +29,28 @@ export class CompanyService {
   async updateGeneralParams(
     companyId: string,
     dto: UpdateCompanySettingsDto,
+    logoFile: Express.Multer.File,
   ) {
+    let logoUrl: string | undefined = undefined;
+
+    if (logoFile) {
+      const uploadPath = path.join(
+        __dirname,
+        "..",
+        "..",
+        "..",
+        "uploads",
+        "logos",
+      );
+      if (!fs.existsSync(uploadPath)) {
+        fs.mkdirSync(uploadPath, { recursive: true });
+      }
+      const fileName = `${companyId}-${Date.now()}${path.extname(logoFile.originalname)}`;
+      const filePath = path.join(uploadPath, fileName);
+      fs.writeFileSync(filePath, logoFile.buffer);
+      logoUrl = `/uploads/logos/${fileName}`;
+    }
+
     const data: Prisma.CompanyUpdateInput = {
       ...(dto.name !== undefined ? { name: dto.name } : {}),
       ...(dto.nit !== undefined ? { nit: dto.nit } : {}),
@@ -36,13 +59,17 @@ export class CompanyService {
       ...(dto.phones !== undefined ? { phones: dto.phones } : {}),
       ...(dto.website !== undefined ? { website: dto.website } : {}),
       ...(dto.currency !== undefined ? { currency: dto.currency } : {}),
-      ...(dto.vatPercent !== undefined ? { vatPercent: dto.vatPercent } : {}),
-      ...(dto.logo !== undefined ? { logo: dto.logo } : {}),
+      ...(dto.vatPercent !== undefined
+        ? { vatPercent: Number(dto.vatPercent) }
+        : {}),
+      ...(logoUrl !== undefined ? { logo: logoUrl } : {}),
     };
 
-    return this.prisma.company.update({
+    await this.prisma.company.update({
       where: { id: companyId },
       data,
     });
+
+    return { logoUrl };
   }
 }

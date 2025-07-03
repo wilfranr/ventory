@@ -6,16 +6,27 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
 import { ToastModule } from 'primeng/toast';
+import { FileUploadModule } from 'primeng/fileupload';
 import { MessageService } from 'primeng/api';
 import { CompanyService, CompanySettings } from '../../services/company.service';
 import { AuthService } from '../../services/auth.service';
+import { SessionService } from '../../services/session.service';
 
 @Component({
     selector: 'app-company-settings',
     standalone: true,
     templateUrl: './company-settings.component.html',
     styleUrl: './company-settings.component.scss',
-    imports: [CommonModule, DropdownModule, InputNumberModule, InputTextModule, ButtonModule, ToastModule, ReactiveFormsModule],
+    imports: [
+        CommonModule,
+        DropdownModule,
+        InputNumberModule,
+        InputTextModule,
+        ButtonModule,
+        ToastModule,
+        ReactiveFormsModule,
+        FileUploadModule
+    ],
     providers: [MessageService]
 })
 export class CompanySettingsComponent implements OnInit {
@@ -23,6 +34,7 @@ export class CompanySettingsComponent implements OnInit {
     private companyService = inject(CompanyService);
     private messageService = inject(MessageService);
     private auth = inject(AuthService);
+    private session = inject(SessionService);
 
     form = this.fb.group({
         name: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
@@ -35,8 +47,11 @@ export class CompanySettingsComponent implements OnInit {
         vatPercent: this.fb.control(0, {
             validators: [Validators.required, Validators.min(0), Validators.max(100)]
         }),
-        logo: ['', [Validators.maxLength(255)]]
+        logo: ['']
     });
+    logoPreview: string | null = null;
+    private logoFile: File | null = null;
+
     currencies = [
         { label: 'COP', value: 'COP' },
         { label: 'USD', value: 'USD' },
@@ -52,10 +67,16 @@ export class CompanySettingsComponent implements OnInit {
         if (this.readonlyMode) {
             this.form.disable();
         }
-        const companyId = this.auth.companyId;
+        const companyId = this.session.companyId;
         if (companyId) {
             this.companyService.getSettings(companyId).subscribe({
-                next: (data) => this.form.patchValue(data),
+                next: (data) => {
+                    console.log('Datos que llegan del backend:', data);
+                    this.form.patchValue(data);
+                    if (data.logo) {
+                        this.logoPreview = data.logo;
+                    }
+                },
                 error: () =>
                     this.messageService.add({
                         severity: 'error',
@@ -66,36 +87,60 @@ export class CompanySettingsComponent implements OnInit {
         }
     }
 
-    save() {
-        if (this.form.invalid || this.readonlyMode) return;
-        const companyId = this.auth.companyId;
-        if (!companyId) return;
+    onLogoSelect(event: { files: File[] }) {
+        if (event.files.length > 0) {
+            this.logoFile = event.files[0];
+            const reader = new FileReader();
+            reader.onload = (e: any) => {
+                this.logoPreview = e.target.result;
+            };
+            reader.readAsDataURL(this.logoFile as Blob);
+        }
+    }
 
-        const payload = this.form.value as CompanySettings;
-        this.companyService.updateSettings(companyId, payload).subscribe({
-            next: () =>
+    onLogoClear() {
+        this.logoFile = null;
+        this.logoPreview = null;
+    }
+
+    save() {
+        console.log('Form validity:', this.form.valid);
+        console.log('Form values:', this.form.getRawValue());
+        console.log('Readonly mode:', this.readonlyMode);
+
+        if (this.form.invalid || this.readonlyMode) {
+            console.log('Save method returned early due to invalid form or readonly mode.');
+            return;
+        }
+        const companyId = this.session.companyId;
+        console.log('Company ID:', companyId);
+        if (!companyId) {
+            console.error('Company ID is missing. Cannot save.');
+            return;
+        }
+
+        const payload = this.form.getRawValue() as CompanySettings;
+
+        this.companyService.updateSettings(companyId, payload, this.logoFile).subscribe({
+            next: (res) => {
                 this.messageService.add({
                     severity: 'success',
                     summary: 'Guardado',
                     detail: 'Parámetros actualizados'
-                }),
-            error: () =>
+                });
+                if (res.logoUrl) {
+                    this.logoPreview = res.logoUrl;
+                    this.form.controls.logo.setValue(res.logoUrl);
+                }
+            },
+            error: (err) => {
+                console.error('Error saving settings:', err);
                 this.messageService.add({
                     severity: 'error',
                     summary: 'Error',
                     detail: 'No se pudieron guardar los cambios'
-                })
+                });
+            }
         });
-    }
-
-    get logoPreview(): string | null {
-        const value = this.form.get('logo')?.value;
-        if (!value) return null;
-        try {
-            new URL(value);
-            return value;
-        } catch {
-            return null;
-        }
     }
 }

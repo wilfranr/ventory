@@ -11,7 +11,7 @@ export interface CompanySettings {
     website: string;
     currency: string;
     vatPercent: number;
-    logo: string;
+    logo?: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -24,7 +24,23 @@ export class CompanyService {
         return this.http.get<CompanySettings>(`${this.baseUrl}/${companyId}/settings`);
     }
 
-    updateSettings(companyId: string, data: CompanySettings): Observable<CompanySettings> {
-        return this.http.put<CompanySettings>(`${this.baseUrl}/${companyId}/settings`, data);
+    updateSettings(
+        companyId: string,
+        data: CompanySettings,
+        logoFile: File | null
+    ): Observable<{ logoUrl?: string }> {
+        const formData = new FormData();
+        Object.keys(data).forEach((key) => {
+            const value = (data as any)[key];
+            if (value !== null && value !== undefined) {
+                formData.append(key, value);
+            }
+        });
+
+        if (logoFile) {
+            formData.append('logo', logoFile, logoFile.name);
+        }
+
+        return this.http.put<{ logoUrl?: string }>(`${this.baseUrl}/${companyId}/settings`, formData);
     }
 }

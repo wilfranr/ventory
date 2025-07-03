@@ -37,7 +37,7 @@
         </div>
         <div class="field col-12 md:col-6">
             <label for="currency" class="font-semibold">Moneda</label>
-            <p-dropdown id="currency" [options]="currencies" formControlName="currency" optionLabel="label" class="w-full" [disabled]="readonlyMode"></p-dropdown>
+            <p-dropdown id="currency" [options]="currencies" formControlName="currency" optionLabel="label" optionValue="value" class="w-full" [disabled]="readonlyMode"></p-dropdown>
             @if (form.get('currency')?.invalid && form.get('currency')?.touched) {
                 <small class="text-red-400">Requerido</small>
             }
@@ -49,12 +49,30 @@
                 <small class="text-red-400">Valor entre 0 y 100</small>
             }
         </div>
-        <div class="field col-12 md:col-6">
-            <label for="logo" class="font-semibold">Logo (URL)</label>
-            <input id="logo" type="text" pInputText formControlName="logo" class="w-full" [readonly]="readonlyMode" />
-            @if (logoPreview) {
-                <img [src]="logoPreview" alt="Logo" class="max-h-32 mt-2" />
-            }
+        <div class="field col-12">
+            <label for="logo" class="font-semibold">Logo</label>
+            <p-fileupload
+                (onSelect)="onLogoSelect($event)"
+                (onClear)="onLogoClear()"
+                [multiple]="false"
+                accept="image/*"
+                maxFileSize="10000000"
+                mode="advanced"
+                [showUploadButton]="false"
+                chooseLabel="Elegir logo"
+                cancelLabel="Cancelar"
+            >
+                <ng-template pTemplate="content">
+                    <div *ngIf="logoPreview" class="p-fileupload-previews">
+                      <div class="p-fileupload-preview">
+                        <img [src]="logoPreview" alt="Logo Preview" class="max-h-32 mt-2" />
+                      </div>
+                    </div>
+                    <div *ngIf="!logoPreview" class="p-fileupload-empty">
+                        <p>Arrastra y suelta la imagen aquí.</p>
+                    </div>
+                </ng-template>
+            </p-fileupload>
         </div>
         @if (!readonlyMode) {
             <div class="col-12 flex justify-end">

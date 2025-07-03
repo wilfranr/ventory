@@ -1,4 +1,5 @@
-import { UseGuards, Put, Body, Param, Controller, Get } from "@nestjs/common";
+import { UseGuards, Put, Body, Param, Controller, Get, UseInterceptors, UploadedFile } from "@nestjs/common";
+import { FileInterceptor } from "@nestjs/platform-express";
 import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
 import { Roles } from "src/auth/roles.decorator";
 import { RolesGuard } from "src/auth/roles.guard";
@@ -17,10 +18,12 @@ export class CompanyController {
   @Put(":id/settings")
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles("admin", "superadmin")
+  @UseInterceptors(FileInterceptor('logo'))
   async updateSettings(
     @Param("id") id: string,
     @Body() dto: UpdateCompanySettingsDto,
+    @UploadedFile() logo: Express.Multer.File
   ) {
-    return await this.companyService.updateGeneralParams(id, dto);
+    return await this.companyService.updateGeneralParams(id, dto, logo);
   }
 }

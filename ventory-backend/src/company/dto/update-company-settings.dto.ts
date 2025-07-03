@@ -1,3 +1,4 @@
+import { Type } from "class-transformer";
 import {
   IsEmail,
   IsNumber,
@@ -42,6 +43,8 @@ export class UpdateCompanySettingsDto {
   @IsString()
   currency?: string;
 
+  @IsOptional()
+  @Type(() => Number)
   @IsNumber()
   @Min(0)
   @Max(100)
