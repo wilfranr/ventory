@@ -90,8 +90,19 @@
                                 <p-password id="password" formControlName="password" />
                             </div>
                         </div>
-                        <div class="flex flex-col grow basis-0 gap-2">
-                            <p-message severity="info">Al crear empresa, se asignará por defecto rol SuperUsuario</p-message>
+                        <div class="flex flex-wrap gap-6">
+                            <div class="flex flex-col grow basis-0 gap-2">
+                                <label for="country">País</label>
+                                <p-autocomplete id="country" formControlName="country" [suggestions]="filteredCountries" (completeMethod)="filterCountries($event)" optionLabel="name" placeholder="Selecciona un país" [dropdown]="true" [forceSelection]="true" (onSelect)="onCountryChange($event)"></p-autocomplete>
+                            </div>
+                            <div class="flex flex-col grow basis-0 gap-2">
+                                <label for="department">Departamento</label>
+                                <p-autocomplete id="department" formControlName="department" [suggestions]="filteredDepartments" (completeMethod)="filterDepartments($event)" optionLabel="name" placeholder="Selecciona un departamento" [dropdown]="true" [forceSelection]="true" (onSelect)="onDepartmentChange($event)"></p-autocomplete>
+                            </div>
+                            <div class="flex flex-col grow basis-0 gap-2">
+                                <label for="city">Ciudad</label>
+                                <p-autocomplete id="city" formControlName="city" [suggestions]="filteredCities" (completeMethod)="filterCities($event)" optionLabel="name" placeholder="Selecciona una ciudad" [dropdown]="true" [forceSelection]="true"></p-autocomplete>
+                            </div>
                         </div>
 
                         <div class="flex flex-col grow basis-0 gap-2">

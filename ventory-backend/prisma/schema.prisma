@@ -41,6 +41,10 @@ model Company {
   currency           String?             // moneda predeterminada, ej: 'COP'
   vatPercent         Float?              // porcentaje de IVA estándar
 
+  country            String?             // País de la empresa
+  department         String?             // Departamento/Estado de la empresa
+  city               String?             // Ciudad de la empresa
+
   users              User[]              // usuarios asociados
   registrationTokens RegistrationToken[] // tokens de registro de usuarios
   listItems          ListItem[]          // relación con ListItem

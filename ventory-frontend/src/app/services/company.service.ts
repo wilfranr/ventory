@@ -43,4 +43,8 @@ export class CompanyService {
 
         return this.http.put<{ logoUrl?: string }>(`${this.baseUrl}/${companyId}/settings`, formData);
     }
+
+    getCountrySettings(countryCode: string): Observable<{ currency: string; vatPercent: number }> {
+        return this.http.get<{ currency: string; vatPercent: number }>(`${this.baseUrl}/country-settings/${countryCode}`);
+    }
 }

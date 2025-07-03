@@ -196,6 +196,9 @@ export class AuthService {
         email: data.companyEmail,
         website: data.website,
         logo: logoPath,
+        country: data.country,
+        department: data.department,
+        city: data.city,
       },
     });
 

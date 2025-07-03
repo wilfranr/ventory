@@ -72,4 +72,15 @@ export class CompanyService {
 
     return { logoUrl };
   }
+
+  async getCountrySettings(countryCode: string) {
+    switch (countryCode) {
+      case 'CO':
+        return { currency: 'COP', vatPercent: 19 };
+      case 'US':
+        return { currency: 'USD', vatPercent: 0 };
+      default:
+        return { currency: 'USD', vatPercent: 0 };
+    }
+  }
 }

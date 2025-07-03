@@ -39,6 +39,18 @@ export class CreateUserDto {
   website?: string;
 
   @IsOptional()
+  @IsString()
+  country?: string;
+
+  @IsOptional()
+  @IsString()
+  department?: string;
+
+  @IsOptional()
+  @IsString()
+  city?: string;
+
+  @IsOptional()
   logo?: any;
 
   //Token, alternativa al tener la empresa creada

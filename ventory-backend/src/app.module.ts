@@ -1,7 +1,3 @@
-/**
- * Módulo raíz de la aplicación que importa y configura
- * los módulos principales del sistema.
- */
 import { Module } from "@nestjs/common";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
@@ -19,9 +15,12 @@ import { ListItemModule } from "./list-item/list-item.module";
 import { ListTypeModule } from './list-type/list-type.module';
 import { CompanyService } from './company/company/company.service';
 import { CompanyController } from './company/company/company.controller';
+import { GeonamesModule } from './geonames/geonames.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot(),
     AuthModule,
     RolesModule,
     UsersModule,
@@ -30,6 +29,7 @@ import { CompanyController } from './company/company/company.controller';
     PermissionsModule,
     ListItemModule,
     ListTypeModule,
+    GeonamesModule,
   ],
   controllers: [AppController, RolesController, CompanyController],
   providers: [

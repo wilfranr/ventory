@@ -25,4 +25,5 @@ Gestión de los parámetros generales de la empresa.
 
 - `PUT /companies/:id/settings` permite modificar nombre, NIT, email, dirección,
   teléfonos, sitio web, moneda, porcentaje de IVA y logo.
+- Ahora acepta `multipart/form-data` para la carga del logo.
 - Utiliza el DTO `UpdateCompanySettingsDto` con todas esas propiedades.
