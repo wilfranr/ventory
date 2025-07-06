@@ -238,15 +238,30 @@ export class AuthService {
    */
 
   async refreshTokens(userId: number, refreshToken: string) {
+    console.log('Backend: refreshTokens - userId recibido:', userId);
+    console.log('Backend: refreshTokens - refreshToken recibido:', refreshToken);
+
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
       include: { role: true, company: true },
     });
 
-    if (!user || !user.refreshToken)
+    if (!user) {
+      console.log('Backend: refreshTokens - Usuario no encontrado para userId:', userId);
       throw new UnauthorizedException("Usuario o token no válidos");
+    }
+
+    console.log('Backend: refreshTokens - Usuario encontrado:', user.email);
+    console.log('Backend: refreshTokens - refreshToken en DB (hasheado):', user.refreshToken);
+
+    if (!user.refreshToken) {
+      console.log('Backend: refreshTokens - No hay refreshToken en DB para el usuario.');
+      throw new UnauthorizedException("Usuario o token no válidos");
+    }
 
     const isValid = await bcrypt.compare(refreshToken, user.refreshToken);
+    console.log('Backend: refreshTokens - Resultado de bcrypt.compare (isValid):', isValid);
+
     if (!isValid) throw new UnauthorizedException("Refresh token inválido");
 
     // Genera nuevos tokens
@@ -260,6 +275,8 @@ export class AuthService {
       where: { id: user.id },
       data: { refreshToken: hashedRefreshToken },
     });
+
+    console.log('Backend: refreshTokens - Tokens generados y guardados exitosamente.');
 
     return {
       access_token: newAccessToken,

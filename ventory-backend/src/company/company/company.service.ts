@@ -47,8 +47,10 @@ export class CompanyService {
       }
       const fileName = `${companyId}-${Date.now()}${path.extname(logoFile.originalname)}`;
       const filePath = path.join(uploadPath, fileName);
+
       fs.writeFileSync(filePath, logoFile.buffer);
       logoUrl = `/uploads/logos/${fileName}`;
+      console.log(`Logo saved at: ${filePath}`);
     }
 
     const data: Prisma.CompanyUpdateInput = {
@@ -75,12 +77,12 @@ export class CompanyService {
 
   async getCountrySettings(countryCode: string) {
     switch (countryCode) {
-      case 'CO':
-        return { currency: 'COP', vatPercent: 19 };
-      case 'US':
-        return { currency: 'USD', vatPercent: 0 };
+      case "CO":
+        return { currency: "COP", vatPercent: 19 };
+      case "US":
+        return { currency: "USD", vatPercent: 0 };
       default:
-        return { currency: 'USD', vatPercent: 0 };
+        return { currency: "USD", vatPercent: 0 };
     }
   }
 }

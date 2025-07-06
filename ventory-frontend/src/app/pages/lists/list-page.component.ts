@@ -110,7 +110,6 @@ export class ListPageComponent {
         const active = this.showDelete ? 'false' : 'true';
         this.listItemService.getAll(active, this.selectedTypeId ?? undefined).subscribe({
             next: (items) => {
-                console.log('🔍 Datos recibidos para la tabla:', items);
                 this.listItems = items;
             },
             error: () =>

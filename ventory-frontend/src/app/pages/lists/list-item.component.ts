@@ -111,7 +111,6 @@ export class ListItemComponent implements OnInit {
         this.listItemService.getAll(active, listTypeId).subscribe({
             next: (items) => {
                 this.listItems = items;
-                // console.log('Datos recibidos para la tabla:', items);
             },
             error: () =>
                 this.messageService.add({

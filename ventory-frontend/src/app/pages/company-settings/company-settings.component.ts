@@ -17,16 +17,7 @@ import { SessionService } from '../../services/session.service';
     standalone: true,
     templateUrl: './company-settings.component.html',
     styleUrl: './company-settings.component.scss',
-    imports: [
-        CommonModule,
-        DropdownModule,
-        InputNumberModule,
-        InputTextModule,
-        ButtonModule,
-        ToastModule,
-        ReactiveFormsModule,
-        FileUploadModule
-    ],
+    imports: [CommonModule, DropdownModule, InputNumberModule, InputTextModule, ButtonModule, ToastModule, ReactiveFormsModule, FileUploadModule],
     providers: [MessageService]
 })
 export class CompanySettingsComponent implements OnInit {
@@ -71,7 +62,6 @@ export class CompanySettingsComponent implements OnInit {
         if (companyId) {
             this.companyService.getSettings(companyId).subscribe({
                 next: (data) => {
-                    console.log('Datos que llegan del backend:', data);
                     this.form.patchValue(data);
                     if (data.logo) {
                         this.logoPreview = data.logo;
@@ -128,6 +118,14 @@ export class CompanySettingsComponent implements OnInit {
                     summary: 'Guardado',
                     detail: 'Parámetros actualizados'
                 });
+
+                const newName = this.form.controls.name.value;
+                const newLogoUrl = res.logoUrl || this.logoPreview;
+
+                if (newName && newLogoUrl) {
+                    this.session.updateCompany(newName, newLogoUrl);
+                }
+
                 if (res.logoUrl) {
                     this.logoPreview = res.logoUrl;
                     this.form.controls.logo.setValue(res.logoUrl);

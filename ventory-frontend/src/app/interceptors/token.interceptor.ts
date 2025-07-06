@@ -1,88 +1,92 @@
-import { Injectable } from '@angular/core';
-import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest, HttpErrorResponse, HttpClient } from '@angular/common/http';
-import { Observable, throwError, BehaviorSubject } from 'rxjs';
-import { catchError, filter, switchMap, take } from 'rxjs/operators';
+import { HttpEvent, HttpHandlerFn, HttpInterceptorFn, HttpRequest, HttpErrorResponse } from '@angular/common/http';
+import { Observable, throwError, BehaviorSubject, catchError, filter, switchMap, take } from 'rxjs';
+import { inject } from '@angular/core';
 import { Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
 
-@Injectable({ providedIn: 'root' })
-export class TokenInterceptor implements HttpInterceptor {
-    private isRefreshing = false;
-    private refreshTokenSubject = new BehaviorSubject<string | null>(null);
+let isRefreshing = false;
+let refreshTokenSubject = new BehaviorSubject<string | null>(null);
 
-    constructor(
-        private http: HttpClient,
-        private router: Router
-    ) {}
+export const tokenInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, next: HttpHandlerFn): Observable<HttpEvent<any>> => {
+    const http = inject(HttpClient);
+    const router = inject(Router);
 
-    intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-        const accessToken = localStorage.getItem('access_token');
-        let authReq = req;
+    const accessToken = localStorage.getItem('access_token');
+    let authReq = req;
 
-        if (accessToken) {
-            authReq = req.clone({
-                setHeaders: { Authorization: `Bearer ${accessToken}` }
-            });
-        }
+    if (accessToken) {
+        authReq = req.clone({
+            setHeaders: { Authorization: `Bearer ${accessToken}` }
+        });
+    }
 
-        return next.handle(authReq).pipe(
-            catchError((error) => {
-                if (error instanceof HttpErrorResponse && error.status === 401 && !req.url.includes('/auth/refresh')) {
-                    return this.handle401Error(authReq, next);
-                }
-                return throwError(() => error);
+    return next(authReq).pipe(
+        catchError((error) => {
+            if (error instanceof HttpErrorResponse && error.status === 401 && !req.url.includes('/auth/refresh')) {
+                return handle401Error(authReq, next, http, router);
+            }
+            return throwError(() => error);
+        })
+    );
+};
+
+function handle401Error(req: HttpRequest<any>, next: HttpHandlerFn, http: HttpClient, router: Router) {
+    if (!isRefreshing) {
+        isRefreshing = true;
+        refreshTokenSubject.next(null);
+
+        const refreshToken = localStorage.getItem('refreshToken') || '';
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        const userId = Number(user.id);
+
+        console.log('TokenInterceptor: Intentando refrescar token...');
+        console.log('TokenInterceptor: refreshToken de localStorage:', refreshToken);
+        console.log('TokenInterceptor: userId de localStorage:', userId);
+
+        return http.post<any>('/api/auth/refresh', { userId, refreshToken }).pipe(
+            switchMap((res) => {
+                isRefreshing = false;
+                localStorage.setItem('access_token', res.access_token);
+                localStorage.setItem('refreshToken', res.refresh_token);
+                refreshTokenSubject.next(res.access_token);
+                console.log('TokenInterceptor: Token refrescado exitosamente. Nuevos tokens guardados.');
+                console.log('TokenInterceptor: Nuevo access_token:', res.access_token);
+                console.log('TokenInterceptor: Nuevo refresh_token:', res.refresh_token);
+
+                return next(
+                    req.clone({
+                        setHeaders: { Authorization: `Bearer ${res.access_token}` }
+                    })
+                );
+            }),
+            catchError((err) => {
+                isRefreshing = false;
+                console.error('TokenInterceptor: Error al refrescar el token:', err);
+                logout(router);
+                console.log('TokenInterceptor: Se ha llamado a logout() debido a un error en el refresco.');
+                return throwError(() => err);
             })
         );
-    }
-
-    private handle401Error(req: HttpRequest<any>, next: HttpHandler) {
-        if (!this.isRefreshing) {
-            this.isRefreshing = true;
-            this.refreshTokenSubject.next(null);
-
-            const refreshToken = localStorage.getItem('refreshToken') || '';
-            const user = JSON.parse(localStorage.getItem('user') || '{}');
-            const userId = Number(user.id);
-
-            return this.http.post<any>('/api/auth/refresh', { userId, refreshToken }).pipe(
-                switchMap((res) => {
-                    this.isRefreshing = false;
-                    localStorage.setItem('access_token', res.access_token);
-                    localStorage.setItem('refreshToken', res.refresh_token);
-                    this.refreshTokenSubject.next(res.access_token);
-
-                    return next.handle(
-                        req.clone({
-                            setHeaders: { Authorization: `Bearer ${res.access_token}` }
-                        })
-                    );
-                }),
-                catchError((err) => {
-                    this.isRefreshing = false;
-                    this.logout();
-                    return throwError(() => err);
-                })
-            );
-        } else {
-            return this.refreshTokenSubject.pipe(
-                filter((token) => token != null),
-                take(1),
-                switchMap((token) =>
-                    next.handle(
-                        req.clone({
-                            setHeaders: { Authorization: `Bearer ${token}` }
-                        })
-                    )
+    } else {
+        return refreshTokenSubject.pipe(
+            filter((token) => token != null),
+            take(1),
+            switchMap((token) =>
+                next(
+                    req.clone({
+                        setHeaders: { Authorization: `Bearer ${token}` }
+                    })
                 )
-            );
-        }
+            )
+        );
     }
+}
 
-    private logout() {
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('refreshToken');
-        localStorage.removeItem('user');
-        localStorage.removeItem('userName');
-        localStorage.removeItem('Bienvenido');
-        this.router.navigate(['/auth/login']);
-    }
+function logout(router: Router) {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('user');
+    localStorage.removeItem('userName');
+    localStorage.removeItem('Bienvenido');
+    router.navigate(['/auth/login']);
 }
