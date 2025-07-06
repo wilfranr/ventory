@@ -36,8 +36,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       throw new UnauthorizedException("Usuario no encontrado");
     }
 
-    // Array plano de permisos (necesario para el helper/guard)
-
     const permissions =
       user.role?.permissions?.map((perm) => ({ name: perm.name })) || [];
 
@@ -50,10 +48,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
     return {
       ...plainUser,
-      permissions,
-    };
-    return {
-      ...user,
       permissions,
     };
   }

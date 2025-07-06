@@ -34,7 +34,7 @@ export class CompanyController {
 
   @Put(":id/settings")
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles("admin", "superadmin")
+  @Roles("admin", "superadmin", "propietario")
   @UseInterceptors(FileInterceptor("logo"))
   async updateSettings(
     @Param("id") id: string,

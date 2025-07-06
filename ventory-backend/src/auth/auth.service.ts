@@ -13,7 +13,7 @@ import * as bcrypt from "bcrypt";
 import { CreateUserDto } from "./dto/create-user.dto";
 import * as fs from "fs";
 import * as path from "path";
-import { User, Role, RoleName } from "@prisma/client";
+import { User, Role } from "@prisma/client";
 
 type CompanyShort = {
   id: string;
@@ -124,7 +124,7 @@ export class AuthService {
 
     //Acá busco el rol por el nombre
     const role = await this.prisma.role.findUnique({
-      where: { name: token.role as RoleName },
+      where: { name: token.role },
     });
     if (!role) {
       throw new BadRequestException("El rol no existe.");
@@ -207,14 +207,14 @@ export class AuthService {
     // 🔐 Hashear contraseña
     const hashedPassword = await bcrypt.hash(data.password, 10);
 
-    // 🔎 Buscar rol "admin"
+    // 🔎 Buscar rol "propietario"
     const role = await this.prisma.role.findUnique({
-      where: { name: "admin" },
+      where: { name: "propietario" },
     });
 
     if (!role) {
       throw new Error(
-        "❌ Rol 'admin' no encontrado. Asegúrate de ejecutar el seed.",
+        "❌ Rol 'propietario' no encontrado. Asegúrate de ejecutar el seed.",
       );
     }
 

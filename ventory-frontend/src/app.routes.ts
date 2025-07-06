@@ -22,7 +22,7 @@ export const appRoutes: Routes = [
                 path: 'roles',
                 loadComponent: () => import('./app/pages/admin/roles.component').then((m) => m.RolesComponent),
                 canActivate: [AuthGuard],
-                data: { requiredRole: 'superadmin' }
+                data: { requiredRole: ['superadmin', 'admin', 'propietario'] }
             },
             {
                 path: 'company-settings',

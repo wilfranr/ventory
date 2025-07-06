@@ -17,6 +17,7 @@ import { UserService } from '../../services/user.service';
 import { InputSwitchModule } from 'primeng/inputswitch';
 import { ToastModule } from 'primeng/toast';
 import { toTitleCase } from '../../utils/string-utils';
+import { RolesService, Role } from '../../services/roles.service';
 
 /**
  * Modelo que representa un usuario dentro del sistema.
@@ -34,7 +35,7 @@ interface User {
      * Rol asignado al usuario. Puede ser el nombre del rol o un
      * objeto con la propiedad `name` proveniente del backend.
      */
-    role?: string | { name: string };
+    role?: string | { id: string; name: string }; // Actualizado para incluir el ID del rol
     /** Estado de la cuenta: activo/inactivo */
     status?: string;
 }
@@ -83,13 +84,7 @@ export class UsersComponent implements OnInit {
     // 🔹 Roles y estados
 
     /** Opciones de roles disponibles para los usuarios */
-    roles = [
-        { label: 'Superadmin', value: 'superadmin' },
-        { label: 'Admin', value: 'admin' },
-        { label: 'Vendedor', value: 'vendedor' },
-        { label: 'Analista de Partes', value: 'analistaPartes' },
-        { label: 'Logística', value: 'logistica' }
-    ];
+    roles: { label: string; value: string }[] = []; // Ahora se cargan dinámicamente
     /** Estados posibles del usuario */
     statuses = [
         { label: 'Activo', value: 'activo' },
@@ -104,7 +99,8 @@ export class UsersComponent implements OnInit {
         private registrationTokenService: RegistrationTokenService,
         private messageService: MessageService,
         private confirmationService: ConfirmationService,
-        private userService: UserService
+        private userService: UserService,
+        private rolesService: RolesService // Inyectar RolesService
     ) {}
 
     /** Inicializa el formulario y carga los usuarios */
@@ -114,7 +110,22 @@ export class UsersComponent implements OnInit {
         });
 
         this.loadUsers();
+        this.loadRoles(); // Cargar roles dinámicamente
     }
+
+    /** Carga los roles desde el backend */
+    loadRoles() {
+        this.rolesService.getAllRoles().subscribe({
+            next: (roles) => {
+                this.roles = roles.map(role => ({ label: role.name, value: role.id }));
+            },
+            error: (err) => {
+                console.error('Error al cargar roles:', err);
+                this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudieron cargar los roles.' });
+            }
+        });
+    }
+
     /** Obtiene los usuarios del backend y los asigna a la tabla */
     loadUsers() {
         this.userService.getUsers().subscribe({
@@ -122,9 +133,6 @@ export class UsersComponent implements OnInit {
                 this.users = users;
             },
             error: (error) => {
-                const token = localStorage.getItem('access_token');
-                console.log(token);
-                console.error('Error al cargar usuarios', error);
                 this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudieron cargar los usuarios.' });
             }
         });
@@ -145,7 +153,9 @@ export class UsersComponent implements OnInit {
     /** Solicita al backend la creación de un token de registro */
     generateToken() {
         if (this.tokenForm.valid) {
-            this.registrationTokenService.createToken(this.tokenForm.value).subscribe({
+            // Asegurarse de enviar el ID del rol, no el nombre
+            const selectedRoleValue = this.tokenForm.value.role; // Esto ya debería ser el ID del rol
+            this.registrationTokenService.createToken({ roleId: selectedRoleValue }).subscribe({
                 next: (response) => {
                     this.generatedToken = response.token;
                     this.messageService.add({ severity: 'success', summary: 'Token generado', detail: 'Token generado exitosamente.' });
@@ -214,13 +224,13 @@ export class UsersComponent implements OnInit {
             return;
         }
 
-        // Adaptar formato de rol
-        const role = typeof this.user.role === 'object' ? this.user.role.name : this.user.role;
+        // Adaptar formato de rol: ahora siempre será un ID de rol
+        const roleId = typeof this.user.role === 'object' ? this.user.role.id : this.user.role; // Asegurarse de enviar el ID
 
         const userPayload = {
             name: toTitleCase(this.user.name),
             email: this.user.email,
-            role,
+            role: roleId, // Enviar el ID del rol
             status: this.user.status ?? 'activo'
         };
 
@@ -259,7 +269,8 @@ export class UsersComponent implements OnInit {
     editUser(user: User) {
         this.user = {
             ...user,
-            role: typeof user.role === 'object' ? user.role?.name : user.role,
+            // Asegurarse de que el rol se muestre correctamente en el dropdown
+            role: typeof user.role === 'object' ? user.role.id : user.role,
             status: user.status ?? 'activo' // valor por defecto si está vacío
         };
         this.userDialog = true;

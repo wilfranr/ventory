@@ -22,7 +22,7 @@ export class RegistrationTokenService {
     return this.prisma.registrationToken.create({
       data: {
         token,
-        role: createRegistrationTokenDto.role,
+        role: createRegistrationTokenDto.roleId,
         companyId,
       },
     });

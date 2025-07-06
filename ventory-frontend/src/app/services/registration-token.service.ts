@@ -10,7 +10,7 @@ export class RegistrationTokenService {
 
     constructor(private http: HttpClient) {}
 
-    createToken(data: { role: string }): Observable<{ token: string }> {
+    createToken(data: { roleId: string }): Observable<{ token: string }> {
         return this.http.post<{ token: string }>(this.apiUrl, data);
     }
 }

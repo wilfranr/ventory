@@ -65,20 +65,11 @@ model RegistrationToken {
 // Roles disponibles dentro de la aplicación
 model Role {
   id          String       @id @default(cuid()) // identificador único
-  name        RoleName     @unique // nombre del rol
+  name        String       @unique // nombre del rol
   users       User[]       @relation("RoleToUsers") // usuarios que poseen este rol
   permissions Permission[] @relation("RoleToPermissions") // permisos asociados
   createdAt   DateTime     @default(now()) // fecha de creación
   updatedAt   DateTime     @updatedAt // fecha de actualización
-}
-
-// Enumeración de nombres de roles
-enum RoleName {
-  superadmin
-  admin
-  vendedor
-  analistaPartes
-  logistica
 }
 
 // Permisos que pueden asociarse a los roles

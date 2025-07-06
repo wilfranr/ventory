@@ -1,8 +1,7 @@
 /**
  * DTO para actualizar la información de un usuario.
  */
-import { IsOptional, IsEmail, IsEnum, IsIn } from "class-validator";
-import { RoleName } from "@prisma/client"; // 👈 tu enum de Prisma
+import { IsOptional, IsEmail, IsIn } from "class-validator";
 
 export class UpdateUserDto {
   @IsOptional()
@@ -13,8 +12,7 @@ export class UpdateUserDto {
   email?: string;
 
   @IsOptional()
-  @IsEnum(RoleName)
-  role?: RoleName;
+  role?: string;
 
   @IsOptional()
   @IsIn(["activo", "inactivo"])

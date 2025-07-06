@@ -54,7 +54,7 @@ export class CompanySettingsComponent implements OnInit {
 
     ngOnInit() {
         const role = this.auth.currentUser?.role?.name || this.auth.currentUser?.role;
-        this.readonlyMode = role !== 'admin' && role !== 'superadmin';
+        this.readonlyMode = role !== 'admin' && role !== 'superadmin' && role !== 'propietario';
         if (this.readonlyMode) {
             this.form.disable();
         }

@@ -1,10 +1,15 @@
-import { PrismaClient, RoleName } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import * as bcrypt from "bcrypt";
 import slugify from "slugify";
 
 const prisma = new PrismaClient();
 
 async function main() {
+  await seedPermissionsAndRoles();
+  // await seedCompanyAndSuperadmin(); // Comentado para evitar recrear la empresa
+}
+
+async function seedPermissionsAndRoles() {
   // 🧩 Crear permisos base
   const permissions = [
     "crear_usuario",
@@ -21,6 +26,7 @@ async function main() {
     "rechazar_pedido",
     "ver_orden_trabajo",
     "editar_orden_trabajo",
+    "modificar_parametros_empresa",
   ];
 
   for (const name of permissions) {
@@ -32,12 +38,13 @@ async function main() {
   }
 
   // 🧩 Crear roles base
-  const roles: RoleName[] = [
+  const roles = [
     "superadmin",
     "admin",
     "vendedor",
     "analistaPartes",
     "logistica",
+    "propietario",
   ];
 
   for (const name of roles) {
@@ -49,7 +56,7 @@ async function main() {
   }
 
   // 🛡️ Asignar permisos a cada rol
-  const rolePermissionsMap: Record<RoleName, string[]> = {
+  const rolePermissionsMap: Record<string, string[]> = {
     superadmin: permissions,
     admin: [
       "crear_usuario",
@@ -73,6 +80,20 @@ async function main() {
     ],
     analistaPartes: ["ver_pedidos", "editar_pedido"],
     logistica: ["ver_orden_trabajo", "editar_orden_trabajo"],
+    propietario: [
+      "crear_usuario",
+      "ver_usuarios",
+      "editar_usuario",
+      "eliminar_usuario",
+      "crear_rol",
+      "ver_roles",
+      "asignar_rol",
+      "crear_pedido",
+      "ver_pedidos",
+      "editar_pedido",
+      "aprobar_pedido",
+      "modificar_parametros_empresa",
+    ],
   };
 
   for (const roleName of roles) {
@@ -96,7 +117,10 @@ async function main() {
       },
     });
   }
+  console.log("✅ Permisos y roles actualizados correctamente.");
+}
 
+async function seedCompanyAndSuperadmin() {
   // 🔐 Crear empresa + usuario superadmin
   const companyName = "VENTORY";
   const nit = "80896995-0";
@@ -106,7 +130,7 @@ async function main() {
 
   const existing = await prisma.company.findUnique({ where: { nit } });
   if (existing) {
-    console.log("La empresa ya existe. Seed cancelado.");
+    console.log("La empresa ya existe. Seed de empresa cancelado.");
     return;
   }
 
@@ -134,7 +158,7 @@ async function main() {
     },
   });
 
-  console.log("✅ Seed ejecutado correctamente con permisos por rol.");
+  console.log("✅ Empresa y usuario superadmin creados correctamente.");
 }
 
 main()
