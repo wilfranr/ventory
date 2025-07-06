@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { tap, catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
+import { SessionService } from './session.service';
 
 @Injectable({
     providedIn: 'root'
@@ -12,7 +13,8 @@ export class AuthService {
 
     constructor(
         private http: HttpClient,
-        private router: Router
+        private router: Router,
+        private session: SessionService
     ) {}
 
     login(credentials: { email: string; password: string }) {
@@ -26,6 +28,12 @@ export class AuthService {
 
                 // 💡 GUARDA el id por separado (esto es CLAVE)
                 localStorage.setItem('userId', String(res.user.id));
+
+                // Actualiza el SessionService con los datos de la empresa
+                this.session.updateCompany(
+                    res.user?.company?.name || null,
+                    res.user?.company?.logo || null
+                );
 
                 this.router.navigate(['/']);
             }),

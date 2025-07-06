@@ -18,6 +18,7 @@ import { User, Role, RoleName } from "@prisma/client";
 type CompanyShort = {
   id: string;
   name: string;
+  logo?: string | null;
 };
 type UserWithRoleAndCompany = User & {
   role: Role | null;
@@ -89,6 +90,7 @@ export class AuthService {
         company: {
           id: user.company?.id || null,
           name: user.company?.name || null,
+          logo: user.company?.logo || null,
         },
       },
     };

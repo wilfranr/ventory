@@ -48,6 +48,7 @@ export class UsersService {
           select: {
             id: true,
             name: true,
+            logo: true,
           },
         },
       },

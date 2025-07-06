@@ -35,7 +35,7 @@ export class SessionService {
         }
     }
 
-    updateCompany(name: string, logoUrl: string) {
+    updateCompany(name: string | null, logoUrl: string | null) {
         this.companyNameSub.next(name);
         this.logoUrlSub.next(logoUrl);
 
@@ -43,8 +43,10 @@ export class SessionService {
         if (userStr) {
             try {
                 const user = JSON.parse(userStr);
-                user.company.name = name;
-                user.company.logo = logoUrl;
+                if (user.company) {
+                    user.company.name = name;
+                    user.company.logo = logoUrl;
+                }
                 localStorage.setItem('user', JSON.stringify(user));
             } catch {}
         }

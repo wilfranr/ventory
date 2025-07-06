@@ -50,7 +50,8 @@ export class RegisterComponent implements OnInit {
         department: [null],
         city: [null],
         currency: [''],
-        vatPercent: [0]
+        vatPercent: [0],
+        token: [''] // Campo para el token de registro
     });
 
     countries: any[] = [];
@@ -177,21 +178,36 @@ export class RegisterComponent implements OnInit {
         if (this.registerForm.invalid) return;
 
         const formData = new FormData();
+        const formValue = this.registerForm.getRawValue();
 
-        Object.entries(this.registerForm.value).forEach(([key, value]) => {
-            if (value !== null && value !== undefined) {
-                if (key === 'logo' && typeof value === 'object' && value !== null && (value as File) instanceof File) {
-                    formData.append(key, value);
-                } else if (key === 'country' || key === 'department' || key === 'city') {
-                    // Para los campos de autocompletado, enviar solo el nombre o el geonameId si es necesario en el backend
-                    formData.append(key, (value as any).name); // O .geonameId si el backend lo espera
-                } else if (typeof value === 'object' && value !== null && 'code' in value) { // Manejar otros objetos de dropdown
-                    formData.append(key, (value as any).code);
-                } else {
-                    formData.append(key, value?.toString?.() ?? '');
-                }
+        // Campos comunes
+        formData.append('name', formValue.name);
+        formData.append('email', formValue.email);
+        formData.append('password', formValue.password);
+
+        if (this.registerMode === 'joinCompany') {
+            // Solo enviar el token si estamos en modo unirse a empresa
+            if (formValue.token) {
+                formData.append('token', formValue.token);
+            } else {
+                this.messageService.add({ severity: 'error', summary: 'Error', detail: 'El token es requerido para unirse a una empresa.' });
+                return;
             }
-        });
+        } else {
+            // Enviar campos de empresa si estamos en modo nueva empresa
+            if (formValue.companyName) formData.append('companyName', formValue.companyName);
+            if (formValue.nit) formData.append('nit', formValue.nit);
+            if (formValue.address) formData.append('address', formValue.address);
+            if (formValue.phones) formData.append('phones', formValue.phones);
+            if (formValue.companyEmail) formData.append('companyEmail', formValue.companyEmail);
+            if (formValue.website) formData.append('website', formValue.website);
+            if (formValue.logo) formData.append('logo', formValue.logo);
+            if (formValue.country) formData.append('country', (formValue.country as any).name); // O .geonameId
+            if (formValue.department) formData.append('department', (formValue.department as any).name); // O .geonameId
+            if (formValue.city) formData.append('city', (formValue.city as any).name); // O .geonameId
+            if (formValue.currency) formData.append('currency', formValue.currency);
+            if (formValue.vatPercent) formData.append('vatPercent', formValue.vatPercent.toString());
+        }
 
         this.authService.register(formData).subscribe({
             next: (res) => {

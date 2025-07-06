@@ -98,13 +98,19 @@ export class AppTopbar implements OnInit {
     ) {}
 
     ngOnInit() {
-        this.session.companyName$.subscribe(name => this.companyName = name);
-        this.session.logoUrl$.subscribe(url => this.logoUrl = url);
+        this.session.companyName$.subscribe(name => {
+            this.companyName = name;
+        });
+        this.session.logoUrl$.subscribe(url => {
+            this.logoUrl = url;
+        });
+
+        this.userName = localStorage.getItem('userName');
 
         const userJson = localStorage.getItem('user');
         if (userJson) {
             const user = JSON.parse(userJson);
-            this.rol = user?.role?.name || 'Sin rol';
+            this.rol = user.role?.name || 'Sin rol';
             if (user.name) {
                 this.firstName = user.name.split(' ')[0];
             }
