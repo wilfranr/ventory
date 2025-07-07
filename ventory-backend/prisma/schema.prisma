@@ -20,7 +20,7 @@ model User {
   role          Role?    @relation("RoleToUsers", fields: [roleId], references: [id]) // relación con Role
   companyId     String   // empresa a la que pertenece
   company       Company  @relation(fields: [companyId], references: [id]) // relación con Company
-  status        String   @default("active") // estado del usuario
+  status        String   @default("activo") // estado del usuario
   refreshToken  String?  @unique // token para refrescar sesión
   createdAt     DateTime @default(now()) // fecha de creación
   updatedAt     DateTime @updatedAt // fecha de actualización

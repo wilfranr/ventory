@@ -140,6 +140,7 @@ export class AuthService {
         password: hashedPassword,
         roleId: role.id,
         companyId: token.companyId,
+        status: "activo",
       },
     });
 
@@ -226,6 +227,7 @@ export class AuthService {
         password: hashedPassword,
         companyId: company.id,
         roleId: role.id,
+        status: "activo",
       },
     });
 

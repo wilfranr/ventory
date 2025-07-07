@@ -153,6 +153,7 @@ async function seedCompanyAndSuperadmin() {
           email,
           password: hashedPassword,
           roleId: superadminRole?.id,
+          status: "activo",
         },
       },
     },

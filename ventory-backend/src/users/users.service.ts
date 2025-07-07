@@ -106,7 +106,7 @@ export class UsersService {
 
     if (data.role) {
       const role = await this.prisma.role.findUnique({
-        where: { name: data.role },
+        where: { id: data.role }, // Buscar por ID
       });
 
       if (!role) {
@@ -119,7 +119,7 @@ export class UsersService {
     }
 
     return this.prisma.user.update({
-      where: { id: Number(id) },
+      where: { id: id }, // Usar el ID directamente
       data: updateData,
     });
   }

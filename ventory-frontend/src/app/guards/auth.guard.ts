@@ -23,7 +23,7 @@ export const AuthGuard: CanActivateFn = (route: ActivatedRouteSnapshot) => {
     const user = JSON.parse(userJson);
 
     // Validación de rol
-    if (requiredRoles && (!user.role || !requiredRoles.includes(user.role.name))) {
+    if (requiredRoles && (!user.role || !requiredRoles.includes(user.role))) {
         return router.parseUrl('/auth/access');
     }
 

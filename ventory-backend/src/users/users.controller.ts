@@ -33,8 +33,8 @@ export class UsersController {
    * Actualiza los datos de un usuario.
    */
   @Put(":id")
-  update(@Param("id") id: number, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.updateUser(id, updateUserDto);
+  update(@Param("id") id: string, @Body() updateUserDto: UpdateUserDto) {
+    return this.usersService.updateUser(Number(id), updateUserDto);
   }
 
   @Permissions("ver_usuarios") // o un permiso especial si quieres que sea solo para admins
