@@ -6,6 +6,8 @@ import { Landing } from './app/pages/landing/landing';
 import { Notfound } from './app/pages/notfound/notfound';
 import { AuthGuard } from './app/guards/auth.guard';
 import { UsersComponent } from './app/pages/users/users.component';
+import { superadminGuard } from './app/guards/superadmin.guard';
+import { SelectCompanyComponent } from './app/pages/select-company/select-company.component';
 
 export const appRoutes: Routes = [
     {
@@ -30,6 +32,11 @@ export const appRoutes: Routes = [
                 canActivate: [AuthGuard]
             }
         ]
+    },
+    { 
+        path: 'select-company', 
+        component: SelectCompanyComponent, 
+        canActivate: [AuthGuard, superadminGuard] 
     },
     { path: 'landing', component: Landing },
     { path: 'notfound', component: Notfound },

@@ -35,7 +35,11 @@ export class AuthService {
                     res.user?.company?.logo || null
                 );
 
-                this.router.navigate(['/']);
+                if (this.hasRole('superadmin')) {
+                    this.router.navigate(['/select-company']);
+                } else {
+                    this.router.navigate(['/']);
+                }
             }),
             catchError((error) => {
                 let msg = 'Ocurrió un error inesperado. Intenta de nuevo';
@@ -70,6 +74,7 @@ export class AuthService {
         localStorage.removeItem('refreshToken');
         localStorage.removeItem('user');
         localStorage.removeItem('userId');
+        this.session.clearSession();
         this.router.navigate(['/auth/login']);
     }
 
@@ -97,5 +102,11 @@ export class AuthService {
 
     get companyId(): string | null {
         return this.currentUser?.companyId || null;
+    }
+
+    hasRole(role: string): boolean {
+        const user = this.currentUser;
+        // Check if user and user.role exist, and if user.role.name matches.
+        return user && user.role && user.role.name === role;
     }
 }

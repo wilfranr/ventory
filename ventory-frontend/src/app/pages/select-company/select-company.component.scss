@@ -1,0 +1,122 @@
+body, html {
+  height: 100%;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--surface-ground);
+}
+
+.select-company-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 2rem;
+}
+
+.card {
+  width: 100%;
+  max-width: 900px;
+  padding: 2rem;
+  background: var(--surface-card);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+
+  .header {
+    text-align: center;
+    margin-bottom: 2rem;
+    .title {
+      font-size: 1.75rem;
+      font-weight: 600;
+      margin: 0;
+    }
+    .subtitle {
+      color: var(--text-color-secondary);
+      margin-top: 0.5rem;
+    }
+  }
+}
+
+.company-card {
+  padding: 1.5rem;
+  margin: 0.5rem;
+  border: 1px solid var(--surface-border);
+  border-radius: 8px;
+  transition: transform 0.2s, box-shadow 0.2s;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: calc(100% - 1rem); // Adjust for margin
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  }
+
+  .company-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+
+    .logo {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-right: 1rem;
+      border: 2px solid var(--surface-border);
+    }
+
+    .company-info {
+      .name {
+        font-weight: 600;
+        font-size: 1.1rem;
+      }
+      .nit {
+        font-size: 0.85rem;
+        color: var(--text-color-secondary);
+      }
+    }
+  }
+
+  .owner-info {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background-color: var(--surface-ground);
+    border-radius: 6px;
+
+    .owner-icon {
+      font-size: 1.5rem;
+      margin-right: 1rem;
+      color: var(--primary-color);
+    }
+
+    .owner-details {
+      .owner-name {
+        font-weight: 500;
+      }
+      .owner-role {
+        font-size: 0.8rem;
+        color: var(--text-color-secondary);
+      }
+    }
+  }
+
+  p-button {
+    width: 100%;
+    margin-top: auto; // Pushes the button to the bottom
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .card {
+    padding: 1rem;
+  }
+  .company-card {
+    padding: 1rem;
+  }
+}

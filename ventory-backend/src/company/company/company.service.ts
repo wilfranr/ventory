@@ -9,6 +9,29 @@ import * as fs from "fs";
 export class CompanyService {
   constructor(private prisma: PrismaService) {}
 
+  async findAll() {
+    return this.prisma.company.findMany({
+      select: {
+        id: true,
+        name: true,
+        nit: true,
+        logo: true,
+        users: {
+          where: {
+            role: {
+              name: 'propietario',
+            },
+          },
+          select: {
+            name: true,
+            email: true,
+          },
+          take: 1,
+        },
+      },
+    });
+  }
+
   async getGeneralParams(companyId: string) {
     return this.prisma.company.findUnique({
       where: { id: companyId },

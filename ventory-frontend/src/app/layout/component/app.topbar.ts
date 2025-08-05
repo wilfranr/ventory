@@ -1,12 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { MenuItem } from 'primeng/api';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { StyleClassModule } from 'primeng/styleclass';
 import { AppConfigurator } from './app.configurator';
 import { LayoutService } from '../service/layout.service';
 import { AuthService } from '../../services/auth.service';
 import { SessionService } from '../../services/session.service';
+import { CompanyContextService } from '../../services/company-context.service';
+import { CompanyService } from '../../services/company.service';
 
 @Component({
     selector: 'app-topbar',
@@ -19,7 +21,8 @@ import { SessionService } from '../../services/session.service';
             </button>
             <a class="layout-topbar-logo" routerLink="/">
                 <img [src]="logoUrl || 'assets/images/Logo-ventory5.png'" alt="Ventory Logo" style="height: 70px;" />
-                <span>{{ companyName || 'VENTORY' }}</span>
+                <span *ngIf="!isSuperAdmin">{{ companyName || 'VENTORY' }}</span>
+                <span *ngIf="isSuperAdmin">{{ activeCompanyName || 'Seleccionar Empresa' }}</span>
             </a>
         </div>
 
@@ -50,6 +53,10 @@ import { SessionService } from '../../services/session.service';
 
             <div class="layout-topbar-menu hidden lg:block">
                 <div class="layout-topbar-menu-content">
+                    <button *ngIf="isSuperAdmin" type="button" class="layout-topbar-action" (click)="changeCompany()">
+                        <i class="pi pi-building"></i>
+                        <span>Cambiar Empresa</span>
+                    </button>
                     <button type="button" class="layout-topbar-action">
                         <i class="pi pi-calendar"></i>
                         <span>Calendar</span>
@@ -90,20 +97,39 @@ export class AppTopbar implements OnInit {
     rol: string | null = null;
     companyName: string | null = null;
     logoUrl: string | null = null;
+    isSuperAdmin = false;
+    activeCompanyName: string | null = null;
 
     constructor(
         public layoutService: LayoutService,
         private auth: AuthService,
-        private session: SessionService
+        private session: SessionService,
+        private companyContext: CompanyContextService,
+        private companyService: CompanyService,
+        private router: Router
     ) {}
 
     ngOnInit() {
+        this.isSuperAdmin = this.auth.hasRole('superadmin');
+
         this.session.companyName$.subscribe(name => {
             this.companyName = name;
         });
         this.session.logoUrl$.subscribe(url => {
             this.logoUrl = url;
         });
+
+        if (this.isSuperAdmin) {
+            this.companyContext.activeCompanyId$.subscribe(companyId => {
+                if (companyId) {
+                    this.companyService.getSettings(companyId).subscribe(settings => {
+                        this.activeCompanyName = settings.name;
+                    });
+                } else {
+                    this.activeCompanyName = null;
+                }
+            });
+        }
 
         this.userName = localStorage.getItem('userName');
 
@@ -125,5 +151,10 @@ export class AppTopbar implements OnInit {
 
     logout() {
         this.auth.logout();
+        this.companyContext.clearActiveCompany();
+    }
+
+    changeCompany() {
+        this.router.navigate(['/select-company']);
     }
 }

@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { Company } from '../models/company.model';
 
 export interface CompanySettings {
     name: string;
@@ -19,6 +20,10 @@ export class CompanyService {
     private baseUrl = '/api/companies';
 
     private http = inject(HttpClient);
+
+    getCompanies(): Observable<Company[]> {
+        return this.http.get<Company[]>(this.baseUrl);
+    }
 
     getSettings(companyId: string): Observable<CompanySettings> {
         return this.http.get<CompanySettings>(`${this.baseUrl}/${companyId}/settings`);

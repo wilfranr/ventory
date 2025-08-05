@@ -5,11 +5,14 @@ import slugify from "slugify";
 const prisma = new PrismaClient();
 
 async function main() {
-  await seedPermissionsAndRoles();
-  // await seedCompanyAndSuperadmin(); // Comentado para evitar recrear la empresa
+  const companyId = await seedCompany(); // Create company first
+  if (companyId) {
+    await seedPermissionsAndRoles(companyId); // Then seed permissions and roles for that company
+    await seedSuperadminUser(companyId); // Finally, create the superadmin user
+  }
 }
 
-async function seedPermissionsAndRoles() {
+async function seedPermissionsAndRoles(companyId: string) {
   // 🧩 Crear permisos base
   const permissions = [
     "crear_usuario",
@@ -49,9 +52,19 @@ async function seedPermissionsAndRoles() {
 
   for (const name of roles) {
     await prisma.role.upsert({
-      where: { name },
+      where: {
+        name_companyId: { // Use compound unique input
+          name: name,
+          companyId: companyId,
+        },
+      },
       update: {},
-      create: { name },
+      create: {
+        name: name,
+        company: {
+          connect: { id: companyId }, // Connect to the company
+        },
+      },
     });
   }
 
@@ -97,7 +110,14 @@ async function seedPermissionsAndRoles() {
   };
 
   for (const roleName of roles) {
-    const role = await prisma.role.findUnique({ where: { name: roleName } });
+    const role = await prisma.role.findUnique({
+      where: {
+        name_companyId: { // Use compound unique input
+          name: roleName,
+          companyId: companyId,
+        },
+      },
+    });
     if (!role) continue;
 
     const permissionNames = rolePermissionsMap[roleName] || [];
@@ -120,25 +140,17 @@ async function seedPermissionsAndRoles() {
   console.log("✅ Permisos y roles actualizados correctamente.");
 }
 
-async function seedCompanyAndSuperadmin() {
-  // 🔐 Crear empresa + usuario superadmin
+async function seedCompany(): Promise<string | undefined> {
   const companyName = "VENTORY";
   const nit = "80896995-0";
-  const email = "info@ventory.com";
-  const password = "896995";
-  const hashedPassword = await bcrypt.hash(password, 10);
 
   const existing = await prisma.company.findUnique({ where: { nit } });
   if (existing) {
     console.log("La empresa ya existe. Seed de empresa cancelado.");
-    return;
+    return existing.id;
   }
 
-  const superadminRole = await prisma.role.findUnique({
-    where: { name: "superadmin" },
-  });
-
-  await prisma.company.create({
+  const company = await prisma.company.create({
     data: {
       name: companyName,
       slug: slugify(companyName, { lower: true, strict: true }),
@@ -147,19 +159,49 @@ async function seedCompanyAndSuperadmin() {
       address: "Calle 123",
       phones: "3001234567",
       website: "https://ventory.com",
-      users: {
-        create: {
-          name: "Yoseth",
-          email,
-          password: hashedPassword,
-          roleId: superadminRole?.id,
-          status: "activo",
-        },
+    },
+  });
+
+  console.log("✅ Empresa creada correctamente.");
+  return company.id;
+}
+
+async function seedSuperadminUser(companyId: string) {
+  const email = "info@ventory.com";
+  const password = "896995";
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  const superadminRole = await prisma.role.findUnique({
+    where: {
+      name_companyId: {
+        name: "superadmin",
+        companyId: companyId,
       },
     },
   });
 
-  console.log("✅ Empresa y usuario superadmin creados correctamente.");
+  if (!superadminRole) {
+    console.error("Error: Rol 'superadmin' no encontrado para crear el usuario.");
+    return;
+  }
+
+  const existingUser = await prisma.user.findUnique({ where: { email } });
+  if (existingUser) {
+    console.log("El usuario superadmin ya existe. Creación de usuario cancelada.");
+    return;
+  }
+
+  await prisma.user.create({
+    data: {
+      name: "Yoseth",
+      email,
+      password: hashedPassword,
+      roleId: superadminRole.id,
+      companyId: companyId,
+      status: "activo",
+    },
+  });
+  console.log("✅ Usuario superadmin creado correctamente.");
 }
 
 main()

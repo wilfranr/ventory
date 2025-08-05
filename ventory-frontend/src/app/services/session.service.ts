@@ -51,4 +51,9 @@ export class SessionService {
             } catch {}
         }
     }
+
+    clearSession() {
+        this.companyNameSub.next(null);
+        this.logoUrlSub.next(null);
+    }
 }

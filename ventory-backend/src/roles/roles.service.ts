@@ -30,13 +30,23 @@ export class RolesService {
   /**
    * Crea un rol con el nombre especificado.
    */
-  async createRole(name: string): Promise<Role> {
-    const existingRole = await this.prisma.role.findUnique({ where: { name } });
+  async createRole(name: string, companyId: string): Promise<Role> {
+    const existingRole = await this.prisma.role.findUnique({
+      where: {
+        name_companyId: {
+          name: name,
+          companyId: companyId,
+        },
+      },
+    });
     if (existingRole) {
-      throw new BadRequestException(`El rol '${name}' ya existe.`);
+      throw new BadRequestException(`El rol '${name}' ya existe para esta empresa.`);
     }
     return this.prisma.role.create({
-      data: { name },
+      data: {
+        name: name,
+        company: { connect: { id: companyId } },
+      },
     });
   }
 

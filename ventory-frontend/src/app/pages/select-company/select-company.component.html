@@ -1,0 +1,34 @@
+<div class="select-company-container">
+    <div class="card">
+        <div class="header">
+            <h2 class="title">Selecciona una Empresa para Gestionar</h2>
+            <p class="subtitle">Haz clic en "Gestionar" para empezar a operar en el contexto de esa empresa.</p>
+        </div>
+
+        <ng-container *ngIf="companies$ | async as companies">
+            <p-dataview [value]="companies" [layout]="'list'">
+                <ng-template #list let-items>
+                    <div class="flex flex-col">
+                        <div *ngFor="let company of items; let i = index">
+                            <div class="flex flex-col sm:flex-row sm:items-center p-6 gap-4" [ngClass]="{ 'border-t border-surface': i !== 0 }">
+                                <!-- LOGO -->
+                                <div class="w-20 h-20 flex items-center justify-center bg-gray-100 rounded shadow">
+                                    <img [src]="company.logo || 'assets/images/default-logo.png'" [alt]="company.name" class="object-contain max-h-16 max-w-16" style="width: 64px; height: 64px" onerror="this.src='assets/images/default-logo.png'" />
+                                </div>
+                                <!-- INFO EMPRESA -->
+                                <div class="flex-1 flex flex-col gap-2 pl-0 sm:pl-4">
+                                    <div class="text-lg font-medium">{{ company.name }}</div>
+                                    <div class="text-sm text-gray-500">NIT: {{ company.nit }}</div>
+                                </div>
+                                <!-- BOTÓN -->
+                                <div>
+                                    <button pButton type="button" label="Gestionar" class="p-button-sm" (click)="selectCompany(company.id)"></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </ng-template>
+            </p-dataview>
+        </ng-container>
+    </div>
+</div>

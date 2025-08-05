@@ -58,29 +58,14 @@ export class UsersService {
   /**
    * Obtiene usuarios visibles dependiendo de la empresa y rol.
    */
-  async findAll(currentUser: AuthUser) {
-    const VENTORY_COMPANY_ID = "cma05z0m90000c6juketn1hgr";
-    if (
-      currentUser.role?.name === "superadmin" ||
-      currentUser.companyId === VENTORY_COMPANY_ID
-    ) {
-      return this.prisma.user.findMany({
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          role: true,
-          status: true,
-        },
-        orderBy: {
-          createdAt: "desc",
-        },
-      });
+  async findAll(companyId: string) {
+    if (!companyId) {
+      // Si no hay companyId (ej. superadmin sin seleccionar empresa), no devolver nada.
+      return [];
     }
 
-    // Si es de otra empresa, solo ve usuarios de su empresa
     return this.prisma.user.findMany({
-      where: { companyId: currentUser.companyId },
+      where: { companyId: companyId },
       select: {
         id: true,
         name: true,

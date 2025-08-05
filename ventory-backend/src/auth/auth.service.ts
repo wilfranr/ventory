@@ -124,7 +124,12 @@ export class AuthService {
 
     //Acá busco el rol por el nombre
     const role = await this.prisma.role.findUnique({
-      where: { name: token.role },
+      where: {
+        name_companyId: {
+          name: token.role,
+          companyId: token.companyId,
+        },
+      },
     });
     if (!role) {
       throw new BadRequestException("El rol no existe.");
@@ -210,7 +215,12 @@ export class AuthService {
 
     // 🔎 Buscar rol "propietario"
     const role = await this.prisma.role.findUnique({
-      where: { name: "propietario" },
+      where: {
+        name_companyId: {
+          name: "propietario",
+          companyId: company.id,
+        },
+      },
     });
 
     if (!role) {

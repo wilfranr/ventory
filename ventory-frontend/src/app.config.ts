@@ -1,3 +1,4 @@
+import { companyIdInterceptor } from './app/interceptors/company-id.interceptor';
 import { authInterceptor } from './app/interceptors/auth.interceptor';
 import { tokenInterceptor } from './app/interceptors/token.interceptor';
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
@@ -13,7 +14,7 @@ import { importProvidersFrom } from '@angular/core';
 export const appConfig: ApplicationConfig = {
     providers: [
         provideRouter(appRoutes, withInMemoryScrolling({ anchorScrolling: 'enabled', scrollPositionRestoration: 'enabled' }), withEnabledBlockingInitialNavigation()),
-        provideHttpClient(withFetch(), withInterceptors([authInterceptor, tokenInterceptor])),
+        provideHttpClient(withFetch(), withInterceptors([authInterceptor, tokenInterceptor, companyIdInterceptor])),
         provideAnimationsAsync(),
         providePrimeNG({ theme: { preset: Aura, options: { darkModeSelector: '.app-dark' } } }),
         importProvidersFrom(FormsModule)

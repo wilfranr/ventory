@@ -46,6 +46,7 @@ model Company {
   city               String?             // Ciudad de la empresa
 
   users              User[]              // usuarios asociados
+  roles              Role[]              // roles asociados a esta empresa
   registrationTokens RegistrationToken[] // tokens de registro de usuarios
   listItems          ListItem[]          // relación con ListItem
   listTypes          ListType[]          // relación con ListType
@@ -65,11 +66,15 @@ model RegistrationToken {
 // Roles disponibles dentro de la aplicación
 model Role {
   id          String       @id @default(cuid()) // identificador único
-  name        String       @unique // nombre del rol
+  name        String       // nombre del rol
+  companyId   String       // empresa a la que pertenece
+  company     Company      @relation(fields: [companyId], references: [id]) // relación con Company
   users       User[]       @relation("RoleToUsers") // usuarios que poseen este rol
   permissions Permission[] @relation("RoleToPermissions") // permisos asociados
   createdAt   DateTime     @default(now()) // fecha de creación
   updatedAt   DateTime     @updatedAt // fecha de actualización
+
+  @@unique([name, companyId]) // El nombre del rol debe ser único por empresa
 }
 
 // Permisos que pueden asociarse a los roles
@@ -112,4 +117,3 @@ model ListType {
 
   @@index([companyId])
 }
-

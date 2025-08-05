@@ -5,6 +5,7 @@ import { Controller, Get, Post, Param, Body, Patch, Delete, UseGuards } from "@n
 import { RolesService } from "./roles.service";
 import { Roles } from "src/auth/roles.decorator";
 import { RolesGuard } from "src/auth/roles.guard";
+import { CurrentUser } from "src/auth/current-user.decorator";
 
 @Controller("roles")
   /**
@@ -29,8 +30,8 @@ export class RolesController {
   @UseGuards(RolesGuard)
   @Roles("admin", "superadmin", "propietario")
   @Post()
-  createRole(@Body("name") name: string) {
-    return this.rolesService.createRole(name);
+  createRole(@Body("name") name: string, @CurrentUser() user: any) {
+    return this.rolesService.createRole(name, user.companyId);
   }
 
   /**

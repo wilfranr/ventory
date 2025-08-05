@@ -20,6 +20,13 @@ import { Public } from "src/auth/public.decorator";
 export class CompanyController {
   constructor(private readonly companyService: CompanyService) {}
 
+  @Get()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("superadmin")
+  async findAll() {
+    return await this.companyService.findAll();
+  }
+
   @Get(":id/settings")
   @UseGuards(JwtAuthGuard)
   async getSettings(@Param("id") id: string) {

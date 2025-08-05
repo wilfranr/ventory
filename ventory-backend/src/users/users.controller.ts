@@ -8,6 +8,7 @@ import { UpdateUserDto } from "./dto/update-user.dto";
 import { CurrentUser } from "src/auth/current-user.decorator";
 import { AuthUser } from "./interfaces/auth-user.interface";
 import { ApiTags, ApiBearerAuth, ApiOperation } from "@nestjs/swagger";
+import { ActiveCompanyId } from "src/common/decorators/active-company-id.decorator";
 
 @ApiTags("Usuarios")
 @ApiBearerAuth()
@@ -24,8 +25,8 @@ export class UsersController {
    * Obtiene la lista de usuarios visibles para el solicitante.
    */
   @Get()
-  async findAll(@CurrentUser() user: AuthUser) {
-    return this.usersService.findAll(user);
+  async findAll(@ActiveCompanyId() companyId: string) {
+    return this.usersService.findAll(companyId);
   }
 
   @Permissions("editar_usuario")
