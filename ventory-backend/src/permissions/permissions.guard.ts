@@ -9,6 +9,7 @@ import {
 } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
 import { PERMISSIONS_KEY } from "./permissions.decorator";
+import { IS_PUBLIC_KEY } from "../auth/public.decorator";
 import { PrismaService } from "../prisma/prisma.service";
 
 @Injectable()
@@ -22,6 +23,16 @@ export class PermissionsGuard implements CanActivate {
    * Comprueba si el usuario posee los permisos necesarios.
    */
   async canActivate(context: ExecutionContext): Promise<boolean> {
+    // Verificar si la ruta está marcada como pública
+    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
+    
+    if (isPublic) {
+      return true;
+    }
+
     const requiredPermissions = this.reflector.getAllAndOverride<string[]>(
       PERMISSIONS_KEY,
       [context.getHandler(), context.getClass()],

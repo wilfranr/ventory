@@ -1,12 +1,12 @@
-import { IsString, IsOptional, IsBoolean, IsInt } from "class-validator";
+import { IsString, IsOptional, IsBoolean } from "class-validator";
 
 /**
  * DTO utilizado para la creación de un elemento de lista.
  */
 export class CreateListItemDto {
   /** Identificador del tipo de lista al que pertenece el elemento */
-  @IsInt()
-  listTypeId: number;
+  @IsString()
+  listTypeId: string;
 
   /** Nombre descriptivo del elemento */
   @IsString()

@@ -35,7 +35,7 @@ export class UsersController {
    */
   @Put(":id")
   update(@Param("id") id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.updateUser(Number(id), updateUserDto);
+    return this.usersService.updateUser(id, updateUserDto);
   }
 
   @Permissions("ver_usuarios") // o un permiso especial si quieres que sea solo para admins

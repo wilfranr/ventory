@@ -46,7 +46,7 @@ export class ListTypeController {
    */
   @Get(":id")
   findOne(@Param("id") id: string, @CurrentUser() user: any) {
-    return this.listTypeService.findOne(+id, user.companyId);
+    return this.listTypeService.findOne(id, user.companyId);
   }
 
   /**
@@ -57,7 +57,7 @@ export class ListTypeController {
     @Param("id") id: string,
     @Body() updateListTypeDto: UpdateListTypeDto,
   ) {
-    return this.listTypeService.update(+id, updateListTypeDto);
+    return this.listTypeService.update(id, updateListTypeDto);
   }
 
   /**
@@ -65,6 +65,6 @@ export class ListTypeController {
    */
   @Delete(":id")
   remove(@Param("id") id: string) {
-    return this.listTypeService.remove(+id);
+    return this.listTypeService.remove(id);
   }
 }

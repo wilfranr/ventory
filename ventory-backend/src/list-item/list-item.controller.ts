@@ -54,16 +54,14 @@ export class ListItemController {
     else if (active === "false") isActive = false;
     // Si no viene el param, deja undefined y el servicio trae todo
 
-    const typeId = listTypeId ? Number(listTypeId) : undefined;
-
-    return this.listItemService.findAll(user.companyId, isActive, typeId);
+    return this.listItemService.findAll(user.companyId, isActive, listTypeId);
   }
 
   @Get("type/:listTypeId")
   /**
    * Devuelve los elementos activos pertenecientes a un tipo de lista.
    */
-  fuindByType(@Param("listTypeId") listTypeId: number) {
+  fuindByType(@Param("listTypeId") listTypeId: string) {
     return this.listItemService.findByTypeId(listTypeId);
   }
 
@@ -72,7 +70,7 @@ export class ListItemController {
    * Busca un elemento concreto por su identificador.
    */
   findOne(@Param("id") id: string) {
-    return this.listItemService.findOne(+id);
+    return this.listItemService.findOne(id);
   }
 
   @Patch(":id")
@@ -83,7 +81,7 @@ export class ListItemController {
     @Param("id") id: string,
     @Body() updateListItemDto: UpdateListItemDto,
   ) {
-    return this.listItemService.update(+id, updateListItemDto);
+    return this.listItemService.update(id, updateListItemDto);
   }
 
   @Delete(":id")
@@ -92,7 +90,7 @@ export class ListItemController {
    * definitivamente de la base de datos.
    */
   remove(@Param("id") id: string) {
-    return this.listItemService.remove(+id);
+    return this.listItemService.remove(id);
   }
 
   @Patch(":id/restore")
@@ -100,6 +98,6 @@ export class ListItemController {
    * Restaura un elemento de lista previamente eliminado.
    */
   restore(@Param("id") id: string) {
-    return this.listItemService.restore(+id);
+    return this.listItemService.restore(id);
   }
 }

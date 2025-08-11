@@ -56,7 +56,7 @@ export class AuthController {
   @Post("refresh")
   async refreshTokens(@Body() data: { userId: string; refreshToken: string }) {
     return this.authService.refreshTokens(
-      Number(data.userId),
+      data.userId,
       data.refreshToken,
     );
   }
@@ -66,6 +66,6 @@ export class AuthController {
    */
   @Post("logout")
   async logout(@Body() data: { userId: string }) {
-    return this.authService.logout(Number(data.userId));
+    return this.authService.logout(data.userId);
   }
 }

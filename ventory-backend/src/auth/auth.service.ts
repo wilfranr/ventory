@@ -213,21 +213,13 @@ export class AuthService {
     // 🔐 Hashear contraseña
     const hashedPassword = await bcrypt.hash(data.password, 10);
 
-    // 🔎 Buscar rol "propietario"
-    const role = await this.prisma.role.findUnique({
-      where: {
-        name_companyId: {
-          name: "propietario",
-          companyId: company.id,
-        },
+    // 🔎 Crear rol "propietario" para la nueva empresa
+    const role = await this.prisma.role.create({
+      data: {
+        name: "propietario",
+        companyId: company.id,
       },
     });
-
-    if (!role) {
-      throw new Error(
-        "❌ Rol 'propietario' no encontrado. Asegúrate de ejecutar el seed.",
-      );
-    }
 
     // 👤 Crear usuario
     const user = await this.prisma.user.create({
@@ -251,7 +243,7 @@ export class AuthService {
    * Genera nuevos tokens usando un refresh token válido.
    */
 
-  async refreshTokens(userId: number, refreshToken: string) {
+  async refreshTokens(userId: string, refreshToken: string) {
     console.log('Backend: refreshTokens - userId recibido:', userId);
     console.log('Backend: refreshTokens - refreshToken recibido:', refreshToken);
 
@@ -310,7 +302,7 @@ export class AuthService {
    * Invalida el refresh token para cerrar la sesión.
    */
 
-  async logout(userId: number) {
+  async logout(userId: string) {
     await this.prisma.user.update({
       where: { id: userId },
       data: { refreshToken: null },

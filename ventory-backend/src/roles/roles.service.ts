@@ -55,12 +55,12 @@ export class RolesService {
    */
   async assignRoleToUser(userId: string, roleId: string) {
     const user = await this.prisma.user.findUnique({
-      where: { id: parseInt(userId) },
+      where: { id: userId },
     });
     if (!user) throw new NotFoundException("Usuario no encontrado");
 
     return this.prisma.user.update({
-      where: { id: parseInt(userId) },
+      where: { id: userId },
       data: { roleId },
     });
   }

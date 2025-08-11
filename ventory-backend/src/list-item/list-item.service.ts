@@ -30,7 +30,7 @@ export class ListItemService {
    * Obtiene todos los elementos de una compañía filtrando por
    * estado o tipo de lista si se proporcionan.
    */
-  findAll(companyId: string, active?: boolean, listTypeId?: number) {
+  findAll(companyId: string, active?: boolean, listTypeId?: string) {
     return this.prisma.listItem.findMany({
       where: {
         companyId,
@@ -45,7 +45,7 @@ export class ListItemService {
   /**
    * Devuelve los elementos activos de un tipo de lista específico.
    */
-  findByTypeId(listTypeId: number) {
+  findByTypeId(listTypeId: string) {
     return this.prisma.listItem.findMany({
       where: { listTypeId, active: true },
       orderBy: { name: "asc" },
@@ -56,14 +56,14 @@ export class ListItemService {
   /**
    * Busca un elemento por su identificador único.
    */
-  findOne(id: number) {
+  findOne(id: string) {
     return this.prisma.listItem.findUnique({ where: { id } });
   }
 
   /**
    * Actualiza los datos de un elemento de lista existente.
    */
-  update(id: number, data: UpdateListItemDto) {
+  update(id: string, data: UpdateListItemDto) {
     return this.prisma.listItem.update({
       where: { id },
       data,
@@ -73,7 +73,7 @@ export class ListItemService {
   /**
    * Deshabilita lógicamente un elemento, dejándolo inactivo.
    */
-  remove(id: number) {
+  remove(id: string) {
     return this.prisma.listItem.update({
       where: { id },
       data: { active: false },
@@ -83,7 +83,7 @@ export class ListItemService {
   /**
    * Restaura un elemento previamente desactivado.
    */
-  restore(id: number) {
+  restore(id: string) {
     return this.prisma.listItem.update({
       where: { id },
       data: { active: true },

@@ -35,7 +35,7 @@ export class ListTypeService {
   /**
    * Busca un tipo de lista por su identificador.
    */
-  findOne(id: number, companyId: string) {
+  findOne(id: string, companyId: string) {
     return this.prisma.listType.findFirst({
       where: { id, companyId },
     });
@@ -44,7 +44,7 @@ export class ListTypeService {
   /**
    * Actualiza la información de un tipo de lista.
    */
-  update(id: number, data: UpdateListTypeDto) {
+  update(id: string, data: UpdateListTypeDto) {
     return this.prisma.listType.update({
       where: { id },
       data,
@@ -54,7 +54,7 @@ export class ListTypeService {
   /**
    * Elimina un tipo de lista de la base de datos.
    */
-  remove(id: number) {
+  remove(id: string) {
     return this.prisma.listType.delete({
       where: { id },
     });

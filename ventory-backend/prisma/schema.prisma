@@ -12,7 +12,7 @@ datasource db {
 
 // Usuarios del sistema
 model User {
-  id            Int      @id @default(autoincrement()) // identificador único
+  id            String   @id @default(cuid()) // identificador único
   name          String   // nombre del usuario
   email         String   @unique // correo electrónico
   password      String   // contraseña encriptada
@@ -81,15 +81,15 @@ model Role {
 model Permission {
   id        String   @id @default(cuid()) // identificador único
   name      String   @unique // nombre del permiso
-  roles     Role[]   @relation("RoleToPermissions") // roles que poseen este permiso
+  roles     Role[]   @relation("RoleToPermissions") // permisos asociados
   createdAt DateTime @default(now()) // fecha de creación
   updatedAt DateTime @updatedAt // fecha de actualización
 }
 
 // Elementos de las listas personalizadas
 model ListItem {
-  id          Int      @id @default(autoincrement()) // identificador único
-  listTypeId  Int      // referencia al tipo de lista
+  id          String   @id @default(cuid()) // identificador único
+  listTypeId  String   // referencia al tipo de lista
   listType    ListType @relation(fields: [listTypeId], references: [id]) // relación con ListType
   name        String   // nombre del elemento
   description String?  // descripción opcional
@@ -105,7 +105,7 @@ model ListItem {
 
 // Tipos de listas personalizables por cada compañía
 model ListType {
-  id          Int        @id @default(autoincrement()) // identificador único
+  id          String     @id @default(cuid()) // identificador único
   code        String?    // código opcional
   name        String     // nombre del tipo de lista
   description String?    // descripción opcional

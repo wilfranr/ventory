@@ -45,7 +45,6 @@ async function seedPermissionsAndRoles(companyId: string) {
     "superadmin",
     "admin",
     "vendedor",
-    "analistaPartes",
     "logistica",
     "propietario",
   ];
@@ -53,7 +52,7 @@ async function seedPermissionsAndRoles(companyId: string) {
   for (const name of roles) {
     await prisma.role.upsert({
       where: {
-        name_companyId: { // Use compound unique input
+        name_companyId: {
           name: name,
           companyId: companyId,
         },
@@ -61,9 +60,7 @@ async function seedPermissionsAndRoles(companyId: string) {
       update: {},
       create: {
         name: name,
-        company: {
-          connect: { id: companyId }, // Connect to the company
-        },
+        companyId: companyId,
       },
     });
   }

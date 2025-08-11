@@ -82,7 +82,7 @@ export class UsersService {
   /**
    * Actualiza la información de un usuario existente.
    */
-  async updateUser(id: number, data: UpdateUserDto) {
+  async updateUser(id: string, data: UpdateUserDto) {
     const updateData: Prisma.UserUpdateInput = {
       name: data.name,
       email: data.email,
@@ -112,7 +112,7 @@ export class UsersService {
   /**
    * Guarda el refresh token hasheado para el usuario.
    */
-  async updateRefreshToken(userId: number, refreshToken: string) {
+  async updateRefreshToken(userId: string, refreshToken: string) {
     const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
     await this.prisma.user.update({
       where: { id: userId },
