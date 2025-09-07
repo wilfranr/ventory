@@ -21,12 +21,13 @@ import { InputIconModule } from 'primeng/inputicon';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { SessionService } from '../../services/session.service';
 import { toTitleCase } from '../../utils/string-utils';
+import { TextareaModule } from 'primeng/textarea';
 
 @Component({
     selector: 'app-list-item',
     templateUrl: './list-item.component.html',
     standalone: true,
-    imports: [TableModule, ConfirmDialogModule, DialogModule, InputTextModule, ButtonModule, ToastModule, FormsModule, ReactiveFormsModule, CommonModule, ToolbarModule, DropdownModule, IconFieldModule, TagModule, InputIconModule],
+    imports: [TableModule, ConfirmDialogModule, DialogModule, InputTextModule, ButtonModule, ToastModule, FormsModule, ReactiveFormsModule, CommonModule, ToolbarModule, DropdownModule, IconFieldModule, TagModule, InputIconModule, TextareaModule],
     providers: [ConfirmationService]
 })
 /**

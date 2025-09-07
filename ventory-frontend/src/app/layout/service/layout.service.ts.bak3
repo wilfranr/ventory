@@ -1,5 +1,5 @@
 import { Injectable, effect, signal, computed, inject } from '@angular/core';
-import { Subject } from 'rxjs';
+import { Subject, catchError, of } from 'rxjs';
 import { CompanyThemeService } from '../../services/company-theme.service';
 import { SessionService } from '../../services/session.service';
 import { CompanyContextService } from '../../services/company-context.service';
@@ -148,8 +148,8 @@ export class LayoutService {
     private loadCompanyTheme() {
         try {
             // Priorizar empresa de la sesión sobre empresa activa para evitar conflictos
-            const sessionCompanyId = this.sessionService.companyId;
-            const activeCompanyId = this.companyContextService.getActiveCompanyId();
+            const sessionCompanyId = this.sessionService?.companyId;
+            const activeCompanyId = this.companyContextService?.getActiveCompanyId?.();
             
             // Validar que el ID de la empresa sea válido
             const companyId = (sessionCompanyId && sessionCompanyId.trim() !== '') 
@@ -166,8 +166,22 @@ export class LayoutService {
             });
             
             if (companyId) {
-                this.companyThemeService.getThemeSettings(companyId).subscribe({
-                    next: (theme) => {
+                this.loading = true;
+                this.companyThemeService.getThemeSettings(companyId).pipe(
+                    catchError(error => {
+                        console.warn('❌ No se pudieron cargar los estilos de la empresa, usando valores por defecto. Error:', error);
+                        // Limpiar empresa inválida del almacenamiento
+                        if (error?.status === 400) {
+                            console.log('🧹 Limpiando ID de empresa inválido del almacenamiento');
+                            this.companyContextService?.clearActiveCompany?.();
+                            localStorage.removeItem('user');
+                        }
+                        this.loadFallbackTheme();
+                        return of(null);
+                    })
+                ).subscribe(theme => {
+                    this.loading = false;
+                    if (theme) {
                         // Solo mostrar éxito en la primera carga
                         if (this.isFirstLoad) {
                             console.log('✅ Estilos cargados para empresa:', companyId, theme);
@@ -176,16 +190,6 @@ export class LayoutService {
                         this.applyCompanyTheme(theme);
                         // Cargar tema del usuario después de aplicar estilos de empresa
                         this.loadUserThemeMode();
-                    },
-                    error: (error) => {
-                        console.warn('❌ No se pudieron cargar los estilos de la empresa, usando valores por defecto. Error:', error);
-                        // Limpiar empresa inválida del almacenamiento
-                        if (error.status === 400) {
-                            console.log('🧹 Limpiando ID de empresa inválido del almacenamiento');
-                            this.companyContextService.clearActiveCompany();
-                            localStorage.removeItem('user');
-                        }
-                        this.loadFallbackTheme();
                     }
                 });
             } else {
@@ -204,12 +208,17 @@ export class LayoutService {
     }
 
     private loadUserThemeMode() {
+        // Verificar si ya hay un tema cargado para evitar sobrescribir
+        if (this.layoutConfig().darkTheme !== undefined) {
+            return;
+        }
+
         const savedTheme = localStorage.getItem('theme-mode');
         console.log('🌙 Cargando modo de tema desde localStorage:', savedTheme);
         
         const isDarkMode = savedTheme === 'dark';
         
-        // Actualizar el estado del tema oscuro
+        // Usar una sola actualización del estado
         this.layoutConfig.update(state => ({
             ...state,
             darkTheme: isDarkMode
@@ -228,222 +237,199 @@ export class LayoutService {
     private applyCompanyTheme(theme: any) {
         console.log('🎨 Aplicando estilos de empresa:', theme);
         
-        // Crear un nuevo objeto de configuración con los valores de la empresa
-        const newConfig = {
-            ...this.layoutConfig(),
-            ...(theme.themePreset && { preset: theme.themePreset }),
-            ...(theme.themePrimary && { primary: theme.themePrimary }),
-            ...(theme.themeSurface && { surface: theme.themeSurface }),
-            ...(theme.menuMode && { menuMode: theme.menuMode })
-            // darkTheme se mantiene como está (no se sobrescribe)
-        };
-
-        console.log('🎨 Nueva configuración aplicada:', newConfig);
-        this.layoutConfig.set(newConfig);
-    }
-
-    private cleanupOldThemeData() {
-        // 🧹 Limpiar estilos obsoletos del localStorage que pueden causar conflictos
-        const keysToRemove = [
-            'theme-preset',
-            'theme-primary', 
-            'theme-surface',
-            'theme-menu-mode'
-        ];
+        // Preservar el estado actual del tema oscuro
+        const currentDarkTheme = this.layoutConfig().darkTheme;
         
-        keysToRemove.forEach(key => {
-            if (localStorage.getItem(key)) {
-                console.log('🧹 Limpiando estilo obsoleto:', key);
-                localStorage.removeItem(key);
-            }
-        });
-    }
-
-    private loadFallbackTheme() {
-        try {
-            // 🟢 Fallback: Solo cargar themeMode desde localStorage (preferencia personal)
-            const savedTheme = localStorage.getItem('theme-mode');
-            const isDarkMode = savedTheme === 'dark';
+        // Aplicar colores directamente al root del documento
+        if (theme.themePrimary) {
+            const primaryColor = theme.themePrimary;
+            document.documentElement.style.setProperty('--primary-color', primaryColor);
+            document.documentElement.style.setProperty('--primary-color-dark', this.adjustColor(primaryColor, -20));
+            document.documentElement.style.setProperty('--primary-color-light', this.adjustColor(primaryColor, 20));
             
-            // Aplicar tema oscuro si está configurado
-            if (isDarkMode) {
-                this.layoutConfig.update(state => ({ ...state, darkTheme: true }));
-                document.documentElement.classList.add('app-dark');
-            } else {
-                this.layoutConfig.update(state => ({ ...state, darkTheme: false }));
-                document.documentElement.classList.remove('app-dark');
-            }
-            
-            // Aplicar colores por defecto
-            const defaultConfig = {
-                preset: 'Aura',
-                primary: 'emerald',
-                surface: null,
-                menuMode: 'static'
-            };
-            
-            this.layoutConfig.update(state => ({
-                ...state,
-                ...defaultConfig
-            }));
-            
-            console.log('✅ Tema por defecto cargado correctamente');
-        } catch (error) {
-            console.error('❌ Error al cargar el tema por defecto:', error);
-            
-            // Asegurarse de que al menos el tema oscuro/claro esté configurado
-            document.documentElement.classList.remove('app-dark');
-            this.layoutConfig.update(state => ({
-                ...state,
-                darkTheme: false,
-                preset: 'Aura',
-                primary: 'emerald',
-                surface: null,
-                menuMode: 'static'
-            }));
-        }
-    }
-
-    handleDarkModeTransition(config: layoutConfig) {
-        // Solo actualizar si hay un cambio real
-        const isDark = config.darkTheme === true;
-        const currentIsDark = document.documentElement.classList.contains('app-dark');
+            // Aplicar estilos adicionales para PrimeNG
+            const style = document.createElement('style');
+            style.id = 'custom-theme-styles';
+            style.textContent = `
+                .p-button {
+                    background: ${primaryColor} !important;
+                    border-color: ${primaryColor} !important;
+                }
+    
+    console.log('Aplicando estilos de empresa:', theme);
+    
+    // Preservar el estado actual del tema oscuro
+    const currentDarkTheme = this.layoutConfig().darkTheme;
+    
+    // Aplicar colores directamente al root del documento
+    if (theme.themePrimary) {
+        const primaryColor = theme.themePrimary;
+        document.documentElement.style.setProperty('--primary-color', primaryColor);
+        document.documentElement.style.setProperty('--primary-color-dark', this.adjustColor(primaryColor, -20));
+        document.documentElement.style.setProperty('--primary-color-light', this.adjustColor(primaryColor, 20));
         
-        if (isDark !== currentIsDark) {
-            if (isDark) {
-                document.documentElement.classList.add('app-dark');
-            } else {
-                document.documentElement.classList.remove('app-dark');
+        // Aplicar estilos adicionales para PrimeNG
+        const style = document.createElement('style');
+        style.id = 'custom-theme-styles';
+        style.textContent = `
+            .p-button {
+                background: ${primaryColor} !important;
+                border-color: ${primaryColor} !important;
             }
-            
-            // Solo guardar si realmente hay un cambio
-            localStorage.setItem('theme-mode', isDark ? 'dark' : 'light');
-            console.log('🌙 Tema actualizado a:', isDark ? 'oscuro' : 'claro');
+            .p-button:enabled:hover {
+                background: ${this.adjustColor(primaryColor, -10)} !important;
+                border-color: ${this.adjustColor(primaryColor, -10)} !important;
+            }
+            .p-button:focus {
+                box-shadow: 0 0 0 0.2rem ${this.adjustColor(primaryColor, 40)} !important;
+            }
+        `;
+        
+        // Eliminar estilos anteriores si existen
+        const existingStyle = document.getElementById('custom-theme-styles');
+        if (existingStyle) {
+            document.head.removeChild(existingStyle);
         }
+        document.head.appendChild(style);
     }
-    private startViewTransition(config: layoutConfig): void {
-        const transition = (document as any).startViewTransition(() => {
-            this.toggleDarkMode(config);
-        });
-
-        transition.ready
-            .then(() => {
-                this.onTransitionEnd();
-            })
-            .catch(() => {});
+    
+    if (theme.themeSurface) {
+        document.documentElement.style.setProperty('--surface-ground', theme.themeSurface);
     }
 
-    toggleDarkMode(config?: layoutConfig): void {
-        const _config = config || this.layoutConfig();
+    // Crear un nuevo objeto de configuración con los valores de la empresa
+    const newConfig = {
+        ...this.layoutConfig(),
+        ...(theme.themePreset && { preset: theme.themePreset }),
+        ...(theme.themePrimary && { primary: theme.themePrimary }),
+        ...(theme.themeSurface && { surface: theme.themeSurface }),
+        ...(theme.menuMode && { menuMode: theme.menuMode }),
+        // Mantener el estado actual del tema oscuro
+        darkTheme: currentDarkTheme
+    };
 
-        if (_config.darkTheme) {
+    console.log('Nueva configuración aplicada:', newConfig);
+    this.layoutConfig.set(newConfig);
+}
+
+// Función auxiliar para ajustar el brillo de un color
+private adjustColor(color: string, amount: number): string {
+    if (!color) return '#000000';
+    
+    // Implementación mejorada para ajustar el brillo de un color
+    let usePound = false;
+    
+    if (color[0] === '#') {
+        color = color.slice(1);
+        usePound = true;
+    }
+    
+    // Asegurar que el color tenga 6 caracteres
+    if (color.length === 3) {
+        color = color.split('').map(c => c + c).join('');
+    } else if (color.length !== 6) {
+        return usePound ? '#000000' : '000000';
+    }
+    
+    const num = parseInt(color, 16);
+    if (isNaN(num)) return usePound ? '#000000' : '000000';
+    
+    let r = (num >> 16) + amount;
+    let g = ((num >> 8) & 0x00FF) + amount;
+    let b = (num & 0x0000FF) + amount;
+    
+    r = Math.min(255, Math.max(0, r));
+    g = Math.min(255, Math.max(0, g));
+    b = Math.min(255, Math.max(0, b));
+    
+    const result = (g | (b << 8) | (r << 16)).toString(16).padStart(6, '0');
+    return (usePound ? '#' : '') + result;
+}
+
+private cleanupOldThemeData() {
+    // Limpiar estilos obsoletos del localStorage que pueden causar conflictos
+    const keysToRemove = [
+        'theme-preset',
+        'theme-primary',
+        'theme-surface',
+        'theme-mode',
+        'layout-theme',
+        'layout-mode',
+        'layout-color',
+        'layout-config',
+        'layout-config-2'
+    ];
+    
+    keysToRemove.forEach(key => {
+        if (localStorage.getItem(key)) {
+            console.log(`Eliminando clave obsoleta del localStorage: ${key}`);
+            localStorage.removeItem(key);
+        }
+    });
+    
+    // Limpiar estilos antiguos del DOM
+    const oldStyles = [
+        'theme-link',
+        'custom-theme',
+        'theme-style'
+    ];
+    
+    oldStyles.forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+            document.head.removeChild(element);
+        }
+    });
+}
+
+private loadFallbackTheme() {
+    // Cargar tema por defecto
+    const defaultTheme = {
+        themePreset: 'Aura',
+        themePrimary: '#10B981', // Color verde por defecto
+        themeSurface: '#f8f9fa',
+        menuMode: 'static'
+    };
+    
+    console.log('Cargando tema por defecto');
+    this.applyCompanyTheme(defaultTheme);
+    this.loadUserThemeMode();
+    this.isFirstLoad = false;
+}
+
+private handleDarkModeTransition(config: layoutConfig) {
+    if (!config) return;
+    
+    // Solo actualizar si hay un cambio real
+    const isDark = config.darkTheme === true;
+    const currentIsDark = document.documentElement.classList.contains('app-dark');
+    
+    if (isDark !== currentIsDark) {
+        console.log(`Cambiando tema a: ${isDark ? 'oscuro' : 'claro'}`);
+        
+        // Aplicar transición suave
+        document.documentElement.style.transition = 'background-color 0.3s ease';
+        
+        if (isDark) {
             document.documentElement.classList.add('app-dark');
         } else {
             document.documentElement.classList.remove('app-dark');
         }
         
-        // 🎨 themeMode es preferencia personal, se guarda solo en localStorage
-        const themeMode = _config.darkTheme ? 'dark' : 'light';
-        localStorage.setItem('theme-mode', themeMode);
-    }
-    private onTransitionEnd() {
-        this.transitionComplete.set(true);
+        // Forzar actualización de estilos de PrimeNG
+        const style = document.getElementById('custom-theme-styles');
+        if (style) {
+            style.textContent = style.textContent; // Forzar repintado
+        }
+        
+        // Solo guardar si realmente hay un cambio
+        localStorage.setItem('theme-mode', isDark ? 'dark' : 'light');
+        
+        // Eliminar la transición después de completarse
         setTimeout(() => {
-            this.transitionComplete.set(false);
-        });
+            document.documentElement.style.transition = '';
+        }, 300);
     }
-
-    onMenuToggle() {
-        if (this.isOverlay()) {
-            this.layoutState.update((prev) => ({ ...prev, overlayMenuActive: !this.layoutState().overlayMenuActive }));
-
-            if (this.layoutState().overlayMenuActive) {
-                this.overlayOpen.next(null);
-            }
-        }
-
-        if (this.isDesktop()) {
-            this.layoutState.update((prev) => ({ ...prev, staticMenuDesktopInactive: !this.layoutState().staticMenuDesktopInactive }));
-        } else {
-            this.layoutState.update((prev) => ({ ...prev, staticMenuMobileActive: !this.layoutState().staticMenuMobileActive }));
-
-            if (this.layoutState().staticMenuMobileActive) {
-                this.overlayOpen.next(null);
-            }
-        }
-    }
-
-    isDesktop() {
-        return window.innerWidth > 991;
-    }
-
-    isMobile() {
-        return !this.isDesktop();
-    }
-
-    onConfigUpdate() {
-        this._config = { ...this.layoutConfig() };
-        this.configUpdate.next(this.layoutConfig());
-    }
-
-    onMenuStateChange(event: MenuChangeEvent) {
-        this.menuSource.next(event);
-    }
-
-    reset() {
-        this.resetSource.next(true);
-    }
-
-    setPreset(preset: string): void {
-        this.layoutConfig.update((state) => ({ ...state, preset }));
-        
-        // Solo guardar en empresa si estamos en contexto de empresa
-        if (this.isCompanyContext()) {
-            this.updateCompanyTheme({ themePreset: preset });
-        } else {
-            // Guardar en localStorage para cambios de usuario
-            localStorage.setItem('theme-preset', preset);
-        }
-    }
-
-    setPrimaryColor(color: string): void {
-        this.layoutConfig.update((state) => ({ ...state, primary: color }));
-        
-        // Solo guardar en empresa si estamos en contexto de empresa
-        if (this.isCompanyContext()) {
-            this.updateCompanyTheme({ themePrimary: color });
-        } else {
-            // Guardar en localStorage para cambios de usuario
-            localStorage.setItem('theme-primary', color);
-        }
-    }
-
-    setSurfaceColor(color: string): void {
-        this.layoutConfig.update((state) => ({ ...state, surface: color }));
-        
-        // Solo guardar en empresa si estamos en contexto de empresa
-        if (this.isCompanyContext()) {
-            this.updateCompanyTheme({ themeSurface: color });
-        } else {
-            // Guardar en localStorage para cambios de usuario
-            localStorage.setItem('theme-surface', color);
-        }
-    }
-
-    setThemeMode(mode: 'light' | 'dark'): void {
-        const isDark = mode === 'dark';
-        // Actualizar el estado de una sola vez
-        this.layoutConfig.update(state => ({
-            ...state,
-            darkTheme: isDark
-        }));
-        
-        // El efecto reactivo se encargará de actualizar el DOM y localStorage
-        console.log('🌙 Modo de tema establecido a:', mode);
-    }
-
-    setMenuMode(mode: 'static' | 'overlay'): void {
-        this.layoutConfig.update((state) => ({ ...state, menuMode: mode }));
         
         // Solo guardar en empresa si estamos en contexto de empresa
         if (this.isCompanyContext()) {

@@ -170,7 +170,7 @@
         </div>
         <div>
             <label class="block font-bold mb-2">Descripción</label>
-            <input pInputText formControlName="description" class="w-full" />
+            <textarea pTextarea formControlName="description" id="description" [autoResize]="true" rows="3" cols="43"></textarea>
         </div>
 
         <!-- Tabla interna para administrar tipos de lista -->
@@ -221,7 +221,7 @@
                 </div>
                 <div class="flex flex-col gap-2">
                     <label for="description">Descripción</label>
-                    <input pInputText formControlName="description" id="description" type="text" />
+                    <textarea pTextarea formControlName="description" id="description" [autoResize]="true" rows="3" cols="30"></textarea>
                 </div>
             </div>
             <div class="flex justify-end gap-2">

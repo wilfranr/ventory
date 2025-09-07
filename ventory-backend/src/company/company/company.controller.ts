@@ -14,6 +14,7 @@ import { Roles } from "src/auth/roles.decorator";
 import { RolesGuard } from "src/auth/roles.guard";
 import { CompanyService } from "./company.service";
 import { UpdateCompanySettingsDto } from "../dto/update-company-settings.dto";
+import { UpdateCompanyThemeDto } from "../dto/update-company-theme.dto";
 import { Public } from "src/auth/public.decorator";
 
 @Controller("companies")
@@ -49,5 +50,21 @@ export class CompanyController {
     @UploadedFile() logo: Express.Multer.File,
   ) {
     return await this.companyService.updateGeneralParams(id, dto, logo);
+  }
+
+  @Get(":id/theme")
+  @UseGuards(JwtAuthGuard)
+  async getThemeSettings(@Param("id") id: string) {
+    return await this.companyService.getThemeSettings(id);
+  }
+
+  @Put(":id/theme")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("admin", "superadmin", "propietario")
+  async updateThemeSettings(
+    @Param("id") id: string,
+    @Body() dto: UpdateCompanyThemeDto,
+  ) {
+    return await this.companyService.updateThemeSettings(id, dto);
   }
 }

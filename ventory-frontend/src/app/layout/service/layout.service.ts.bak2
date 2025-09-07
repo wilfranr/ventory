@@ -204,12 +204,17 @@ export class LayoutService {
     }
 
     private loadUserThemeMode() {
+        // Verificar si ya hay un tema cargado para evitar sobrescribir
+        if (this.layoutConfig().darkTheme !== undefined) {
+            return;
+        }
+
         const savedTheme = localStorage.getItem('theme-mode');
         console.log('🌙 Cargando modo de tema desde localStorage:', savedTheme);
         
         const isDarkMode = savedTheme === 'dark';
         
-        // Actualizar el estado del tema oscuro
+        // Usar una sola actualización del estado
         this.layoutConfig.update(state => ({
             ...state,
             darkTheme: isDarkMode
@@ -228,18 +233,75 @@ export class LayoutService {
     private applyCompanyTheme(theme: any) {
         console.log('🎨 Aplicando estilos de empresa:', theme);
         
+        // Preservar el estado actual del tema oscuro
+        const currentDarkTheme = this.layoutConfig().darkTheme;
+        
+        // Aplicar colores directamente al root del documento
+        if (theme.themePrimary) {
+            const primaryColor = theme.themePrimary;
+            document.documentElement.style.setProperty('--primary-color', primaryColor);
+            document.documentElement.style.setProperty('--primary-color-dark', this.adjustColor(primaryColor, -20));
+            document.documentElement.style.setProperty('--primary-color-light', this.adjustColor(primaryColor, 20));
+            
+            // Aplicar estilos adicionales para PrimeNG
+            const style = document.createElement('style');
+            style.id = 'custom-theme-styles';
+            style.textContent = `
+                .p-button {
+                    background: ${primaryColor} !important;
+                    border-color: ${primaryColor} !important;
+                }
+                .p-button:enabled:hover {
+                    background: ${this.adjustColor(primaryColor, -10)} !important;
+                    border-color: ${this.adjustColor(primaryColor, -10)} !important;
+                }
+                .p-button:focus {
+                    box-shadow: 0 0 0 0.2rem ${this.adjustColor(primaryColor, 40)} !important;
+                }
+            `;
+            
+            // Eliminar estilos anteriores si existen
+            const existingStyle = document.getElementById('custom-theme-styles');
+            if (existingStyle) {
+                document.head.removeChild(existingStyle);
+            }
+            document.head.appendChild(style);
+        }
+        
+        if (theme.themeSurface) {
+            document.documentElement.style.setProperty('--surface-ground', theme.themeSurface);
+        }
+
         // Crear un nuevo objeto de configuración con los valores de la empresa
         const newConfig = {
             ...this.layoutConfig(),
             ...(theme.themePreset && { preset: theme.themePreset }),
             ...(theme.themePrimary && { primary: theme.themePrimary }),
             ...(theme.themeSurface && { surface: theme.themeSurface }),
-            ...(theme.menuMode && { menuMode: theme.menuMode })
-            // darkTheme se mantiene como está (no se sobrescribe)
+            ...(theme.menuMode && { menuMode: theme.menuMode }),
+            // Mantener el estado actual del tema oscuro
+            darkTheme: currentDarkTheme
         };
 
         console.log('🎨 Nueva configuración aplicada:', newConfig);
         this.layoutConfig.set(newConfig);
+    }
+    
+    // Función auxiliar para ajustar el brillo de un color
+    private adjustColor(color: string, amount: number): string {
+        // Convertir el color a RGB
+        let r = parseInt(color.substr(1, 2), 16);
+        let g = parseInt(color.substr(3, 2), 16);
+        let b = parseInt(color.substr(5, 2), 16);
+        
+        // Ajustar el brillo
+        r = Math.max(0, Math.min(255, r + amount));
+        g = Math.max(0, Math.min(255, g + amount));
+        b = Math.max(0, Math.min(255, b + amount));
+        
+        // Volver a convertir a formato hexadecimal
+        return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
+    }
     }
 
     private cleanupOldThemeData() {

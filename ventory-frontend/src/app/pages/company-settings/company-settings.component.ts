@@ -12,13 +12,16 @@ import { CompanyService, CompanySettings } from '../../services/company.service'
 import { AuthService } from '../../services/auth.service';
 import { SessionService } from '../../services/session.service';
 import { CompanyContextService } from '../../services/company-context.service';
+import { CompanyThemeService } from '../../services/company-theme.service';
+import { LayoutService } from '../../layout/service/layout.service';
+import { AppConfigurator } from '../../layout/component/app.configurator';
 
 @Component({
     selector: 'app-company-settings',
     standalone: true,
     templateUrl: './company-settings.component.html',
     styleUrl: './company-settings.component.scss',
-    imports: [CommonModule, DropdownModule, InputNumberModule, InputTextModule, ButtonModule, ToastModule, ReactiveFormsModule, FileUploadModule],
+    imports: [CommonModule, DropdownModule, InputNumberModule, InputTextModule, ButtonModule, ToastModule, ReactiveFormsModule, FileUploadModule, AppConfigurator],
     providers: [MessageService]
 })
 export class CompanySettingsComponent implements OnInit {
@@ -28,6 +31,8 @@ export class CompanySettingsComponent implements OnInit {
     private auth = inject(AuthService);
     private session = inject(SessionService);
     private companyContext = inject(CompanyContextService);
+    private companyThemeService = inject(CompanyThemeService);
+    private layoutService = inject(LayoutService);
 
     form = this.fb.group({
         name: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
@@ -50,6 +55,7 @@ export class CompanySettingsComponent implements OnInit {
         { label: 'USD', value: 'USD' },
         { label: 'EUR', value: 'EUR' }
     ];
+
     readonlyMode = false;
 
     constructor() {}
@@ -63,6 +69,7 @@ export class CompanySettingsComponent implements OnInit {
         const activeCompanyId = this.companyContext.getActiveCompanyId();
         const companyId = activeCompanyId || this.session.companyId;
         if (companyId) {
+            // Cargar configuración general
             this.companyService.getSettings(companyId).subscribe({
                 next: (data) => {
                     this.form.patchValue(data);
@@ -78,6 +85,17 @@ export class CompanySettingsComponent implements OnInit {
                         summary: 'Error',
                         detail: 'No se pudieron cargar los parámetros.'
                     })
+            });
+
+            // Cargar configuración de estilos (el AppConfigurator se encarga de aplicarlos)
+            this.companyThemeService.getThemeSettings(companyId).subscribe({
+                next: (themeData) => {
+                    // Los estilos se aplicarán automáticamente por el LayoutService
+                    console.log('Estilos de empresa cargados:', themeData);
+                },
+                error: (error) => {
+                    console.warn('No se pudieron cargar los estilos de la empresa:', error);
+                }
             });
         }
     }
@@ -98,6 +116,11 @@ export class CompanySettingsComponent implements OnInit {
         this.logoPreview = null;
     }
 
+    getCurrentCompanyId(): string | null {
+        const activeCompanyId = this.companyContext.getActiveCompanyId();
+        return activeCompanyId || this.session.companyId;
+    }
+
     save() {
         console.log('Form validity:', this.form.valid);
         console.log('Form values:', this.form.getRawValue());
@@ -115,9 +138,22 @@ export class CompanySettingsComponent implements OnInit {
             return;
         }
 
-        const payload = this.form.getRawValue() as CompanySettings;
+        const formData = this.form.getRawValue();
+        
+        // Solo guardar datos generales (los estilos los maneja el AppConfigurator)
+        const generalSettings: CompanySettings = {
+            name: formData.name,
+            nit: formData.nit,
+            email: formData.email,
+            address: formData.address,
+            phones: formData.phones,
+            website: formData.website,
+            currency: formData.currency,
+            vatPercent: formData.vatPercent,
+            logo: formData.logo
+        };
 
-        this.companyService.updateSettings(companyId, payload, this.logoFile).subscribe({
+        this.companyService.updateSettings(companyId, generalSettings, this.logoFile).subscribe({
             next: (res) => {
                 this.messageService.add({
                     severity: 'success',

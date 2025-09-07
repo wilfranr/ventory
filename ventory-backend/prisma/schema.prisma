@@ -45,6 +45,12 @@ model Company {
   department         String?             // Departamento/Estado de la empresa
   city               String?             // Ciudad de la empresa
 
+  // 🎨 Configuración de estilos de la empresa
+  themePreset        String?             // preset del tema (Aura, Lara, Nora)
+  themePrimary       String?             // color primario del tema
+  themeSurface       String?             // color de superficie del tema
+  menuMode           String?             // modo del menú (static, overlay)
+
   users              User[]              // usuarios asociados
   roles              Role[]              // roles asociados a esta empresa
   registrationTokens RegistrationToken[] // tokens de registro de usuarios

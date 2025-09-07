@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { Prisma } from "@prisma/client";
 import { PrismaService } from "src/prisma/prisma.service";
 import { UpdateCompanySettingsDto } from "../dto/update-company-settings.dto";
+import { UpdateCompanyThemeDto } from "../dto/update-company-theme.dto";
 import * as path from "path";
 import * as fs from "fs";
 
@@ -45,6 +46,18 @@ export class CompanyService {
         currency: true,
         vatPercent: true,
         logo: true,
+      },
+    });
+  }
+
+  async getThemeSettings(companyId: string) {
+    return this.prisma.company.findUnique({
+      where: { id: companyId },
+      select: {
+        themePreset: true,
+        themePrimary: true,
+        themeSurface: true,
+        menuMode: true,
       },
     });
   }
@@ -96,6 +109,26 @@ export class CompanyService {
     });
 
     return { logoUrl };
+  }
+
+  async updateThemeSettings(companyId: string, dto: UpdateCompanyThemeDto) {
+    const data: Prisma.CompanyUpdateInput = {
+      ...(dto.themePreset !== undefined ? { themePreset: dto.themePreset } : {}),
+      ...(dto.themePrimary !== undefined ? { themePrimary: dto.themePrimary } : {}),
+      ...(dto.themeSurface !== undefined ? { themeSurface: dto.themeSurface } : {}),
+      ...(dto.menuMode !== undefined ? { menuMode: dto.menuMode } : {}),
+    };
+
+    return this.prisma.company.update({
+      where: { id: companyId },
+      data,
+      select: {
+        themePreset: true,
+        themePrimary: true,
+        themeSurface: true,
+        menuMode: true,
+      },
+    });
   }
 
   async getCountrySettings(countryCode: string) {

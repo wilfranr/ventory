@@ -18,15 +18,35 @@ export class CompanyAccessGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const user = request.user;
-    const activeCompanyId = request.activeCompanyId;
 
     if (!user) {
       throw new ForbiddenException('Usuario no autenticado');
     }
 
-    if (!activeCompanyId) {
-      throw new BadRequestException('No se pudo determinar la empresa activa');
+    // Obtener companyId del usuario
+    const userCompanyId = user.companyId;
+    if (!userCompanyId) {
+      throw new BadRequestException('Usuario sin empresa asignada');
     }
+
+    // Para superadmin, permitir acceso a cualquier empresa si se especifica en header
+    let activeCompanyId = userCompanyId;
+    if (user.role === 'superadmin') {
+      const headerCompanyId = request.headers['x-company-id'];
+      if (headerCompanyId) {
+        // Validar que la empresa existe
+        const companyExists = await this.prisma.company.findUnique({
+          where: { id: headerCompanyId },
+        });
+        if (!companyExists) {
+          throw new BadRequestException('Empresa especificada no existe');
+        }
+        activeCompanyId = headerCompanyId;
+      }
+    }
+
+    // Añadir companyId al request para uso posterior (por si el interceptor no se ejecuta)
+    request.activeCompanyId = activeCompanyId;
 
     // Superadmin puede acceder a cualquier empresa
     if (user.role === 'superadmin') {

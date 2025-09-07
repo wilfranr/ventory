@@ -1,5 +1,5 @@
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { Component, computed, inject, PLATFORM_ID, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, PLATFORM_ID, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { $t, updatePreset, updateSurfacePalette } from '@primeng/themes';
@@ -9,6 +9,7 @@ import Nora from '@primeng/themes/nora';
 import { PrimeNG } from 'primeng/config';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { LayoutService } from '../service/layout.service';
+import { CompanyThemeService } from '../../services/company-theme.service';
 
 const presets = {
     Aura,
@@ -87,13 +88,28 @@ declare type SurfacesType = {
         </div>
     `,
     host: {
-        class: 'hidden absolute top-[3.25rem] right-0 w-72 p-4 bg-surface-0 dark:bg-surface-900 border border-surface rounded-border origin-top shadow-[0px_3px_5px_rgba(0,0,0,0.02),0px_0px_2px_rgba(0,0,0,0.05),0px_1px_4px_rgba(0,0,0,0.08)]'
+        class: 'block w-full p-4 bg-surface-0 dark:bg-surface-900 border border-surface rounded-lg'
     }
 })
 export class AppConfigurator {
     router = inject(Router);
-
     config: PrimeNG = inject(PrimeNG);
+    companyThemeService = inject(CompanyThemeService);
+
+    // Input para recibir el ID de la empresa
+    companyId = input<string | null>(null);
+
+    // Effect para establecer el contexto de empresa cuando cambie el companyId
+    constructor() {
+        effect(() => {
+            const companyId = this.companyId();
+            if (companyId) {
+                this.layoutService.setCompanyContext(companyId);
+            } else {
+                this.layoutService.clearCompanyContext();
+            }
+        });
+    }
 
     layoutService: LayoutService = inject(LayoutService);
 
@@ -422,11 +438,9 @@ export class AppConfigurator {
 
     updateColors(event: any, type: string, color: any) {
         if (type === 'primary') {
-            this.layoutService.layoutConfig.update((state) => ({ ...state, primary: color.name }));
-            localStorage.setItem('primaryColor', color.name);
+            this.layoutService.setPrimaryColor(color.name);
         } else if (type === 'surface') {
-            this.layoutService.layoutConfig.update((state) => ({ ...state, surface: color.name }));
-            localStorage.setItem('surfaceColor', color.name);
+            this.layoutService.setSurfaceColor(color.name);
         }
         this.applyTheme(type, color);
 
@@ -442,14 +456,14 @@ export class AppConfigurator {
     }
 
     onPresetChange(event: any) {
-        this.layoutService.layoutConfig.update((state) => ({ ...state, preset: event }));
+        this.layoutService.setPreset(event);
         const preset = presets[event as KeyOfType<typeof presets>];
         const surfacePalette = this.surfaces.find((s) => s.name === this.selectedSurfaceColor())?.palette;
         $t().preset(preset).preset(this.getPresetExt()).surfacePalette(surfacePalette).use({ useDefaultOptions: true });
     }
 
     onMenuModeChange(event: string) {
-        this.layoutService.layoutConfig.update((prev) => ({ ...prev, menuMode: event }));
+        this.layoutService.setMenuMode(event as 'static' | 'overlay');
     }
 
     changeTheme(color: string) {
@@ -459,4 +473,5 @@ export class AppConfigurator {
     changeSurface(color: string) {
         this.layoutService.setSurfaceColor(color);
     }
+
 }

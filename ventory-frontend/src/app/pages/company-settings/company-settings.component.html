@@ -74,6 +74,15 @@
                 </ng-template>
             </p-fileupload>
         </div>
+
+        <!-- Sección de Estilos -->
+        <div class="col-12">
+            <h3 class="text-lg font-semibold mb-4 text-primary">🎨 Personalización Visual</h3>
+            <div class="bg-surface-0 dark:bg-surface-900 border border-surface rounded-lg p-4">
+                <app-configurator [companyId]="getCurrentCompanyId()" />
+            </div>
+        </div>
+
         @if (!readonlyMode) {
             <div class="col-12 flex justify-end">
                 <p-button type="submit" label="Guardar" [disabled]="form.invalid"></p-button>
