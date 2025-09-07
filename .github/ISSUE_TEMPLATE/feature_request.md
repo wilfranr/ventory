@@ -2,8 +2,9 @@
 name: Solicitud de funcionalidad
 about: Plantilla para proponer una nueva funcionalidad o mejora
 title: "[Feature] "
-labels: feature
+labels: ''
 assignees: wilfranr
+
 ---
 
 ## 📝 Descripción de la tarea
