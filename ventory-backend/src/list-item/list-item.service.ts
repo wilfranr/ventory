@@ -44,10 +44,15 @@ export class ListItemService {
 
   /**
    * Devuelve los elementos activos de un tipo de lista específico.
+   * Filtra por empresa para asegurar aislamiento de datos.
    */
-  findByTypeId(listTypeId: string) {
+  findByTypeId(listTypeId: string, companyId: string) {
     return this.prisma.listItem.findMany({
-      where: { listTypeId, active: true },
+      where: { 
+        listTypeId, 
+        companyId, // ✅ Añadido filtro por empresa
+        active: true 
+      },
       orderBy: { name: "asc" },
       include: { listType: true },
     });
@@ -55,37 +60,56 @@ export class ListItemService {
 
   /**
    * Busca un elemento por su identificador único.
+   * Valida que pertenezca a la empresa del usuario.
    */
-  findOne(id: string) {
-    return this.prisma.listItem.findUnique({ where: { id } });
+  findOne(id: string, companyId: string) {
+    return this.prisma.listItem.findFirst({ 
+      where: { 
+        id, 
+        companyId // ✅ Añadido filtro por empresa
+      },
+      include: { listType: true }
+    });
   }
 
   /**
    * Actualiza los datos de un elemento de lista existente.
+   * Valida que pertenezca a la empresa del usuario.
    */
-  update(id: string, data: UpdateListItemDto) {
-    return this.prisma.listItem.update({
-      where: { id },
+  update(id: string, data: UpdateListItemDto, companyId: string) {
+    return this.prisma.listItem.updateMany({
+      where: { 
+        id, 
+        companyId // ✅ Añadido filtro por empresa
+      },
       data,
     });
   }
 
   /**
    * Deshabilita lógicamente un elemento, dejándolo inactivo.
+   * Valida que pertenezca a la empresa del usuario.
    */
-  remove(id: string) {
-    return this.prisma.listItem.update({
-      where: { id },
+  remove(id: string, companyId: string) {
+    return this.prisma.listItem.updateMany({
+      where: { 
+        id, 
+        companyId // ✅ Añadido filtro por empresa
+      },
       data: { active: false },
     });
   }
 
   /**
    * Restaura un elemento previamente desactivado.
+   * Valida que pertenezca a la empresa del usuario.
    */
-  restore(id: string) {
-    return this.prisma.listItem.update({
-      where: { id },
+  restore(id: string, companyId: string) {
+    return this.prisma.listItem.updateMany({
+      where: { 
+        id, 
+        companyId // ✅ Añadido filtro por empresa
+      },
       data: { active: true },
     });
   }

@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CompanyService } from '../../services/company.service';
 import { Company } from '../../models/company.model';
 import { CompanyContextService } from '../../services/company-context.service';
+import { SessionService } from '../../services/session.service';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -22,6 +23,7 @@ export class SelectCompanyComponent implements OnInit {
     constructor(
         private companyService: CompanyService,
         private companyContextService: CompanyContextService,
+        private sessionService: SessionService,
         private router: Router
     ) {}
 
@@ -32,6 +34,18 @@ export class SelectCompanyComponent implements OnInit {
 
     selectCompany(companyId: string): void {
         this.companyContextService.setActiveCompany(companyId);
+        
+        // Obtener los datos de la empresa seleccionada y actualizar la sesión
+        this.companyService.getSettings(companyId).subscribe({
+            next: (settings) => {
+                // Actualizar la sesión con los datos de la empresa seleccionada
+                this.sessionService.updateCompany(settings.name, settings.logo || null);
+            },
+            error: (error) => {
+                console.error('Error al obtener datos de la empresa:', error);
+            }
+        });
+        
         this.router.navigate(['/']);
     }
 }

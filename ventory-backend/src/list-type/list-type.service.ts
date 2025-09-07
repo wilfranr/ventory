@@ -43,20 +43,28 @@ export class ListTypeService {
 
   /**
    * Actualiza la información de un tipo de lista.
+   * Valida que pertenezca a la empresa del usuario.
    */
-  update(id: string, data: UpdateListTypeDto) {
-    return this.prisma.listType.update({
-      where: { id },
+  update(id: string, data: UpdateListTypeDto, companyId: string) {
+    return this.prisma.listType.updateMany({
+      where: { 
+        id, 
+        companyId // ✅ Añadido filtro por empresa
+      },
       data,
     });
   }
 
   /**
    * Elimina un tipo de lista de la base de datos.
+   * Valida que pertenezca a la empresa del usuario.
    */
-  remove(id: string) {
-    return this.prisma.listType.delete({
-      where: { id },
+  remove(id: string, companyId: string) {
+    return this.prisma.listType.deleteMany({
+      where: { 
+        id, 
+        companyId // ✅ Añadido filtro por empresa
+      },
     });
   }
 }

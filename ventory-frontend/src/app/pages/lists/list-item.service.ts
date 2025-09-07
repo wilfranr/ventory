@@ -35,15 +35,15 @@ export class ListItemService {
     /**
      * Obtiene los ítems asociados a un tipo de lista.
      * @param listTypeId identificador del tipo de lista
+     * El filtrado por empresa se maneja automáticamente por el interceptor.
      */
     getByTypeId(listTypeId: number): Observable<ListItem[]> {
-        // Este endpoint puede ajustarse para filtrar por companyId si es necesario
-        const companyId = this.session.companyId;
-        return this.http.get<ListItem[]>(`${this.apiUrl}/type/${listTypeId}?companyId=${companyId}`);
+        return this.http.get<ListItem[]>(`${this.apiUrl}/type/${listTypeId}`);
     }
 
     /**
      * Obtiene un ítem por su identificador.
+     * El filtrado por empresa se maneja automáticamente por el interceptor.
      */
     getById(id: number): Observable<ListItem> {
         return this.http.get<ListItem>(`${this.apiUrl}/${id}`);

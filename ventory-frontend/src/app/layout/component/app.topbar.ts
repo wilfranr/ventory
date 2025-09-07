@@ -9,6 +9,7 @@ import { AuthService } from '../../services/auth.service';
 import { SessionService } from '../../services/session.service';
 import { CompanyContextService } from '../../services/company-context.service';
 import { CompanyService } from '../../services/company.service';
+import { take } from 'rxjs/operators';
 
 @Component({
     selector: 'app-topbar',
@@ -112,24 +113,42 @@ export class AppTopbar implements OnInit {
     ngOnInit() {
         this.isSuperAdmin = this.auth.hasRole('superadmin');
 
+        // Suscribirse a los datos de la sesión del usuario
         this.session.companyName$.subscribe(name => {
             this.companyName = name;
         });
-        this.session.logoUrl$.subscribe(url => {
-            this.logoUrl = url;
-        });
 
         if (this.isSuperAdmin) {
+            // Para superadmin, manejar el logo basado en la empresa activa
             this.companyContext.activeCompanyId$.subscribe(companyId => {
                 if (companyId) {
                     this.companyService.getSettings(companyId).subscribe(settings => {
                         this.activeCompanyName = settings.name;
+                        // Actualizar el logo de la empresa activa
+                        this.logoUrl = settings.logo || null;
                     });
                 } else {
                     this.activeCompanyName = null;
+                    // Restaurar el logo original del usuario cuando no hay empresa seleccionada
+                    this.session.logoUrl$.pipe(take(1)).subscribe(url => {
+                        this.logoUrl = url;
+                    });
                 }
             });
+        } else {
+            // Para usuarios normales, usar el logo de su empresa
+            this.session.logoUrl$.subscribe(url => {
+                this.logoUrl = url;
+            });
         }
+
+        // También escuchar cambios en la sesión para actualizar el logo cuando se actualiza la empresa
+        this.session.logoUrl$.subscribe(url => {
+            // Solo actualizar si no es superadmin o si no hay empresa activa seleccionada
+            if (!this.isSuperAdmin || !this.companyContext.getActiveCompanyId()) {
+                this.logoUrl = url;
+            }
+        });
 
         this.userName = localStorage.getItem('userName');
 

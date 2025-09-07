@@ -9,9 +9,13 @@ import { CurrentUser } from "src/auth/current-user.decorator";
 import { AuthUser } from "./interfaces/auth-user.interface";
 import { ApiTags, ApiBearerAuth, ApiOperation } from "@nestjs/swagger";
 import { ActiveCompanyId } from "src/common/decorators/active-company-id.decorator";
+import { ActiveCompany } from "../common/decorators/active-company.decorator";
+import { CompanyAccessGuard } from "../common/guards/company-access.guard";
+import { UseGuards } from "@nestjs/common";
 
 @ApiTags("Usuarios")
 @ApiBearerAuth()
+@UseGuards(CompanyAccessGuard)
 @Controller("users")
   /**
    * Endpoints relacionados con los usuarios.
@@ -34,8 +38,12 @@ export class UsersController {
    * Actualiza los datos de un usuario.
    */
   @Put(":id")
-  update(@Param("id") id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.updateUser(id, updateUserDto);
+  update(
+    @Param("id") id: string, 
+    @Body() updateUserDto: UpdateUserDto,
+    @ActiveCompany() companyId: string,
+  ) {
+    return this.usersService.updateUser(id, updateUserDto, companyId);
   }
 
   @Permissions("ver_usuarios") // o un permiso especial si quieres que sea solo para admins

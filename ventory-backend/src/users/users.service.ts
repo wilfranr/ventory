@@ -81,8 +81,18 @@ export class UsersService {
 
   /**
    * Actualiza la información de un usuario existente.
+   * Valida que el usuario pertenezca a la empresa del usuario autenticado.
    */
-  async updateUser(id: string, data: UpdateUserDto) {
+  async updateUser(id: string, data: UpdateUserDto, companyId: string) {
+    // Verificar que el usuario pertenece a la empresa
+    const user = await this.prisma.user.findFirst({
+      where: { id, companyId },
+    });
+
+    if (!user) {
+      throw new BadRequestException("Usuario no encontrado o no pertenece a tu empresa.");
+    }
+
     const updateData: Prisma.UserUpdateInput = {
       name: data.name,
       email: data.email,
@@ -90,12 +100,15 @@ export class UsersService {
     };
 
     if (data.role) {
-      const role = await this.prisma.role.findUnique({
-        where: { id: data.role }, // Buscar por ID
+      const role = await this.prisma.role.findFirst({
+        where: { 
+          id: data.role,
+          companyId // ✅ Verificar que el rol pertenece a la misma empresa
+        },
       });
 
       if (!role) {
-        throw new BadRequestException("El rol proporcionado no existe.");
+        throw new BadRequestException("El rol proporcionado no existe o no pertenece a tu empresa.");
       }
 
       updateData.role = {
@@ -104,7 +117,7 @@ export class UsersService {
     }
 
     return this.prisma.user.update({
-      where: { id: id }, // Usar el ID directamente
+      where: { id: id },
       data: updateData,
     });
   }

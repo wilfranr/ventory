@@ -8,7 +8,7 @@ import { RegistrationTokenModule } from "./registration-token/registration-token
 import { RolesController } from "./roles/roles.controller";
 import { RolesModule } from "./roles/roles.module";
 import { PermissionsModule } from "./permissions/permissions.module";
-import { APP_GUARD } from "@nestjs/core";
+import { APP_GUARD, APP_INTERCEPTOR } from "@nestjs/core";
 import { PermissionsGuard } from "./permissions/permissions.guard";
 import { JwtAuthGuard } from "./auth/jwt-auth.guard";
 import { ListItemModule } from "./list-item/list-item.module";
@@ -19,6 +19,7 @@ import { GeonamesModule } from './geonames/geonames.module';
 import { ConfigModule } from '@nestjs/config';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { CompanyFilterInterceptor } from './common/interceptors/company-filter.interceptor';
 
 @Module({
   imports: [
@@ -47,6 +48,10 @@ import { join } from 'path';
     {
       provide: APP_GUARD,
       useClass: PermissionsGuard,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: CompanyFilterInterceptor,
     },
     CompanyService,
   ],

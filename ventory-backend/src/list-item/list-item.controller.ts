@@ -17,8 +17,10 @@ import { CreateListItemDto } from "./dto/create-list-item.dto";
 import { UpdateListItemDto } from "./dto/update-list-item.dto";
 import { CurrentUser } from "src/auth/current-user.decorator";
 import { AuthGuard } from "@nestjs/passport";
+import { ActiveCompany } from "../common/decorators/active-company.decorator";
+import { CompanyAccessGuard } from "../common/guards/company-access.guard";
 
-@UseGuards(AuthGuard("jwt"))
+@UseGuards(AuthGuard("jwt"), CompanyAccessGuard)
 @Controller("list-items")
 /**
  * Controlador encargado de exponer las rutas HTTP relacionadas
@@ -61,16 +63,22 @@ export class ListItemController {
   /**
    * Devuelve los elementos activos pertenecientes a un tipo de lista.
    */
-  fuindByType(@Param("listTypeId") listTypeId: string) {
-    return this.listItemService.findByTypeId(listTypeId);
+  findByType(
+    @Param("listTypeId") listTypeId: string,
+    @ActiveCompany() companyId: string,
+  ) {
+    return this.listItemService.findByTypeId(listTypeId, companyId);
   }
 
   @Get(":id")
   /**
    * Busca un elemento concreto por su identificador.
    */
-  findOne(@Param("id") id: string) {
-    return this.listItemService.findOne(id);
+  findOne(
+    @Param("id") id: string,
+    @ActiveCompany() companyId: string,
+  ) {
+    return this.listItemService.findOne(id, companyId);
   }
 
   @Patch(":id")
@@ -80,8 +88,9 @@ export class ListItemController {
   update(
     @Param("id") id: string,
     @Body() updateListItemDto: UpdateListItemDto,
+    @ActiveCompany() companyId: string,
   ) {
-    return this.listItemService.update(id, updateListItemDto);
+    return this.listItemService.update(id, updateListItemDto, companyId);
   }
 
   @Delete(":id")
@@ -89,15 +98,21 @@ export class ListItemController {
    * Marca un elemento de lista como inactivo en lugar de eliminarlo
    * definitivamente de la base de datos.
    */
-  remove(@Param("id") id: string) {
-    return this.listItemService.remove(id);
+  remove(
+    @Param("id") id: string,
+    @ActiveCompany() companyId: string,
+  ) {
+    return this.listItemService.remove(id, companyId);
   }
 
   @Patch(":id/restore")
   /**
    * Restaura un elemento de lista previamente eliminado.
    */
-  restore(@Param("id") id: string) {
-    return this.listItemService.restore(id);
+  restore(
+    @Param("id") id: string,
+    @ActiveCompany() companyId: string,
+  ) {
+    return this.listItemService.restore(id, companyId);
   }
 }

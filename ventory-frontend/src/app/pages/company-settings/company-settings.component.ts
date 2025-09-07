@@ -11,6 +11,7 @@ import { MessageService } from 'primeng/api';
 import { CompanyService, CompanySettings } from '../../services/company.service';
 import { AuthService } from '../../services/auth.service';
 import { SessionService } from '../../services/session.service';
+import { CompanyContextService } from '../../services/company-context.service';
 
 @Component({
     selector: 'app-company-settings',
@@ -26,6 +27,7 @@ export class CompanySettingsComponent implements OnInit {
     private messageService = inject(MessageService);
     private auth = inject(AuthService);
     private session = inject(SessionService);
+    private companyContext = inject(CompanyContextService);
 
     form = this.fb.group({
         name: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
@@ -58,13 +60,16 @@ export class CompanySettingsComponent implements OnInit {
         if (this.readonlyMode) {
             this.form.disable();
         }
-        const companyId = this.session.companyId;
+        const activeCompanyId = this.companyContext.getActiveCompanyId();
+        const companyId = activeCompanyId || this.session.companyId;
         if (companyId) {
             this.companyService.getSettings(companyId).subscribe({
                 next: (data) => {
                     this.form.patchValue(data);
                     if (data.logo) {
                         this.logoPreview = data.logo;
+                        // Actualizar la sesión con el logo actual de la empresa
+                        this.session.updateCompany(data.name, data.logo);
                     }
                 },
                 error: () =>
@@ -102,7 +107,8 @@ export class CompanySettingsComponent implements OnInit {
             console.log('Save method returned early due to invalid form or readonly mode.');
             return;
         }
-        const companyId = this.session.companyId;
+        const activeCompanyId = this.companyContext.getActiveCompanyId();
+        const companyId = activeCompanyId || this.session.companyId;
         console.log('Company ID:', companyId);
         if (!companyId) {
             console.error('Company ID is missing. Cannot save.');

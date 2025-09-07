@@ -16,8 +16,10 @@ import { CreateListTypeDto } from "./dto/create-list-type.dto";
 import { UpdateListTypeDto } from "./dto/update-list-type.dto";
 import { CurrentUser } from "src/auth/current-user.decorator";
 import { AuthGuard } from "@nestjs/passport";
+import { ActiveCompany } from "../common/decorators/active-company.decorator";
+import { CompanyAccessGuard } from "../common/guards/company-access.guard";
 
-@UseGuards(AuthGuard("jwt"))
+@UseGuards(AuthGuard("jwt"), CompanyAccessGuard)
 @Controller("list-type")
   /**
    * Controlador con las operaciones CRUD de tipos de lista.
@@ -56,15 +58,19 @@ export class ListTypeController {
   update(
     @Param("id") id: string,
     @Body() updateListTypeDto: UpdateListTypeDto,
+    @ActiveCompany() companyId: string,
   ) {
-    return this.listTypeService.update(id, updateListTypeDto);
+    return this.listTypeService.update(id, updateListTypeDto, companyId);
   }
 
   /**
    * Elimina un tipo de lista.
    */
   @Delete(":id")
-  remove(@Param("id") id: string) {
-    return this.listTypeService.remove(id);
+  remove(
+    @Param("id") id: string,
+    @ActiveCompany() companyId: string,
+  ) {
+    return this.listTypeService.remove(id, companyId);
   }
 }
