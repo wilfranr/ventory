@@ -1,0 +1,120 @@
+name: "Reporte de Bug"
+description: "Informa un comportamiento inesperado o un error."
+title: "[BUG] Descripción breve del problema"
+labels:
+  - bug
+  - needs-triage
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Gracias por tomarte el tiempo de reportar un bug. Por favor completa la información para ayudarnos a reproducir y solucionar el problema más rápido.
+  - type: checkboxes
+    id: confirmaciones
+    attributes:
+      label: Confirmaciones
+      description: Marca las opciones que aplican antes de continuar.
+      options:
+        - label: He buscado en los issues abiertos y no encontré uno igual.
+          required: true
+        - label: Estoy usando la versión más reciente (o confirmo la versión en el campo correspondiente).
+          required: false
+  - type: input
+    id: version
+    attributes:
+      label: Versión / Commit
+      description: "Indica la versión, tag, commit SHA o rama donde ocurre el bug."
+      placeholder: "ej. v1.4.2, main @ a1b2c3d"
+    validations:
+      required: true
+  - type: dropdown
+    id: entorno
+    attributes:
+      label: Entorno
+      description: Selecciona el entorno donde lo observaste.
+      options:
+        - Producción
+        - Staging
+        - Desarrollo local
+        - Otro (describir abajo)
+    validations:
+      required: true
+  - type: textarea
+    id: descripcion
+    attributes:
+      label: Descripción del bug
+      description: "Explica claramente qué sucede y qué esperabas que sucediera."
+      placeholder: "Al hacer X esperaba Y, pero en su lugar sucede Z..."
+    validations:
+      required: true
+  - type: textarea
+    id: pasos
+    attributes:
+      label: Pasos para reproducir
+      description: Lista los pasos numerados para reproducir el problema.
+      placeholder: |
+        1. Ir a '...'
+        2. Hacer clic en '...'
+        3. Desplazarse hasta '...'
+        4. Se observa el error '...'
+    validations:
+      required: true
+  - type: textarea
+    id: comportamiento_esperado
+    attributes:
+      label: Comportamiento esperado
+      description: "¿Qué debería ocurrir en su lugar?"
+      placeholder: "Debería ..."
+    validations:
+      required: true
+  - type: textarea
+    id: evidencias
+    attributes:
+      label: "Evidencias (logs, capturas, videos)"
+      description: "Adjunta o pega logs relevantes (en bloque de código), imágenes o GIFs."
+      placeholder: |
+        Logs:
+        ```
+        Pega aquí trazas o logs
+        ```
+  - type: textarea
+    id: contexto
+    attributes:
+      label: Contexto adicional
+      description: "Cualquier otra información: configuración, dependencias, cambios recientes, etc."
+  - type: textarea
+    id: posibles_soluciones
+    attributes:
+      label: "Posibles soluciones / Hipótesis"
+      description: "Comparte ideas sobre dónde podría estar el problema."
+  - type: checkboxes
+    id: impacto
+    attributes:
+      label: Impacto
+      description: "¿Cómo impacta este bug?"
+      options:
+        - label: Bloquea funcionalidad crítica
+        - label: Degrada la experiencia de usuario
+        - label: Problema menor / cosmético
+  - type: input
+    id: sistema
+    attributes:
+      label: Sistema operativo / Plataforma
+      description: "Si aplica (cliente, servidor, navegador, OS)."
+      placeholder: "ej. Ubuntu 22.04, Node 20.x, Chrome 128, Android 14"
+  - type: input
+    id: reproducibilidad
+    attributes:
+      label: Frecuencia / Reproducibilidad
+      description: "Siempre, intermitente (%), sólo una vez, etc."
+      placeholder: "Siempre / 3 de 5 intentos / 1 vez"
+  - type: textarea
+    id: relacionados
+    attributes:
+      label: "Issues / PRs relacionados"
+      description: "Menciona con # los issues o PRs que se relacionan."
+  - type: markdown
+    attributes:
+      value: |
+        ¡Gracias! Un mantenedor revisará este reporte pronto.
