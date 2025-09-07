@@ -16,6 +16,7 @@ import { ListTypeModule } from './list-type/list-type.module';
 import { CompanyService } from './company/company/company.service';
 import { CompanyController } from './company/company/company.controller';
 import { GeonamesModule } from './geonames/geonames.module';
+import { ThirdPartiesModule } from './third-parties/third-parties.module';
 import { ConfigModule } from '@nestjs/config';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
@@ -37,6 +38,7 @@ import { CompanyFilterInterceptor } from './common/interceptors/company-filter.i
     ListItemModule,
     ListTypeModule,
     GeonamesModule,
+    ThirdPartiesModule,
   ],
   controllers: [AppController, RolesController, CompanyController],
   providers: [

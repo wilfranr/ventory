@@ -12,6 +12,10 @@ export default [
     {
         path: 'listas',
         loadChildren: () => import('./lists/lists.routes').then((m) => m.listsRoutes)
+    },
+    {
+        path: 'terceros',
+        loadChildren: () => import('./third-parties/third-parties.routes').then((m) => m.thirdPartiesRoutes)
     }
     //{ path: '**', redirectTo: '/notfound' }
 ] as Routes;

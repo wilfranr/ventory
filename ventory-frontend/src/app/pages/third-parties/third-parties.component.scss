@@ -1,0 +1,161 @@
+.card {
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background: var(--surface-card);
+}
+
+.flex {
+  display: flex;
+}
+
+.justify-content-between {
+  justify-content: space-between;
+}
+
+.align-items-center {
+  align-items: center;
+}
+
+.gap-1 {
+  gap: 0.25rem;
+}
+
+.gap-2 {
+  gap: 0.5rem;
+}
+
+.mb-4 {
+  margin-bottom: 1rem;
+}
+
+.field {
+  margin-bottom: 1rem;
+}
+
+.field label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+.p-datatable-sm {
+  font-size: 0.875rem;
+}
+
+.p-datatable-sm .p-datatable-tbody > tr > td {
+  padding: 0.5rem;
+}
+
+.p-datatable-sm .p-datatable-thead > tr > th {
+  padding: 0.75rem 0.5rem;
+  font-weight: 600;
+  background: var(--surface-100);
+  color: var(--text-color);
+}
+
+.p-tag {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+}
+
+.p-button.p-button-sm {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+}
+
+.p-dialog .p-dialog-content {
+  padding: 1.5rem;
+}
+
+.p-dialog .p-dialog-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--surface-border);
+}
+
+.p-inputtext,
+.p-inputnumber {
+  width: 100%;
+}
+
+.p-inputnumber .p-inputnumber-input {
+  width: 100%;
+}
+
+.p-tabview .p-tabview-nav {
+  border-bottom: 1px solid var(--surface-border);
+}
+
+.p-tabview .p-tabview-nav li .p-tabview-nav-link {
+  padding: 1rem 1.5rem;
+  font-weight: 500;
+}
+
+.p-tabview .p-tabview-panels {
+  padding: 1.5rem 0;
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .card {
+    padding: 1rem;
+  }
+  
+  .flex.justify-content-between {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .flex.gap-2 {
+    flex-wrap: wrap;
+  }
+  
+  .p-datatable-sm .p-datatable-thead > tr > th,
+  .p-datatable-sm .p-datatable-tbody > tr > td {
+    padding: 0.375rem 0.25rem;
+    font-size: 0.8rem;
+  }
+  
+  .p-dialog {
+    width: 95vw !important;
+    max-width: 500px;
+  }
+}
+
+// Dark theme support
+@media (prefers-color-scheme: dark) {
+  .card {
+    background: var(--surface-card);
+    border: 1px solid var(--surface-border);
+  }
+  
+  .p-datatable-sm .p-datatable-thead > tr > th {
+    background: var(--surface-100);
+    color: var(--text-color);
+  }
+}
+
+// Custom scrollbar for tables
+.p-datatable .p-datatable-scrollable-body {
+  scrollbar-width: thin;
+  scrollbar-color: var(--surface-300) var(--surface-100);
+}
+
+.p-datatable .p-datatable-scrollable-body::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.p-datatable .p-datatable-scrollable-body::-webkit-scrollbar-track {
+  background: var(--surface-100);
+}
+
+.p-datatable .p-datatable-scrollable-body::-webkit-scrollbar-thumb {
+  background: var(--surface-300);
+  border-radius: 3px;
+}
+
+.p-datatable .p-datatable-scrollable-body::-webkit-scrollbar-thumb:hover {
+  background: var(--surface-400);
+}

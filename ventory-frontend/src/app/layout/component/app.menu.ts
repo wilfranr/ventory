@@ -43,9 +43,10 @@ export class AppMenu {
                     //{ label: 'Timeline', icon: 'pi pi-fw pi-calendar', routerLink: ['/uikit/timeline'] },
                     //{ label: 'Misc', icon: 'pi pi-fw pi-circle', routerLink: ['/uikit/misc'] },
                     { label: 'Listas', icon: 'pi pi-fw pi-list', routerLink: ['pages/listas'] },
-                    { label: 'Usuarios', icon: 'pi pi-fw pi-users', routerLink: ['/users'] },
+                    { label: 'Terceros', icon: 'pi pi-fw pi-users', routerLink: ['pages/terceros'] },
+                    { label: 'Usuarios', icon: 'pi pi-fw pi-user', routerLink: ['/users'] },
                     { label: 'Roles', icon: 'pi pi-fw pi-shield', routerLink: ['/roles'] },
-                    { label: 'Empresa', icon: 'pi pi-fw pi-shield', routerLink: ['/company-settings'] }
+                    { label: 'Empresa', icon: 'pi pi-fw pi-building', routerLink: ['/company-settings'] }
                 ]
             },
             {

@@ -56,6 +56,9 @@ model Company {
   registrationTokens RegistrationToken[] // tokens de registro de usuarios
   listItems          ListItem[]          // relación con ListItem
   listTypes          ListType[]          // relación con ListType
+  thirdParties       ThirdParty[]        // terceros asociados a esta empresa
+  clients            Client[]            // clientes asociados a esta empresa
+  providers          Provider[]          // proveedores asociados a esta empresa
   createdAt          DateTime            @default(now()) // fecha de creación
 }
 
@@ -122,4 +125,66 @@ model ListType {
   updatedAt   DateTime   @updatedAt // fecha de actualización
 
   @@index([companyId])
+}
+
+// Modelo central con datos compartidos
+model ThirdParty {
+  id        String   @id @default(cuid())
+  name      String
+  nit       String   // Documento de identificación
+  address   String?
+  phones    String?
+  email     String?  @unique
+  website   String?
+
+  // Relación con la empresa (Multi-tenant)
+  companyId String
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  // Relaciones de Rol (Opcionales, One-to-One)
+  client   Client?
+  provider Provider?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([nit, companyId]) // El NIT debe ser único por empresa
+  @@map("third_parties")
+}
+
+// Rol: Cliente
+model Client {
+  id           String    @id @default(cuid())
+  creditLimit  Float     @default(0)
+  // Campos futuros: contactPerson, salesAgentId, etc.
+
+  // Relación One-to-One con ThirdParty
+  thirdPartyId String      @unique
+  thirdParty   ThirdParty  @relation(fields: [thirdPartyId], references: [id], onDelete: Cascade)
+
+  // Redundancia controlada para queries directas
+  companyId    String
+  company      Company     @relation(fields: [companyId], references: [id], onDelete: NoAction)
+
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+}
+
+// Rol: Proveedor
+model Provider {
+  id             String    @id @default(cuid())
+  paymentTerms   String?   // Ej: "Net 30", "Net 60"
+  bankAccount    String?
+  // Campos futuros: contactPerson, rating, etc.
+
+  // Relación One-to-One con ThirdParty
+  thirdPartyId   String      @unique
+  thirdParty     ThirdParty  @relation(fields: [thirdPartyId], references: [id], onDelete: Cascade)
+  
+  // Redundancia controlada para queries directas
+  companyId      String
+  company        Company     @relation(fields: [companyId], references: [id], onDelete: NoAction)
+
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
 }

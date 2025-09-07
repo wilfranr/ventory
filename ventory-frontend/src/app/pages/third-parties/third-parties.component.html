@@ -1,0 +1,497 @@
+<div class="card">
+  <div class="flex justify-content-between align-items-center mb-4">
+    <h2>Gestión de Terceros</h2>
+    <div class="flex gap-2">
+      <p-button 
+        label="Nuevo Cliente" 
+        icon="pi pi-user-plus" 
+        severity="success"
+        (onClick)="showAddClientDialog()">
+      </p-button>
+      <p-button 
+        label="Nuevo Proveedor" 
+        icon="pi pi-building" 
+        severity="help"
+        (onClick)="showAddProviderDialog()">
+      </p-button>
+      <p-button 
+        label="Nuevo Tercero" 
+        icon="pi pi-plus" 
+        (onClick)="showAddDialog()">
+      </p-button>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <p-tabView (onChange)="onTabChange($event)">
+    <p-tabPanel header="Todos">
+      <p-table 
+        [value]="getCurrentData()" 
+        [paginator]="true" 
+        [rows]="10"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
+        [rowsPerPageOptions]="[10, 25, 50]"
+        styleClass="p-datatable-sm">
+        
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Nombre</th>
+            <th>NIT</th>
+            <th>Email</th>
+            <th>Teléfonos</th>
+            <th>Rol</th>
+            <th>Límite Crédito</th>
+            <th>Términos Pago</th>
+            <th>Acciones</th>
+          </tr>
+        </ng-template>
+        
+        <ng-template pTemplate="body" let-thirdParty>
+          <tr>
+            <td>{{ thirdParty.name }}</td>
+            <td>{{ thirdParty.nit }}</td>
+            <td>{{ thirdParty.email || '-' }}</td>
+            <td>{{ thirdParty.phones || '-' }}</td>
+            <td>
+              <p-tag 
+                [value]="getRoleTag(thirdParty).label" 
+                [severity]="getRoleTag(thirdParty).severity">
+              </p-tag>
+            </td>
+            <td>{{ getCreditLimit(thirdParty) | currency:'COP':'symbol':'1.0-0' }}</td>
+            <td>{{ getPaymentTerms(thirdParty) }}</td>
+            <td>
+              <div class="flex gap-1">
+                <p-button 
+                  icon="pi pi-pencil" 
+                  size="small" 
+                  severity="info"
+                  [text]="true"
+                  (onClick)="showEditDialog(thirdParty)"
+                  pTooltip="Editar">
+                </p-button>
+                <p-button 
+                  icon="pi pi-trash" 
+                  size="small" 
+                  severity="danger"
+                  [text]="true"
+                  (onClick)="confirmDelete(thirdParty)"
+                  pTooltip="Eliminar">
+                </p-button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </p-tabPanel>
+
+    <p-tabPanel header="Clientes">
+      <p-table 
+        [value]="clients" 
+        [paginator]="true" 
+        [rows]="10"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
+        [rowsPerPageOptions]="[10, 25, 50]"
+        styleClass="p-datatable-sm">
+        
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Nombre</th>
+            <th>NIT</th>
+            <th>Email</th>
+            <th>Teléfonos</th>
+            <th>Límite Crédito</th>
+            <th>Acciones</th>
+          </tr>
+        </ng-template>
+        
+        <ng-template pTemplate="body" let-client>
+          <tr>
+            <td>{{ client.thirdParty?.name }}</td>
+            <td>{{ client.thirdParty?.nit }}</td>
+            <td>{{ client.thirdParty?.email || '-' }}</td>
+            <td>{{ client.thirdParty?.phones || '-' }}</td>
+            <td>{{ client.creditLimit | currency:'COP':'symbol':'1.0-0' }}</td>
+            <td>
+              <div class="flex gap-1">
+                <p-button 
+                  icon="pi pi-pencil" 
+                  size="small" 
+                  severity="info"
+                  [text]="true"
+                  (onClick)="showEditDialog(client.thirdParty!)"
+                  pTooltip="Editar">
+                </p-button>
+                <p-button 
+                  icon="pi pi-trash" 
+                  size="small" 
+                  severity="danger"
+                  [text]="true"
+                  (onClick)="confirmDelete(client.thirdParty!)"
+                  pTooltip="Eliminar">
+                </p-button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </p-tabPanel>
+
+    <p-tabPanel header="Proveedores">
+      <p-table 
+        [value]="providers" 
+        [paginator]="true" 
+        [rows]="10"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
+        [rowsPerPageOptions]="[10, 25, 50]"
+        styleClass="p-datatable-sm">
+        
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Nombre</th>
+            <th>NIT</th>
+            <th>Email</th>
+            <th>Teléfonos</th>
+            <th>Términos Pago</th>
+            <th>Cuenta Bancaria</th>
+            <th>Acciones</th>
+          </tr>
+        </ng-template>
+        
+        <ng-template pTemplate="body" let-provider>
+          <tr>
+            <td>{{ provider.thirdParty?.name }}</td>
+            <td>{{ provider.thirdParty?.nit }}</td>
+            <td>{{ provider.thirdParty?.email || '-' }}</td>
+            <td>{{ provider.thirdParty?.phones || '-' }}</td>
+            <td>{{ provider.paymentTerms || '-' }}</td>
+            <td>{{ provider.bankAccount || '-' }}</td>
+            <td>
+              <div class="flex gap-1">
+                <p-button 
+                  icon="pi pi-pencil" 
+                  size="small" 
+                  severity="info"
+                  [text]="true"
+                  (onClick)="showEditDialog(provider.thirdParty!)"
+                  pTooltip="Editar">
+                </p-button>
+                <p-button 
+                  icon="pi pi-trash" 
+                  size="small" 
+                  severity="danger"
+                  [text]="true"
+                  (onClick)="confirmDelete(provider.thirdParty!)"
+                  pTooltip="Eliminar">
+                </p-button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </p-tabPanel>
+  </p-tabView>
+</div>
+
+<!-- Dialog para crear/editar tercero general -->
+<p-dialog 
+  header="{{ isEditMode ? 'Editar Tercero' : 'Nuevo Tercero' }}" 
+  [(visible)]="displayDialog" 
+  [modal]="true" 
+  [style]="{ width: '500px' }"
+  [closable]="true">
+  
+  <div class="p-fluid">
+    <div class="field">
+      <label for="name">Nombre *</label>
+      <input 
+        id="name" 
+        type="text" 
+        pInputText 
+        [(ngModel)]="formData.name" 
+        placeholder="Nombre del tercero"
+        required>
+    </div>
+    
+    <div class="field">
+      <label for="nit">NIT *</label>
+      <input 
+        id="nit" 
+        type="text" 
+        pInputText 
+        [(ngModel)]="formData.nit" 
+        placeholder="Número de identificación tributaria"
+        required>
+    </div>
+    
+    <div class="field">
+      <label for="email">Email</label>
+      <input 
+        id="email" 
+        type="email" 
+        pInputText 
+        [(ngModel)]="formData.email" 
+        placeholder="correo@ejemplo.com">
+    </div>
+    
+    <div class="field">
+      <label for="phones">Teléfonos</label>
+      <input 
+        id="phones" 
+        type="text" 
+        pInputText 
+        [(ngModel)]="formData.phones" 
+        placeholder="Teléfonos de contacto">
+    </div>
+    
+    <div class="field">
+      <label for="address">Dirección</label>
+      <input 
+        id="address" 
+        type="text" 
+        pInputText 
+        [(ngModel)]="formData.address" 
+        placeholder="Dirección física">
+    </div>
+    
+    <div class="field">
+      <label for="website">Sitio Web</label>
+      <input 
+        id="website" 
+        type="url" 
+        pInputText 
+        [(ngModel)]="formData.website" 
+        placeholder="https://ejemplo.com">
+    </div>
+  </div>
+  
+  <ng-template pTemplate="footer">
+    <p-button 
+      label="Cancelar" 
+      icon="pi pi-times" 
+      [text]="true" 
+      (onClick)="displayDialog = false">
+    </p-button>
+    <p-button 
+      label="{{ isEditMode ? 'Actualizar' : 'Crear' }}" 
+      icon="pi pi-check" 
+      (onClick)="saveThirdParty()">
+    </p-button>
+  </ng-template>
+</p-dialog>
+
+<!-- Dialog para crear cliente -->
+<p-dialog 
+  header="Nuevo Cliente" 
+  [(visible)]="displayClientDialog" 
+  [modal]="true" 
+  [style]="{ width: '500px' }"
+  [closable]="true">
+  
+  <div class="p-fluid">
+    <div class="field">
+      <label for="clientName">Nombre *</label>
+      <input 
+        id="clientName" 
+        type="text" 
+        pInputText 
+        [(ngModel)]="formData.name" 
+        placeholder="Nombre del cliente"
+        required>
+    </div>
+    
+    <div class="field">
+      <label for="clientNit">NIT *</label>
+      <input 
+        id="clientNit" 
+        type="text" 
+        pInputText 
+        [(ngModel)]="formData.nit" 
+        placeholder="Número de identificación tributaria"
+        required>
+    </div>
+    
+    <div class="field">
+      <label for="clientEmail">Email</label>
+      <input 
+        id="clientEmail" 
+        type="email" 
+        pInputText 
+        [(ngModel)]="formData.email" 
+        placeholder="correo@ejemplo.com">
+    </div>
+    
+    <div class="field">
+      <label for="clientPhones">Teléfonos</label>
+      <input 
+        id="clientPhones" 
+        type="text" 
+        pInputText 
+        [(ngModel)]="formData.phones" 
+        placeholder="Teléfonos de contacto">
+    </div>
+    
+    <div class="field">
+      <label for="clientAddress">Dirección</label>
+      <input 
+        id="clientAddress" 
+        type="text" 
+        pInputText 
+        [(ngModel)]="formData.address" 
+        placeholder="Dirección física">
+    </div>
+    
+    <div class="field">
+      <label for="clientWebsite">Sitio Web</label>
+      <input 
+        id="clientWebsite" 
+        type="url" 
+        pInputText 
+        [(ngModel)]="formData.website" 
+        placeholder="https://ejemplo.com">
+    </div>
+    
+    <div class="field">
+      <label for="creditLimit">Límite de Crédito</label>
+      <p-inputNumber 
+        id="creditLimit"
+        [(ngModel)]="formData.creditLimit" 
+        mode="currency" 
+        currency="COP" 
+        locale="es-CO"
+        [min]="0"
+        placeholder="0">
+      </p-inputNumber>
+    </div>
+  </div>
+  
+  <ng-template pTemplate="footer">
+    <p-button 
+      label="Cancelar" 
+      icon="pi pi-times" 
+      [text]="true" 
+      (onClick)="displayClientDialog = false">
+    </p-button>
+    <p-button 
+      label="Crear Cliente" 
+      icon="pi pi-check" 
+      (onClick)="createClient()">
+    </p-button>
+  </ng-template>
+</p-dialog>
+
+<!-- Dialog para crear proveedor -->
+<p-dialog 
+  header="Nuevo Proveedor" 
+  [(visible)]="displayProviderDialog" 
+  [modal]="true" 
+  [style]="{ width: '500px' }"
+  [closable]="true">
+  
+  <div class="p-fluid">
+    <div class="field">
+      <label for="providerName">Nombre *</label>
+      <input 
+        id="providerName" 
+        type="text" 
+        pInputText 
+        [(ngModel)]="formData.name" 
+        placeholder="Nombre del proveedor"
+        required>
+    </div>
+    
+    <div class="field">
+      <label for="providerNit">NIT *</label>
+      <input 
+        id="providerNit" 
+        type="text" 
+        pInputText 
+        [(ngModel)]="formData.nit" 
+        placeholder="Número de identificación tributaria"
+        required>
+    </div>
+    
+    <div class="field">
+      <label for="providerEmail">Email</label>
+      <input 
+        id="providerEmail" 
+        type="email" 
+        pInputText 
+        [(ngModel)]="formData.email" 
+        placeholder="correo@ejemplo.com">
+    </div>
+    
+    <div class="field">
+      <label for="providerPhones">Teléfonos</label>
+      <input 
+        id="providerPhones" 
+        type="text" 
+        pInputText 
+        [(ngModel)]="formData.phones" 
+        placeholder="Teléfonos de contacto">
+    </div>
+    
+    <div class="field">
+      <label for="providerAddress">Dirección</label>
+      <input 
+        id="providerAddress" 
+        type="text" 
+        pInputText 
+        [(ngModel)]="formData.address" 
+        placeholder="Dirección física">
+    </div>
+    
+    <div class="field">
+      <label for="providerWebsite">Sitio Web</label>
+      <input 
+        id="providerWebsite" 
+        type="url" 
+        pInputText 
+        [(ngModel)]="formData.website" 
+        placeholder="https://ejemplo.com">
+    </div>
+    
+    <div class="field">
+      <label for="paymentTerms">Términos de Pago</label>
+      <input 
+        id="paymentTerms" 
+        type="text" 
+        pInputText 
+        [(ngModel)]="formData.paymentTerms" 
+        placeholder="Ej: Net 30, Net 60">
+    </div>
+    
+    <div class="field">
+      <label for="bankAccount">Cuenta Bancaria</label>
+      <input 
+        id="bankAccount" 
+        type="text" 
+        pInputText 
+        [(ngModel)]="formData.bankAccount" 
+        placeholder="Número de cuenta bancaria">
+    </div>
+  </div>
+  
+  <ng-template pTemplate="footer">
+    <p-button 
+      label="Cancelar" 
+      icon="pi pi-times" 
+      [text]="true" 
+      (onClick)="displayProviderDialog = false">
+    </p-button>
+    <p-button 
+      label="Crear Proveedor" 
+      icon="pi pi-check" 
+      (onClick)="createProvider()">
+    </p-button>
+  </ng-template>
+</p-dialog>
+
+<!-- Toast para mensajes -->
+<p-toast></p-toast>
+
+<!-- Dialog de confirmación -->
+<p-confirmDialog></p-confirmDialog>
