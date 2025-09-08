@@ -22,11 +22,17 @@
     .layout-topbar-logo {
         display: inline-flex;
         align-items: center;
+        height: 2.5rem;
         font-size: 1.5rem;
         border-radius: var(--content-border-radius);
         color: var(--text-color);
         font-weight: 500;
         gap: 0.5rem;
+
+        img {
+            max-height: 100%;
+            object-fit: contain;
+        }
 
         svg {
             width: 3rem;

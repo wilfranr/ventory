@@ -20,7 +20,7 @@ import { take } from 'rxjs/operators';
                 <i class="pi pi-bars"></i>
             </button>
             <a class="layout-topbar-logo" routerLink="/">
-                <img [src]="logoUrl || 'assets/images/Logo-ventory5.png'" alt="Ventory Logo" style="height: 70px;" />
+                <img [src]="logoUrl || 'assets/images/Logo-ventory5.png'" alt="Ventory Logo" />
                 <span *ngIf="!isSuperAdmin">{{ companyName || 'VENTORY' }}</span>
                 <span *ngIf="isSuperAdmin">{{ activeCompanyName || 'Seleccionar Empresa' }}</span>
             </a>
