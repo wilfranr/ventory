@@ -90,25 +90,25 @@ export class ListTypeComponent implements OnInit {
         const formValue = { ...this.listTypeForm.value };
         if (formValue.name) formValue.name = toTitleCase(formValue.name);
 
-        if (this.isEdit && this.selectedListType) {
-            this.listTypeService.update(this.selectedListType.id, this.listTypeForm.value).subscribe({
-                next: () => {
-                    this.messageService.add({ severity: 'success', summary: 'Actualizado', detail: 'Tipo de lista actualizado' });
-                    this.displayDialog = false;
-                    this.loadListTypes();
-                },
-                error: () => this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudo actualizar' })
-            });
-        } else {
-            this.listTypeService.create(this.listTypeForm.value).subscribe({
-                next: () => {
-                    this.messageService.add({ severity: 'success', summary: 'Creado', detail: 'Tipo de lista creado' });
-                    this.displayDialog = false;
-                    this.loadListTypes();
-                },
-                error: () => this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudo crear' })
-            });
-        }
+        const operation = (this.isEdit && this.selectedListType)
+            ? this.listTypeService.update(this.selectedListType.id, formValue)
+            : this.listTypeService.create(formValue);
+
+        const summary = this.isEdit ? 'Actualizado' : 'Creado';
+        const detail = `Tipo de lista ${summary.toLowerCase()}`;
+
+        operation.subscribe({
+            next: () => {
+                this.messageService.add({ severity: 'success', summary, detail });
+                this.displayDialog = false;
+                this.loadListTypes();
+                this.saved.emit();
+            },
+            error: (err) => {
+                const errorDetail = err.error?.message || `No se pudo ${summary.toLowerCase()}`;
+                this.messageService.add({ severity: 'error', summary: 'Error', detail: errorDetail });
+            }
+        });
     }
 
     /**
