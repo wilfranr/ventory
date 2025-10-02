@@ -196,6 +196,75 @@
         </div>
     </form>
 
+    <!-- Diálogo para crear/editar tipos de lista -->
+    <p-dialog 
+        header="{{ typeForm.get('id')?.value ? 'Editar' : 'Nuevo' }} Tipo de Lista" 
+        [(visible)]="typeDialogVisible" 
+        [modal]="true"
+        [style]="{ width: '450px' }"
+        [draggable]="false"
+        [resizable]="false"
+    >
+        <form [formGroup]="typeForm" (ngSubmit)="saveType()" class="p-fluid">
+            <div class="field">
+                <label for="name" class="block font-bold mb-2">Nombre *</label>
+                <input 
+                    id="name" 
+                    type="text" 
+                    pInputText 
+                    formControlName="name" 
+                    class="w-full" 
+                    autofocus
+                    [ngClass]="{ 'p-invalid': typeForm.get('name')?.invalid && typeForm.get('name')?.touched }"
+                />
+                <small *ngIf="typeForm.get('name')?.invalid && typeForm.get('name')?.touched" class="p-error">
+                    El nombre es requerido
+                </small>
+            </div>
+
+            <div class="field">
+                <label for="code" class="block font-bold mb-2">Código</label>
+                <input 
+                    id="code" 
+                    type="text" 
+                    pInputText 
+                    formControlName="code" 
+                    class="w-full"
+                />
+            </div>
+
+            <div class="field">
+                <label for="description" class="block font-bold mb-2">Descripción</label>
+                <textarea 
+                    id="description" 
+                    pInputTextarea 
+                    formControlName="description" 
+                    class="w-full"
+                    [rows]="3"
+                    [autoResize]="true"
+                ></textarea>
+            </div>
+
+            <div class="flex justify-content-end gap-2 mt-4">
+                <button 
+                    pButton 
+                    type="button" 
+                    label="Cancelar" 
+                    icon="pi pi-times" 
+                    class="p-button-text"
+                    (click)="typeDialogVisible = false"
+                ></button>
+                <button 
+                    pButton 
+                    type="submit" 
+                    label="Guardar" 
+                    icon="pi pi-check" 
+                    [disabled]="typeForm.invalid"
+                ></button>
+            </div>
+        </form>
+    </p-dialog>
+
     <!-- Pie del diálogo con los botones de acción -->
     <ng-template #footer>
         <div class="flex justify-end gap-2 w-full">

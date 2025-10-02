@@ -7,7 +7,7 @@ export interface ListItem {
     /** Identificador único del ítem */
     id: number;
     /** Identificador del tipo de lista al que pertenece */
-    listTypeId: number;
+    listTypeId: string;
     /** Nombre visible del ítem */
     name: string;
     /** Descripción opcional */

@@ -32,7 +32,7 @@ export class LayoutService {
     private companyThemeService = inject(CompanyThemeService);
     private sessionService = inject(SessionService);
     private companyContextService = inject(CompanyContextService);
-    
+
     // Contexto para distinguir entre cambios de usuario y cambios de empresa
     private isCompanyContext = signal<boolean>(false);
     private currentCompanyId = signal<string | null>(null);
@@ -109,18 +109,16 @@ export class LayoutService {
     constructor() {
         // 🧹 Limpiar estilos obsoletos del localStorage
         this.cleanupOldThemeData();
-        
+
         // 🎯 Carga inicial inmediata basada en SessionService
         this.loadCompanyTheme();
-        
+
         // 🎯 Suscribirse a cambios de empresa activa para recargas posteriores
-        this.companyContextService.activeCompanyId$.subscribe(companyId => {
+        this.companyContextService.activeCompanyId$.subscribe((companyId) => {
             if (companyId && !this.isFirstLoad) {
-                console.log('🔄 Empresa activa cambió, recargando estilos:', companyId);
                 this.loadCompanyTheme();
             } else if (!companyId && !this.isFirstLoad) {
                 // Solo usar fallback si NO es la primera carga y no hay empresa activa
-                console.log('⚠️ Empresa activa se perdió, usando estilos por defecto');
                 this.loadFallbackTheme();
             }
         });
@@ -150,27 +148,15 @@ export class LayoutService {
             // Priorizar empresa de la sesión sobre empresa activa para evitar conflictos
             const sessionCompanyId = this.sessionService.companyId;
             const activeCompanyId = this.companyContextService.getActiveCompanyId();
-            
+
             // Validar que el ID de la empresa sea válido
-            const companyId = (sessionCompanyId && sessionCompanyId.trim() !== '') 
-                ? sessionCompanyId.trim() 
-                : (activeCompanyId && activeCompanyId.trim() !== '' ? activeCompanyId.trim() : null);
-            
-            // Debug detallado para identificar el problema
-            console.log('🔍 Debug carga de estilos:', {
-                activeCompanyId,
-                sessionCompanyId,
-                selectedCompanyId: companyId,
-                sessionServiceExists: !!this.sessionService,
-                companyContextServiceExists: !!this.companyContextService
-            });
-            
+            const companyId = sessionCompanyId && sessionCompanyId.trim() !== '' ? sessionCompanyId.trim() : activeCompanyId && activeCompanyId.trim() !== '' ? activeCompanyId.trim() : null;
+
             if (companyId) {
                 this.companyThemeService.getThemeSettings(companyId).subscribe({
                     next: (theme) => {
                         // Solo mostrar éxito en la primera carga
                         if (this.isFirstLoad) {
-                            console.log('✅ Estilos cargados para empresa:', companyId, theme);
                             this.isFirstLoad = false;
                         }
                         this.applyCompanyTheme(theme);
@@ -205,12 +191,11 @@ export class LayoutService {
 
     private loadUserThemeMode() {
         const savedTheme = localStorage.getItem('theme-mode');
-        console.log('🌙 Cargando modo de tema desde localStorage:', savedTheme);
-        
+
         const isDarkMode = savedTheme === 'dark';
-        
+
         // Actualizar el estado del tema oscuro
-        this.layoutConfig.update(state => ({
+        this.layoutConfig.update((state) => ({
             ...state,
             darkTheme: isDarkMode
         }));
@@ -221,13 +206,9 @@ export class LayoutService {
         } else {
             document.documentElement.classList.remove('app-dark');
         }
-        
-        console.log('🌙 Modo de tema aplicado:', isDarkMode ? 'oscuro' : 'claro');
     }
 
     private applyCompanyTheme(theme: any) {
-        console.log('🎨 Aplicando estilos de empresa:', theme);
-        
         // Crear un nuevo objeto de configuración con los valores de la empresa
         const newConfig = {
             ...this.layoutConfig(),
@@ -238,20 +219,14 @@ export class LayoutService {
             // darkTheme se mantiene como está (no se sobrescribe)
         };
 
-        console.log('🎨 Nueva configuración aplicada:', newConfig);
         this.layoutConfig.set(newConfig);
     }
 
     private cleanupOldThemeData() {
         // 🧹 Limpiar estilos obsoletos del localStorage que pueden causar conflictos
-        const keysToRemove = [
-            'theme-preset',
-            'theme-primary', 
-            'theme-surface',
-            'theme-menu-mode'
-        ];
-        
-        keysToRemove.forEach(key => {
+        const keysToRemove = ['theme-preset', 'theme-primary', 'theme-surface', 'theme-menu-mode'];
+
+        keysToRemove.forEach((key) => {
             if (localStorage.getItem(key)) {
                 console.log('🧹 Limpiando estilo obsoleto:', key);
                 localStorage.removeItem(key);
@@ -264,16 +239,16 @@ export class LayoutService {
             // 🟢 Fallback: Solo cargar themeMode desde localStorage (preferencia personal)
             const savedTheme = localStorage.getItem('theme-mode');
             const isDarkMode = savedTheme === 'dark';
-            
+
             // Aplicar tema oscuro si está configurado
             if (isDarkMode) {
-                this.layoutConfig.update(state => ({ ...state, darkTheme: true }));
+                this.layoutConfig.update((state) => ({ ...state, darkTheme: true }));
                 document.documentElement.classList.add('app-dark');
             } else {
-                this.layoutConfig.update(state => ({ ...state, darkTheme: false }));
+                this.layoutConfig.update((state) => ({ ...state, darkTheme: false }));
                 document.documentElement.classList.remove('app-dark');
             }
-            
+
             // Aplicar colores por defecto
             const defaultConfig = {
                 preset: 'Aura',
@@ -281,19 +256,19 @@ export class LayoutService {
                 surface: null,
                 menuMode: 'static'
             };
-            
-            this.layoutConfig.update(state => ({
+
+            this.layoutConfig.update((state) => ({
                 ...state,
                 ...defaultConfig
             }));
-            
+
             console.log('✅ Tema por defecto cargado correctamente');
         } catch (error) {
             console.error('❌ Error al cargar el tema por defecto:', error);
-            
+
             // Asegurarse de que al menos el tema oscuro/claro esté configurado
             document.documentElement.classList.remove('app-dark');
-            this.layoutConfig.update(state => ({
+            this.layoutConfig.update((state) => ({
                 ...state,
                 darkTheme: false,
                 preset: 'Aura',
@@ -308,17 +283,16 @@ export class LayoutService {
         // Solo actualizar si hay un cambio real
         const isDark = config.darkTheme === true;
         const currentIsDark = document.documentElement.classList.contains('app-dark');
-        
+
         if (isDark !== currentIsDark) {
             if (isDark) {
                 document.documentElement.classList.add('app-dark');
             } else {
                 document.documentElement.classList.remove('app-dark');
             }
-            
+
             // Solo guardar si realmente hay un cambio
             localStorage.setItem('theme-mode', isDark ? 'dark' : 'light');
-            console.log('🌙 Tema actualizado a:', isDark ? 'oscuro' : 'claro');
         }
     }
     private startViewTransition(config: layoutConfig): void {
@@ -341,7 +315,7 @@ export class LayoutService {
         } else {
             document.documentElement.classList.remove('app-dark');
         }
-        
+
         // 🎨 themeMode es preferencia personal, se guarda solo en localStorage
         const themeMode = _config.darkTheme ? 'dark' : 'light';
         localStorage.setItem('theme-mode', themeMode);
@@ -396,7 +370,7 @@ export class LayoutService {
 
     setPreset(preset: string): void {
         this.layoutConfig.update((state) => ({ ...state, preset }));
-        
+
         // Solo guardar en empresa si estamos en contexto de empresa
         if (this.isCompanyContext()) {
             this.updateCompanyTheme({ themePreset: preset });
@@ -408,7 +382,7 @@ export class LayoutService {
 
     setPrimaryColor(color: string): void {
         this.layoutConfig.update((state) => ({ ...state, primary: color }));
-        
+
         // Solo guardar en empresa si estamos en contexto de empresa
         if (this.isCompanyContext()) {
             this.updateCompanyTheme({ themePrimary: color });
@@ -420,7 +394,7 @@ export class LayoutService {
 
     setSurfaceColor(color: string): void {
         this.layoutConfig.update((state) => ({ ...state, surface: color }));
-        
+
         // Solo guardar en empresa si estamos en contexto de empresa
         if (this.isCompanyContext()) {
             this.updateCompanyTheme({ themeSurface: color });
@@ -433,18 +407,18 @@ export class LayoutService {
     setThemeMode(mode: 'light' | 'dark'): void {
         const isDark = mode === 'dark';
         // Actualizar el estado de una sola vez
-        this.layoutConfig.update(state => ({
+        this.layoutConfig.update((state) => ({
             ...state,
             darkTheme: isDark
         }));
-        
+
         // El efecto reactivo se encargará de actualizar el DOM y localStorage
         console.log('🌙 Modo de tema establecido a:', mode);
     }
 
     setMenuMode(mode: 'static' | 'overlay'): void {
         this.layoutConfig.update((state) => ({ ...state, menuMode: mode }));
-        
+
         // Solo guardar en empresa si estamos en contexto de empresa
         if (this.isCompanyContext()) {
             this.updateCompanyTheme({ menuMode: mode });
@@ -459,7 +433,7 @@ export class LayoutService {
         if (companyId && this.isCompanyContext()) {
             const currentTheme = this.companyThemeService.getCurrentTheme();
             const updatedTheme = { ...currentTheme, ...themeUpdate };
-            
+
             this.companyThemeService.updateThemeSettings(companyId, updatedTheme).subscribe({
                 next: () => {
                     console.log('Estilos de empresa actualizados correctamente');

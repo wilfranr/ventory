@@ -14,6 +14,8 @@ export class ListTypeService {
    * Crea un nuevo tipo de lista asociado a la compañía.
    */
   create(data: CreateListTypeDto, companyId: string) {
+    console.log('ListTypeService.create - CompanyId:', companyId, 'Data:', data);
+    
     return this.prisma.listType.create({
       data: {
         ...data,
@@ -45,11 +47,26 @@ export class ListTypeService {
    * Actualiza la información de un tipo de lista.
    * Valida que pertenezca a la empresa del usuario.
    */
-  update(id: string, data: UpdateListTypeDto, companyId: string) {
-    return this.prisma.listType.updateMany({
+  async update(id: string, data: UpdateListTypeDto, companyId: string) {
+    console.log('ListTypeService.update - ID:', id, 'CompanyId:', companyId, 'Data:', data);
+    
+    // Primero verificar que el registro existe y pertenece a la empresa
+    const existingRecord = await this.prisma.listType.findFirst({
       where: { 
         id, 
-        companyId // ✅ Añadido filtro por empresa
+        companyId
+      },
+    });
+
+    if (!existingRecord) {
+      throw new Error(`Tipo de lista con ID ${id} no encontrado o no pertenece a la empresa ${companyId}`);
+    }
+
+    console.log('ListTypeService.update - Record found:', existingRecord);
+    
+    return this.prisma.listType.update({
+      where: { 
+        id
       },
       data,
     });
@@ -59,11 +76,26 @@ export class ListTypeService {
    * Elimina un tipo de lista de la base de datos.
    * Valida que pertenezca a la empresa del usuario.
    */
-  remove(id: string, companyId: string) {
-    return this.prisma.listType.deleteMany({
+  async remove(id: string, companyId: string) {
+    console.log('ListTypeService.remove - ID:', id, 'CompanyId:', companyId);
+    
+    // Primero verificar que el registro existe y pertenece a la empresa
+    const existingRecord = await this.prisma.listType.findFirst({
       where: { 
         id, 
-        companyId // ✅ Añadido filtro por empresa
+        companyId
+      },
+    });
+
+    if (!existingRecord) {
+      throw new Error(`Tipo de lista con ID ${id} no encontrado o no pertenece a la empresa ${companyId}`);
+    }
+
+    console.log('ListTypeService.remove - Record found:', existingRecord);
+    
+    return this.prisma.listType.delete({
+      where: { 
+        id
       },
     });
   }

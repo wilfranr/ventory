@@ -60,7 +60,9 @@ export class ListTypeController {
     @Body() updateListTypeDto: UpdateListTypeDto,
     @ActiveCompany() companyId: string,
   ) {
-    return this.listTypeService.update(id, updateListTypeDto, companyId);
+    // Asegurarse de que el ID del DTO coincida con el ID de la ruta
+    const updateData = { ...updateListTypeDto, id };
+    return this.listTypeService.update(id, updateData, companyId);
   }
 
   /**

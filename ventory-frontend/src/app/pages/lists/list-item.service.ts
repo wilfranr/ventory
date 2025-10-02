@@ -24,7 +24,7 @@ export class ListItemService {
      * @param active indica si se solicitan activos o eliminados
      * @param listTypeId opcional, filtra por un tipo de lista concreto
      */
-    getAll(active: string, listTypeId?: number): Observable<ListItem[]> {
+    getAll(active: string, listTypeId?: string): Observable<ListItem[]> {
         let url = `/api/list-items?active=${active}`;
         if (listTypeId !== undefined && listTypeId !== null) {
             url += `&listTypeId=${listTypeId}`;
@@ -37,7 +37,7 @@ export class ListItemService {
      * @param listTypeId identificador del tipo de lista
      * El filtrado por empresa se maneja automáticamente por el interceptor.
      */
-    getByTypeId(listTypeId: number): Observable<ListItem[]> {
+    getByTypeId(listTypeId: string): Observable<ListItem[]> {
         return this.http.get<ListItem[]>(`${this.apiUrl}/type/${listTypeId}`);
     }
 
