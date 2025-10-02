@@ -6,6 +6,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ToastModule } from 'primeng/toast';
 import { TabsModule } from 'primeng/tabs';
+import { ButtonModule } from 'primeng/button';
 import { ListItemService } from './list-item.service';
 import { SessionService } from '../../services/session.service';
 import { ConfirmationService, MessageService } from 'primeng/api';
@@ -13,7 +14,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 @Component({
     selector: 'app-list-page',
-    imports: [DropdownModule, ListItemComponent, CommonModule, FormsModule, ToastModule, TabsModule, ConfirmDialogModule],
+    imports: [DropdownModule, ListItemComponent, CommonModule, FormsModule, ToastModule, TabsModule, ButtonModule, ConfirmDialogModule],
     templateUrl: './list-page.component.html',
     styleUrl: './list-page.component.scss',
     standalone: true,
@@ -26,7 +27,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
  */
 export class ListPageComponent {
     listTypes: any[] = [];
-    selectedTypeId: number | null = null;
+    selectedTypeId: string | null = null;
     typeDialogVisible = false;
     selectedTabIndex = 0;
     showDelete = false;

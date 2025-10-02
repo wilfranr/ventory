@@ -38,7 +38,7 @@ import { TextareaModule } from 'primeng/textarea';
  */
 export class ListItemComponent implements OnInit {
     // Inputs reactivos del padre
-    readonly listTypeId = input<number | null>(null);
+    readonly listTypeId = input<string | null>(null);
     readonly showDelete = input<boolean>(false);
 
     listItems: ListItem[] = [];
@@ -70,6 +70,7 @@ export class ListItemComponent implements OnInit {
         });
 
         this.typeForm = this.fb.group({
+            id: [''],
             code: [''],
             name: ['', Validators.required],
             description: ['']
@@ -96,7 +97,7 @@ export class ListItemComponent implements OnInit {
     /**
      * Obtiene los valores de filtro según la pestaña seleccionada.
      */
-    private getFiltroActual(): { active: string; listTypeId?: number } {
+    private getFiltroActual(): { active: string; listTypeId?: string } {
         const eliminar = this.showDelete();
         const typeId = this.listTypeId();
         return {
@@ -108,7 +109,7 @@ export class ListItemComponent implements OnInit {
     /**
      * Consulta y carga los ítems aplicando los filtros indicados.
      */
-    loadAllItems(active: string, listTypeId?: number) {
+    loadAllItems(active: string, listTypeId?: string) {
         this.listItemService.getAll(active, listTypeId).subscribe({
             next: (items) => {
                 this.listItems = items;
@@ -302,20 +303,87 @@ export class ListItemComponent implements OnInit {
     // ----- Tipos -----
     /** Abre el formulario para crear un nuevo tipo */
     openTypeDialog() {
-        this.typeForm.reset();
+        this.typeForm.reset({
+            id: '',
+            code: '',
+            name: '',
+            description: ''
+        });
         this.typeDialogVisible = true;
     }
 
-    /** Guarda un nuevo tipo de lista */
+    /** Guarda un nuevo tipo de lista o actualiza uno existente */
     saveType() {
-        if (this.typeForm.invalid) return;
-        const typeForm = { ...this.typeForm.value };
-        if (typeForm.name) typeForm.name = toTitleCase(typeForm.name); // Convertir a Title Case
-        this.listTypeService.create(typeForm).subscribe({
-            // <--- Aquí!
-            next: () => {
+        if (this.typeForm.invalid) {
+            console.error('El formulario no es válido');
+            return;
+        }
+
+        const formValue = this.typeForm.value;
+        console.log('Datos del formulario:', formValue);
+        
+        // Determinar si es una edición o creación
+        const isEditing = !!formValue.id;
+        
+        // Crear objeto con los datos a enviar
+        const typeData: any = {
+            name: formValue.name ? toTitleCase(formValue.name) : '',
+            description: formValue.description || null,
+            code: formValue.code || null
+        };
+
+        // Solo agregar companyId si estamos creando un nuevo tipo
+        if (!isEditing) {
+            typeData.companyId = this.companyId;
+            console.log('Agregando companyId al nuevo tipo:', this.companyId);
+        } else {
+            console.log('Editando tipo existente con ID:', formValue.id);
+        }
+        
+        console.log('Operación:', isEditing ? 'Actualizando' : 'Creando');
+        console.log('ID del tipo:', formValue.id);
+        console.log('Datos a enviar:', typeData);
+
+        const operation = isEditing 
+            ? this.listTypeService.update(formValue.id, typeData)
+            : this.listTypeService.create(typeData);
+
+        operation.subscribe({
+            next: (result) => {
+                console.log('Operación exitosa:', result);
                 this.typeDialogVisible = false;
+                this.typeForm.reset({
+                    id: '',
+                    code: '',
+                    name: '',
+                    description: ''
+                });
                 this.loadListTypes();
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Éxito',
+                    detail: `Tipo de lista ${isEditing ? 'actualizado' : 'creado'} correctamente`,
+                    life: 3000
+                });
+            },
+            error: (error) => {
+                console.error('Error al guardar el tipo de lista:', error);
+                let errorMessage = 'Error al guardar el tipo de lista';
+                
+                if (error.error) {
+                    if (typeof error.error === 'string') {
+                        errorMessage = error.error;
+                    } else if (error.error.message) {
+                        errorMessage = error.error.message;
+                    }
+                }
+                
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: errorMessage,
+                    life: 5000
+                });
             }
         });
     }
@@ -324,7 +392,14 @@ export class ListItemComponent implements OnInit {
      * Carga en el formulario el tipo seleccionado para editarlo.
      */
     editType(type: ListType) {
-        this.typeForm.patchValue(type);
+        console.log('Editando tipo de lista:', type);
+        this.typeForm.reset();
+        this.typeForm.patchValue({
+            id: type.id,
+            name: type.name,
+            description: type.description || '',
+            code: type.code || ''
+        });
         this.typeDialogVisible = true;
     }
 
@@ -339,6 +414,16 @@ export class ListItemComponent implements OnInit {
      * Elimina un tipo de lista específico.
      */
     deleteType(type: ListType) {
+        if (!type.id) {
+            console.error('No se puede eliminar: ID no proporcionado');
+            this.messageService.add({ 
+                severity: 'error', 
+                summary: 'Error', 
+                detail: 'No se pudo eliminar: ID no válido' 
+            });
+            return;
+        }
+
         this.confirmationService.confirm({
             message: `¿Seguro que deseas eliminar "${type.name}"?`,
             header: 'Eliminar Tipo de Lista',
@@ -346,13 +431,22 @@ export class ListItemComponent implements OnInit {
             acceptLabel: 'Sí, eliminar',
             rejectLabel: 'Cancelar',
             accept: () => {
-                this.listTypeService.delete(type.id).subscribe({
+                this.listTypeService.delete(type.id as string).subscribe({
                     next: () => {
-                        this.messageService.add({ severity: 'success', summary: 'Eliminado', detail: 'Tipo de lista eliminado' });
+                        this.messageService.add({ 
+                            severity: 'success', 
+                            summary: 'Eliminado', 
+                            detail: 'Tipo de lista eliminado' 
+                        });
                         this.loadListTypes();
                     },
-                    error: () => {
-                        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudo eliminar el tipo de lista' });
+                    error: (error) => {
+                        console.error('Error al eliminar tipo de lista:', error);
+                        this.messageService.add({ 
+                            severity: 'error', 
+                            summary: 'Error', 
+                            detail: error.error?.message || 'No se pudo eliminar el tipo de lista' 
+                        });
                     }
                 });
             }
