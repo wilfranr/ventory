@@ -33,13 +33,18 @@ export class SelectCompanyComponent implements OnInit {
     }
 
     selectCompany(companyId: string): void {
+        // Guardar el companyId en localStorage para que esté disponible globalmente
+        localStorage.setItem('userCompanyId', companyId);
+        console.log('[SelectCompany] CompanyId guardado en localStorage:', companyId);
+        
         this.companyContextService.setActiveCompany(companyId);
         
         // Obtener los datos de la empresa seleccionada y actualizar la sesión
         this.companyService.getSettings(companyId).subscribe({
             next: (settings) => {
                 // Actualizar la sesión con los datos de la empresa seleccionada
-                this.sessionService.updateCompany(settings.name, settings.logo || null);
+                this.sessionService.updateCompany(settings.name, settings.logo || null, companyId);
+                console.log('[SelectCompany] Sesión actualizada con empresa:', settings.name);
             },
             error: (error) => {
                 console.error('Error al obtener datos de la empresa:', error);

@@ -21,6 +21,7 @@ import { ConfigModule } from '@nestjs/config';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { CompanyFilterInterceptor } from './common/interceptors/company-filter.interceptor';
+import { AssetsModule } from './assets/assets.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { CompanyFilterInterceptor } from './common/interceptors/company-filter.i
     ListTypeModule,
     GeonamesModule,
     ThirdPartiesModule,
+    AssetsModule,
   ],
   controllers: [AppController, RolesController, CompanyController],
   providers: [

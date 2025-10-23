@@ -5,15 +5,15 @@ import slugify from "slugify";
 const prisma = new PrismaClient();
 
 async function main() {
-  const companyId = await seedCompany(); // Create company first
+  const companyId = await seedCompany();
   if (companyId) {
-    await seedPermissionsAndRoles(companyId); // Then seed permissions and roles for that company
-    await seedSuperadminUser(companyId); // Finally, create the superadmin user
+    await seedPermissionsAndRoles(companyId);
+    await seedSuperadminUser(companyId);
   }
 }
 
 async function seedPermissionsAndRoles(companyId: string) {
-  // 🧩 Crear permisos base
+  // --- AJUSTE 2: Añadir nuevos permisos para Activos ---
   const permissions = [
     "crear_usuario",
     "ver_usuarios",
@@ -30,6 +30,11 @@ async function seedPermissionsAndRoles(companyId: string) {
     "ver_orden_trabajo",
     "editar_orden_trabajo",
     "modificar_parametros_empresa",
+    // Nuevos permisos
+    "crear_activo",
+    "ver_activos",
+    "editar_activo",
+    "eliminar_activo",
   ];
 
   for (const name of permissions) {
@@ -40,13 +45,14 @@ async function seedPermissionsAndRoles(companyId: string) {
     });
   }
 
-  // 🧩 Crear roles base
+  // --- AJUSTE 3: Añadir rol faltante ---
   const roles = [
     "superadmin",
     "admin",
     "vendedor",
     "logistica",
     "propietario",
+    "analistaPartes", // Rol añadido
   ];
 
   for (const name of roles) {
@@ -65,9 +71,9 @@ async function seedPermissionsAndRoles(companyId: string) {
     });
   }
 
-  // 🛡️ Asignar permisos a cada rol
+  // --- AJUSTE 3: Asignar nuevos permisos a los roles ---
   const rolePermissionsMap: Record<string, string[]> = {
-    superadmin: permissions,
+    superadmin: permissions, // Superadmin tiene todos los permisos
     admin: [
       "crear_usuario",
       "ver_usuarios",
@@ -80,6 +86,11 @@ async function seedPermissionsAndRoles(companyId: string) {
       "ver_pedidos",
       "editar_pedido",
       "aprobar_pedido",
+      // Permisos de activos para admin
+      "crear_activo",
+      "ver_activos",
+      "editar_activo",
+      "eliminar_activo",
     ],
     vendedor: [
       "crear_pedido",
@@ -88,8 +99,8 @@ async function seedPermissionsAndRoles(companyId: string) {
       "aprobar_pedido",
       "rechazar_pedido",
     ],
-    analistaPartes: ["ver_pedidos", "editar_pedido"],
-    logistica: ["ver_orden_trabajo", "editar_orden_trabajo"],
+    analistaPartes: ["ver_pedidos", "editar_pedido", "ver_activos"], // Puede ver activos
+    logistica: ["ver_orden_trabajo", "editar_orden_trabajo", "ver_activos"], // Puede ver activos
     propietario: [
       "crear_usuario",
       "ver_usuarios",
@@ -103,13 +114,18 @@ async function seedPermissionsAndRoles(companyId: string) {
       "editar_pedido",
       "aprobar_pedido",
       "modificar_parametros_empresa",
+      // Permisos de activos para propietario
+      "crear_activo",
+      "ver_activos",
+      "editar_activo",
+      "eliminar_activo",
     ],
   };
 
-  for (const roleName of roles) {
+  for (const roleName of Object.keys(rolePermissionsMap)) {
     const role = await prisma.role.findUnique({
       where: {
-        name_companyId: { // Use compound unique input
+        name_companyId: {
           name: roleName,
           companyId: companyId,
         },
@@ -118,11 +134,8 @@ async function seedPermissionsAndRoles(companyId: string) {
     if (!role) continue;
 
     const permissionNames = rolePermissionsMap[roleName] || [];
-
     const rolePermissions = await prisma.permission.findMany({
-      where: {
-        name: { in: permissionNames },
-      },
+      where: { name: { in: permissionNames } },
     });
 
     await prisma.role.update({
@@ -156,6 +169,8 @@ async function seedCompany(): Promise<string | undefined> {
       address: "Calle 123",
       phones: "3001234567",
       website: "https://ventory.com",
+      // --- AJUSTE 1: Activar el módulo de activos para esta empresa ---
+      hasAssetTrackingModule: true,
     },
   });
 
@@ -178,13 +193,17 @@ async function seedSuperadminUser(companyId: string) {
   });
 
   if (!superadminRole) {
-    console.error("Error: Rol 'superadmin' no encontrado para crear el usuario.");
+    console.error(
+      "Error: Rol 'superadmin' no encontrado para crear el usuario.",
+    );
     return;
   }
 
   const existingUser = await prisma.user.findUnique({ where: { email } });
   if (existingUser) {
-    console.log("El usuario superadmin ya existe. Creación de usuario cancelada.");
+    console.log(
+      "El usuario superadmin ya existe. Creación de usuario cancelada.",
+    );
     return;
   }
 
@@ -209,3 +228,4 @@ main()
   .finally(async () => {
     await prisma.$disconnect();
   });
+

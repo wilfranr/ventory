@@ -21,7 +21,9 @@ type CompanyShort = {
   logo?: string | null;
 };
 type UserWithRoleAndCompany = User & {
-  role: Role | null;
+  role: (Role & {
+    permissions: Array<{ name: string }>;
+  }) | null;
   company?: CompanyShort;
 };
 
@@ -63,11 +65,15 @@ export class AuthService {
    */
 
   login = async (user: UserWithRoleAndCompany) => {
+    // Obtener permisos del usuario
+    const permissions = user.role?.permissions?.map(p => p.name) || [];
+    
     const payload = {
       sub: user.id,
       email: user.email,
-      role: user.role?.name, // <- SOLO el nombre del rol como string
+      role: user.role?.name,
       companyId: user.company?.id || null,
+      permissions, // Incluir los permisos en el payload
     };
     const accessToken = this.jwtService.sign(payload, { expiresIn: "15m" });
     const refreshToken = this.jwtService.sign(payload, { expiresIn: "7d" });

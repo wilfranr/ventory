@@ -1,5 +1,6 @@
 import { Type } from "class-transformer";
 import {
+  IsBoolean,
   IsEmail,
   IsNumber,
   IsOptional,
@@ -53,4 +54,8 @@ export class UpdateCompanySettingsDto {
   @IsOptional()
   @IsString()
   logo?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  hasAssetTrackingModule?: boolean;
 }

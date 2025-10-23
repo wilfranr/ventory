@@ -30,7 +30,15 @@ export class UsersController {
    */
   @Get()
   async findAll(@ActiveCompanyId() companyId: string) {
-    return this.usersService.findAll(companyId);
+    console.log('[UsersController] findAll - companyId:', companyId);
+    try {
+      const users = await this.usersService.findAll(companyId);
+      console.log('[UsersController] Usuarios encontrados:', users.length);
+      return users;
+    } catch (error) {
+      console.error('[UsersController] Error en findAll:', error);
+      throw error;
+    }
   }
 
   @Permissions("editar_usuario")

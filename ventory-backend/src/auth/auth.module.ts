@@ -22,6 +22,7 @@ import { PrismaModule } from "../prisma/prisma.module";
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy],
+  exports: [AuthService, JwtStrategy],
 })
 /**
  * Define el módulo de autenticación de la aplicación.

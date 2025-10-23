@@ -4,6 +4,10 @@
   "description": "Proyecto full-stack con Angular + Nestjs.",
   "main": "index.js",
   "scripts": {
+    "backup:start": "node start-backup-service.js",
+    "backup:create": "node -e \"require('./ventory-backend/scripts/backup-db').createBackup()\"",
+    "backup:restore": "node restore-backup.js",
+    "backup:list": "node -e \"require('./ventory-backend/scripts/backup-db').listBackups()\"",
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "concurrently \"cd ventory-frontend && npm run start\" \"cd ventory-backend && npm run start:dev\""
   },

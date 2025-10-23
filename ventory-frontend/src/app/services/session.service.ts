@@ -35,7 +35,7 @@ export class SessionService {
         }
     }
 
-    updateCompany(name: string | null, logoUrl: string | null) {
+    updateCompany(name: string | null, logoUrl: string | null, companyId?: string | null) {
         this.companyNameSub.next(name);
         this.logoUrlSub.next(logoUrl);
 
@@ -46,6 +46,11 @@ export class SessionService {
                 if (user.company) {
                     user.company.name = name;
                     user.company.logo = logoUrl;
+                    if (companyId) {
+                        user.company.id = companyId;
+                    }
+                } else if (companyId) {
+                    user.company = { id: companyId, name, logo: logoUrl };
                 }
                 localStorage.setItem('user', JSON.stringify(user));
             } catch {}

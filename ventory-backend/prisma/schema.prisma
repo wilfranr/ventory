@@ -10,6 +10,18 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// Registro de respaldos
+model BackupLog {
+  id        String   @id @default(cuid())
+  fileName  String   // Nombre del archivo de respaldo
+  filePath  String   // Ruta completa del archivo
+  size      BigInt?  // Tamaño del archivo en bytes
+  status    String   // Estado del respaldo (COMPLETED, FAILED)
+  error     String?  // Mensaje de error en caso de fallo
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 // Usuarios del sistema
 model User {
   id            String   @id @default(cuid()) // identificador único
@@ -45,7 +57,7 @@ model Company {
   department         String?             // Departamento/Estado de la empresa
   city               String?             // Ciudad de la empresa
 
-  // 🎨 Configuración de estilos de la empresa
+  //Configuración de estilos de la empresa
   themePreset        String?             // preset del tema (Aura, Lara, Nora)
   themePrimary       String?             // color primario del tema
   themeSurface       String?             // color de superficie del tema
@@ -59,7 +71,10 @@ model Company {
   thirdParties       ThirdParty[]        // terceros asociados a esta empresa
   clients            Client[]            // clientes asociados a esta empresa
   providers          Provider[]          // proveedores asociados a esta empresa
+  hasAssetTrackingModule Boolean @default(false) // indica si tiene activo el módulo de seguimiento de activos
+  assets               Asset[]  // activos asociados a la empresa
   createdAt          DateTime            @default(now()) // fecha de creación
+
 }
 
 // Tokens de registro utilizados para invitar a nuevos usuarios
@@ -108,6 +123,9 @@ model ListItem {
   createdAt   DateTime @default(now()) // fecha de creación
   updatedAt   DateTime @updatedAt // fecha de actualización
 
+  assetAsType Asset[] @relation("AssetType")
+  assetAsStatus Asset[] @relation("AssetStatus")
+
   @@index([listTypeId])
   @@index([companyId])
 }
@@ -144,6 +162,8 @@ model ThirdParty {
   // Relaciones de Rol (Opcionales, One-to-One)
   client   Client?
   provider Provider?
+
+  assets   Asset[]  // Activos asociados a este tercero
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -188,3 +208,34 @@ model Provider {
   createdAt      DateTime    @default(now())
   updatedAt      DateTime    @updatedAt
 }
+
+// Modelo assets para gestión de activos
+model Asset {
+    id          String      @id @default(cuid())
+    serialNumber String
+    brand       String?
+    model       String?
+    installDate DateTime?
+    notes       String?
+
+    //Relación Multi-Tenant; Cada activo pertenece a una empresa
+    companyId   String
+    company     Company     @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+    //Relación con el tercero (propietario o proveedor)
+    thirdPartyId String
+    thirdParty   ThirdParty  @relation(fields: [thirdPartyId], references: [id], onDelete: Restrict)
+
+    //relaciones nombradas: Se conecta con ListItem para definir tipo y estado del activo
+    assetTypeId  String
+    assetType    ListItem   @relation("AssetType", fields: [assetTypeId], references: [id], onDelete: Restrict)
+    statusId     String
+    status      ListItem   @relation("AssetStatus", fields: [statusId], references: [id], onDelete: Restrict)
+
+    createdAt   DateTime    @default(now())
+    updatedAt   DateTime    @updatedAt
+
+    //Regla de negocio: El número de serie debe ser único dentro de cada empresa
+    @@unique([serialNumber, companyId])
+    @@map("assets")
+  }

@@ -32,8 +32,14 @@ export class AuthService {
                 // Actualiza el SessionService con los datos de la empresa
                 this.session.updateCompany(
                     res.user?.company?.name || null,
-                    res.user?.company?.logo || null
+                    res.user?.company?.logo || null,
+                    res.user?.company?.id || null
                 );
+                
+                // Guarda el companyId en localStorage para el interceptor
+                if (res.user?.company?.id) {
+                    localStorage.setItem('userCompanyId', res.user.company.id);
+                }
 
                 if (this.hasRole('superadmin')) {
                     this.router.navigate(['/select-company']);
@@ -56,7 +62,12 @@ export class AuthService {
     }
 
     logout() {
-        const userId = Number(localStorage.getItem('userId'));
+        const userId = localStorage.getItem('userId');
+        if (!userId) {
+            this.limpiarStorageYSalir();
+            return;
+        }
+        
         this.http.post(`${this.baseUrl}/logout`, { userId }).subscribe({
             next: () => {
                 // Opcional: mostrar mensaje de "Sesión cerrada correctamente"
